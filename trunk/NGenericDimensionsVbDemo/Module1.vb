@@ -5,7 +5,3 @@
     End Sub
 
 End Module
-
-Public Class ExampleUsingNumericExtensions
-
-End Class
