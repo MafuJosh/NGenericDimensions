@@ -1,4 +1,4 @@
-# NGenericDimensions
+# NGenericDimensions™
 
 ## Project Description
 NGenericDimensions™ is an experiment at creating a .NET library for attempting to represent quantities along with their units of measure, as generic dimensions like length, mass, etc., with compile time safety, lightweight value types, and some operator overloading.
