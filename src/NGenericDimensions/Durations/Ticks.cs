@@ -9,7 +9,7 @@ using System.ComponentModel;
 namespace NGenericDimensions.Durations
 {
 
-    public class Ticks : StandardDurationUnitOfMeasure
+    public class Ticks : StandardDurationUnitOfMeasure, IDefinedUnitOfMeasure
     {
 
         protected override double GetMultiplier(bool stayWithinFamily)
@@ -17,6 +17,13 @@ namespace NGenericDimensions.Durations
             return 1;
         }
 
+        public override string UnitSymbol
+        {
+            get
+            {
+                return "ticks";
+            }
+        }
     }
 
 }
@@ -35,13 +42,13 @@ namespace NGenericDimensions.Extensions
         //End Function
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static T TicksValue<T>(this Duration<Durations.Ticks, T> duration) where T : struct, IComparable, IConvertible
+        public static T TicksValue<T>(this Duration<Durations.Ticks, T> duration) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return duration.DurationValue;
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static Nullable<T> TicksValue<T>(this Nullable<Duration<Durations.Ticks, T>> duration) where T : struct, IComparable, IConvertible
+        public static Nullable<T> TicksValue<T>(this Nullable<Duration<Durations.Ticks, T>> duration) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             if (duration.HasValue)
             {

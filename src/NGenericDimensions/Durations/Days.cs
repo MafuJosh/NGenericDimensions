@@ -9,7 +9,7 @@ using System.ComponentModel;
 namespace NGenericDimensions.Durations
 {
 
-    public class Days : StandardDurationUnitOfMeasure
+    public class Days : StandardDurationUnitOfMeasure, IDefinedUnitOfMeasure
     {
 
         protected override double GetMultiplier(bool stayWithinFamily)
@@ -17,6 +17,13 @@ namespace NGenericDimensions.Durations
             return 864000000000L;
         }
 
+        public override string UnitSymbol
+        {
+            get
+            {
+                return "d";
+            }
+        }
     }
 
 }
@@ -28,13 +35,13 @@ namespace NGenericDimensions.Extensions
     {
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static T DaysValue<T>(this Duration<Durations.Days, T> duration) where T : struct, IComparable, IConvertible
+        public static T DaysValue<T>(this Duration<Durations.Days, T> duration) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return duration.DurationValue;
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static Nullable<T> DaysValue<T>(this Nullable<Duration<Durations.Days, T>> duration) where T : struct, IComparable, IConvertible
+        public static Nullable<T> DaysValue<T>(this Nullable<Duration<Durations.Days, T>> duration) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             if (duration.HasValue)
             {
@@ -47,11 +54,11 @@ namespace NGenericDimensions.Extensions
         }
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static Speed<TUnitOfMeasure, Durations.Days, TDataType> day<TUnitOfMeasure, TDataType>(this LengthPerExtension<TUnitOfMeasure, TDataType> length)
-            where TUnitOfMeasure : Lengths.Length1DUnitOfMeasure
-            where TDataType : struct, IComparable, IConvertible
+        public static Speed<TUnitOfMeasure, Durations.Days, TDataType> day<TUnitOfMeasure, TDataType>(this DimensionPerExtension<Length<TUnitOfMeasure, TDataType>> length)
+            where TUnitOfMeasure : Lengths.Length1DUnitOfMeasure, IDefinedUnitOfMeasure
+            where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
         {
-            return length.Length.LengthValue;
+            return length.PerValue.LengthValue;
         }
 
     }
@@ -65,7 +72,7 @@ namespace NGenericDimensions.Extensions.Numbers
     {
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static Duration<Durations.Days, T> days<T>(this T duration) where T : struct, IComparable, IConvertible
+        public static Duration<Durations.Days, T> days<T>(this T duration) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return duration;
         }

@@ -7,11 +7,12 @@ using System.Data;
 using System.Diagnostics;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using NGenericDimensions.MetricPrefix;
 
 namespace NGenericDimensions
 {
 
-    public interface ILength : IDimension
+    public interface ILength : IDimension, IDimensionSupportsPerExtension
     {
         Lengths.Length1DUnitOfMeasure UnitOfMeasure { get; }
     }
@@ -21,12 +22,10 @@ namespace NGenericDimensions
     }
 
     public struct Length<TUnitOfMeasure, TDataType> : ILength<TUnitOfMeasure>
-        where TUnitOfMeasure : Lengths.Length1DUnitOfMeasure
-        where TDataType : struct, IComparable, IConvertible
+        where TUnitOfMeasure : Lengths.Length1DUnitOfMeasure, IDefinedUnitOfMeasure
+        where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
     {
-
-
-        private TDataType mLength;
+        #region Constructors
         public Length(TDataType length)
         {
             mLength = length;
@@ -39,8 +38,12 @@ namespace NGenericDimensions
 
         public Length(ILength lengthToConvertFrom)
         {
-            mLength = (TDataType)(object)(lengthToConvertFrom.Value * lengthToConvertFrom.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1));
+            mLength = (TDataType)(Convert.ChangeType(lengthToConvertFrom.Value * lengthToConvertFrom.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1), typeof(TDataType)));
         }
+        #endregion
+
+        #region Value
+        private TDataType mLength;
 
         [EditorBrowsable(EditorBrowsableState.Always)]
         public TDataType LengthValue
@@ -48,35 +51,46 @@ namespace NGenericDimensions
             get { return mLength; }
         }
 
+        private double ValueAsDouble
+        {
+            get { return Convert.ToDouble((object)mLength); }
+        }
+        double IDimension.Value
+        {
+            get { return ValueAsDouble; }
+        }
+        #endregion
+
+        #region UnitOfMeasure
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public TUnitOfMeasure UnitOfMeasure
         {
             get { return UnitOfMeasureGlobals<TUnitOfMeasure>.GlobalInstance; }
         }
 
-        private Lengths.Length1DUnitOfMeasure UnitOfMeasure1
+        Lengths.Length1DUnitOfMeasure ILength.UnitOfMeasure
         {
             get { return UnitOfMeasure; }
         }
-        Lengths.Length1DUnitOfMeasure ILength.UnitOfMeasure
-        {
-            get { return UnitOfMeasure1; }
-        }
+        #endregion
 
+        #region ConvertTo
         [EditorBrowsable(EditorBrowsableState.Always)]
         public Length<TNewUnitOfMeasure, TNewDataType> ConvertTo<TNewUnitOfMeasure, TNewDataType>()
-            where TNewUnitOfMeasure : Lengths.Length1DUnitOfMeasure
-            where TNewDataType : struct, IComparable, IConvertible
+            where TNewUnitOfMeasure : Lengths.Length1DUnitOfMeasure, IDefinedUnitOfMeasure
+            where TNewDataType : struct, IComparable, IFormattable, IComparable<TNewDataType>, IEquatable<TNewDataType>
         {
-            return (TNewDataType)(object)(ValueAsDouble * UnitOfMeasure1.GetCompleteMultiplier<TNewUnitOfMeasure>(1));
+            return new Length<TNewUnitOfMeasure, TNewDataType>(this);
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public Length<TUnitOfMeasure, TNewDataType> ConvertTo<TNewDataType>() where TNewDataType : struct, IComparable, IConvertible
+        public Length<TUnitOfMeasure, TNewDataType> ConvertTo<TNewDataType>() where TNewDataType : struct, IComparable, IFormattable, IComparable<TNewDataType>, IEquatable<TNewDataType>
         {
-            return (TNewDataType)(object)mLength;
+            return new Length<TUnitOfMeasure, TNewDataType>(this);
         }
+        #endregion
 
+        #region Casting Operators
         public static implicit operator Length<TUnitOfMeasure, TDataType>(TDataType length)
         {
             return new Length<TUnitOfMeasure, TDataType>(length);
@@ -86,7 +100,9 @@ namespace NGenericDimensions
         {
             return length.mLength;
         }
+        #endregion
 
+        #region + Operators
         public static Length<TUnitOfMeasure, TDataType> operator +(Length<TUnitOfMeasure, TDataType> length1, Length<TUnitOfMeasure, TDataType> length2)
         {
             return new Length<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Add(length1.mLength, length2.mLength));
@@ -96,7 +112,9 @@ namespace NGenericDimensions
         {
             return length1.ValueAsDouble + (length2.Value * length2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1));
         }
+        #endregion
 
+        #region - Operators
         public static Length<TUnitOfMeasure, TDataType> operator -(Length<TUnitOfMeasure, TDataType> length1, Length<TUnitOfMeasure, TDataType> length2)
         {
             return new Length<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Subtract(length1.mLength, length2.mLength));
@@ -106,7 +124,9 @@ namespace NGenericDimensions
         {
             return length1.ValueAsDouble - (length2.Value * length2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1));
         }
+        #endregion
 
+        #region * Operators
         public static Length<TUnitOfMeasure, TDataType> operator *(TDataType length1, Length<TUnitOfMeasure, TDataType> length2)
         {
             return new Length<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Multiply(length1, length2.mLength));
@@ -146,15 +166,32 @@ namespace NGenericDimensions
         {
             return length2.ValueAsDouble * (area1.Value * area1.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2));
         }
+        #endregion
 
+        #region / Operators
         public static Length<TUnitOfMeasure, double> operator /(Length<TUnitOfMeasure, TDataType> length1, double length2)
         {
             return new Length<TUnitOfMeasure, double>(Convert.ToDouble((object)length1.mLength) / length2);
         }
 
-        public static double operator /(Length<TUnitOfMeasure, TDataType> length1, Length<TUnitOfMeasure, TDataType> length2)
+        public static Length<TUnitOfMeasure, double> operator /(Length<TUnitOfMeasure, TDataType> length1, decimal length2)
         {
-            return length1.ValueAsDouble / length2.ValueAsDouble;
+            return new Length<TUnitOfMeasure, double>(Convert.ToDouble((object)length1.mLength) / Convert.ToDouble(length2));
+        }
+        
+        public static Length<TUnitOfMeasure, double> operator /(Length<TUnitOfMeasure, TDataType> length1, Int64 length2)
+        {
+            return new Length<TUnitOfMeasure, double>(Convert.ToDouble((object)length1.mLength) / length2);
+        }
+
+        public static double operator /(Length<TUnitOfMeasure, TDataType> length1, ILength length2)
+        {
+            return length1.ValueAsDouble / length2.Value;
+        }
+
+        public static Length<TUnitOfMeasure, double> operator /(IArea area1, Length<TUnitOfMeasure, TDataType> length2)
+        {
+            return new Length<TUnitOfMeasure, double>((new Area<TUnitOfMeasure, double>(area1)).AreaValue / length2.ValueAsDouble);
         }
 
         public static Speed<TUnitOfMeasure, Durations.Days, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Days> duration2)
@@ -182,6 +219,106 @@ namespace NGenericDimensions
             return new Speed<TUnitOfMeasure, Durations.Seconds, double>(length1, duration2);
         }
 
+        public static Speed<TUnitOfMeasure, Durations.Seconds<Deca>, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Seconds<Deca>> duration2)
+        {
+            return new Speed<TUnitOfMeasure, Durations.Seconds<Deca>, double>(length1, duration2);
+        }
+
+        public static Speed<TUnitOfMeasure, Durations.Seconds<Hecto>, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Seconds<Hecto>> duration2)
+        {
+            return new Speed<TUnitOfMeasure, Durations.Seconds<Hecto>, double>(length1, duration2);
+        }
+
+        public static Speed<TUnitOfMeasure, Durations.Seconds<Kilo>, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Seconds<Kilo>> duration2)
+        {
+            return new Speed<TUnitOfMeasure, Durations.Seconds<Kilo>, double>(length1, duration2);
+        }
+
+        public static Speed<TUnitOfMeasure, Durations.Seconds<Mega>, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Seconds<Mega>> duration2)
+        {
+            return new Speed<TUnitOfMeasure, Durations.Seconds<Mega>, double>(length1, duration2);
+        }
+
+        public static Speed<TUnitOfMeasure, Durations.Seconds<Giga>, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Seconds<Giga>> duration2)
+        {
+            return new Speed<TUnitOfMeasure, Durations.Seconds<Giga>, double>(length1, duration2);
+        }
+
+        public static Speed<TUnitOfMeasure, Durations.Seconds<Tera>, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Seconds<Tera>> duration2)
+        {
+            return new Speed<TUnitOfMeasure, Durations.Seconds<Tera>, double>(length1, duration2);
+        }
+
+        public static Speed<TUnitOfMeasure, Durations.Seconds<Peta>, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Seconds<Peta>> duration2)
+        {
+            return new Speed<TUnitOfMeasure, Durations.Seconds<Peta>, double>(length1, duration2);
+        }
+
+        public static Speed<TUnitOfMeasure, Durations.Seconds<Exa>, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Seconds<Exa>> duration2)
+        {
+            return new Speed<TUnitOfMeasure, Durations.Seconds<Exa>, double>(length1, duration2);
+        }
+
+        public static Speed<TUnitOfMeasure, Durations.Seconds<Zetta>, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Seconds<Zetta>> duration2)
+        {
+            return new Speed<TUnitOfMeasure, Durations.Seconds<Zetta>, double>(length1, duration2);
+        }
+
+        public static Speed<TUnitOfMeasure, Durations.Seconds<Yotta>, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Seconds<Yotta>> duration2)
+        {
+            return new Speed<TUnitOfMeasure, Durations.Seconds<Yotta>, double>(length1, duration2);
+        }
+
+        public static Speed<TUnitOfMeasure, Durations.Seconds<Deci>, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Seconds<Deci>> duration2)
+        {
+            return new Speed<TUnitOfMeasure, Durations.Seconds<Deci>, double>(length1, duration2);
+        }
+
+        public static Speed<TUnitOfMeasure, Durations.Seconds<Centi>, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Seconds<Centi>> duration2)
+        {
+            return new Speed<TUnitOfMeasure, Durations.Seconds<Centi>, double>(length1, duration2);
+        }
+
+        public static Speed<TUnitOfMeasure, Durations.Seconds<Milli>, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Seconds<Milli>> duration2)
+        {
+            return new Speed<TUnitOfMeasure, Durations.Seconds<Milli>, double>(length1, duration2);
+        }
+
+        public static Speed<TUnitOfMeasure, Durations.Seconds<Micro>, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Seconds<Micro>> duration2)
+        {
+            return new Speed<TUnitOfMeasure, Durations.Seconds<Micro>, double>(length1, duration2);
+        }
+
+        public static Speed<TUnitOfMeasure, Durations.Seconds<Nano>, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Seconds<Nano>> duration2)
+        {
+            return new Speed<TUnitOfMeasure, Durations.Seconds<Nano>, double>(length1, duration2);
+        }
+
+        public static Speed<TUnitOfMeasure, Durations.Seconds<Pico>, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Seconds<Pico>> duration2)
+        {
+            return new Speed<TUnitOfMeasure, Durations.Seconds<Pico>, double>(length1, duration2);
+        }
+
+        public static Speed<TUnitOfMeasure, Durations.Seconds<Femto>, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Seconds<Femto>> duration2)
+        {
+            return new Speed<TUnitOfMeasure, Durations.Seconds<Femto>, double>(length1, duration2);
+        }
+
+        public static Speed<TUnitOfMeasure, Durations.Seconds<Atto>, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Seconds<Atto>> duration2)
+        {
+            return new Speed<TUnitOfMeasure, Durations.Seconds<Atto>, double>(length1, duration2);
+        }
+
+        public static Speed<TUnitOfMeasure, Durations.Seconds<Zepto>, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Seconds<Zepto>> duration2)
+        {
+            return new Speed<TUnitOfMeasure, Durations.Seconds<Zepto>, double>(length1, duration2);
+        }
+
+        public static Speed<TUnitOfMeasure, Durations.Seconds<Yocto>, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Seconds<Yocto>> duration2)
+        {
+            return new Speed<TUnitOfMeasure, Durations.Seconds<Yocto>, double>(length1, duration2);
+        }
+
         public static Speed<TUnitOfMeasure, Durations.Minutes, double> operator /(Length<TUnitOfMeasure, TDataType> length1, IDuration<Durations.Minutes> duration2)
         {
             return new Speed<TUnitOfMeasure, Durations.Minutes, double>(length1, duration2);
@@ -191,7 +328,9 @@ namespace NGenericDimensions
         {
             return new Speed<TUnitOfMeasure, Durations.Seconds, double>(length1, duration2);
         }
+        #endregion
 
+        #region == Operators
         public static bool operator ==(Length<TUnitOfMeasure, TDataType> length1, Length<TUnitOfMeasure, TDataType> length2)
         {
             return length1.mLength.CompareTo(length2.mLength) == 0;
@@ -201,7 +340,9 @@ namespace NGenericDimensions
         {
             return length1.ValueAsDouble.CompareTo(length2.Value * length2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) == 0;
         }
+        #endregion
 
+        #region != Operators
         public static bool operator !=(Length<TUnitOfMeasure, TDataType> length1, Length<TUnitOfMeasure, TDataType> length2)
         {
             return length1.mLength.CompareTo(length2.mLength) != 0;
@@ -211,7 +352,9 @@ namespace NGenericDimensions
         {
             return length1.ValueAsDouble.CompareTo(length2.Value * length2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) != 0;
         }
+        #endregion
 
+        #region > Operators
         public static bool operator >(Length<TUnitOfMeasure, TDataType> length1, Length<TUnitOfMeasure, TDataType> length2)
         {
             return length1.mLength.CompareTo(length2.mLength) > 0;
@@ -221,7 +364,9 @@ namespace NGenericDimensions
         {
             return length1.ValueAsDouble.CompareTo(length2.Value * length2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) > 0;
         }
+        #endregion
 
+        #region < Operators
         public static bool operator <(Length<TUnitOfMeasure, TDataType> length1, Length<TUnitOfMeasure, TDataType> length2)
         {
             return length1.mLength.CompareTo(length2.mLength) < 0;
@@ -231,7 +376,9 @@ namespace NGenericDimensions
         {
             return length1.ValueAsDouble.CompareTo(length2.Value * length2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) < 0;
         }
+        #endregion
 
+        #region >= Operators
         public static bool operator >=(Length<TUnitOfMeasure, TDataType> length1, Length<TUnitOfMeasure, TDataType> length2)
         {
             return length1.mLength.CompareTo(length2.mLength) >= 0;
@@ -241,7 +388,9 @@ namespace NGenericDimensions
         {
             return length1.ValueAsDouble.CompareTo(length2.Value * length2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) >= 0;
         }
+        #endregion
 
+        #region <= Operators
         public static bool operator <=(Length<TUnitOfMeasure, TDataType> length1, Length<TUnitOfMeasure, TDataType> length2)
         {
             return length1.mLength.CompareTo(length2.mLength) <= 0;
@@ -251,88 +400,46 @@ namespace NGenericDimensions
         {
             return length1.ValueAsDouble.CompareTo(length2.Value * length2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) <= 0;
         }
+        #endregion
 
-        private double ValueAsDouble
-        {
-            get { return Convert.ToDouble((object)mLength); }
-        }
-        double IDimension.Value
-        {
-            get { return ValueAsDouble; }
-        }
-
-        public Area<TUnitOfMeasure, TDataType> squared
+        #region squared, cubed
+        public Area<TUnitOfMeasure, TDataType> Squared
         {
             get { return Math.GenericOperatorMath<TDataType>.Multiply(mLength, mLength); }
         }
 
-        public Volume<TUnitOfMeasure, TDataType> cubed
+        public Volume<TUnitOfMeasure, TDataType> Cubed
         {
             get { return Math.GenericOperatorMath<TDataType>.Multiply(Math.GenericOperatorMath<TDataType>.Multiply(mLength, mLength), mLength); }
         }
+        #endregion
 
-    }
+        #region ToString
+        public override string ToString()
+        {
+            return UnitOfMeasure.ToString(mLength, null, null);
+        }
 
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct LengthSquareExtension<T> where T : struct, IComparable, IConvertible
-    {
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public T Area;
-    }
-
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct LengthPerExtension<TUnitOfMeasure, TDataType>
-        where TUnitOfMeasure : Lengths.Length1DUnitOfMeasure
-        where TDataType : struct, IComparable, IConvertible
-    {
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Length<TUnitOfMeasure, TDataType> Length;
+        public string ToString(string format, IFormatProvider formatProvider)
+        {
+            return UnitOfMeasure.ToString(mLength, format, formatProvider);
+        }
+        #endregion
     }
 }
 
 namespace NGenericDimensions.Extensions
 {
-
     public static class LengthExtensionMethods
     {
-
+        #region Nullable LengthValue
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static TDataType LengthValue<TUnitOfMeasure, TDataType>(this Nullable<Length<TUnitOfMeasure, TDataType>> length)
-            where TUnitOfMeasure : Lengths.Length1DUnitOfMeasure
-            where TDataType : struct, IComparable, IConvertible
+        public static TDataType? LengthValue<TUnitOfMeasure, TDataType>(this Length<TUnitOfMeasure, TDataType>? length)
+            where TUnitOfMeasure : Lengths.Length1DUnitOfMeasure, IDefinedUnitOfMeasure
+            where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
         {
-            return length.Value.LengthValue;
+            return length.HasValue ? length.Value.LengthValue : (TDataType?)null;
         }
-
-        [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static LengthPerExtension<TUnitOfMeasure, TDataType> per<TUnitOfMeasure, TDataType>(this Length<TUnitOfMeasure, TDataType> length)
-            where TUnitOfMeasure : Lengths.Length1DUnitOfMeasure
-            where TDataType : struct, IComparable, IConvertible
-        {
-            return new LengthPerExtension<TUnitOfMeasure, TDataType> { Length = length };
-        }
-
+        #endregion
     }
-}
-
-namespace NGenericDimensions.Extensions.Numbers
-{
-
-    public static class LengthNumberExtensionMethods
-    {
-
-        [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static LengthSquareExtension<T> square<T>(this T area) where T : struct, IComparable, IConvertible
-        {
-            return new LengthSquareExtension<T> { Area = area };
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static LengthVolumeExtension<T> cube<T>(this T volume) where T : struct, IComparable, IConvertible
-        {
-            return new LengthVolumeExtension<T> { Volume = volume };
-        }
-
-    }
-
 }

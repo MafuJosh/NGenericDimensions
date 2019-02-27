@@ -26,6 +26,21 @@ namespace NGenericDimensions.Lengths.Uscs
             return typeof(UscsLengthUnitOfMeasure).IsAssignableFrom(typeOfUnitOfMeasure);
         }
 
+        protected internal override string AreaUnitSymbol
+        {
+            get
+            {
+                return @"sq. " + UnitSymbol;
+            }
+        }
+
+        protected internal override string VolumeUnitSymbol
+        {
+            get
+            {
+                return @"cu. " + UnitSymbol;
+            }
+        }
     }
 
 }

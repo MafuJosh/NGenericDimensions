@@ -9,7 +9,7 @@ using System.ComponentModel;
 namespace NGenericDimensions.Lengths.Uscs
 {
 
-    public class Yards : UscsLengthUnitOfMeasure
+    public class Yards : UscsLengthUnitOfMeasure, IDefinedUnitOfMeasure
     {
 
         protected override double GetMultiplier(bool stayWithinFamily)
@@ -17,6 +17,13 @@ namespace NGenericDimensions.Lengths.Uscs
             return base.GetMultiplier(stayWithinFamily) * 3;
         }
 
+        public override string UnitSymbol
+        {
+            get
+            {
+                return "yd.";
+            }
+        }
     }
 
 }
@@ -28,13 +35,13 @@ namespace NGenericDimensions.Extensions
     {
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static T YardsValue<T>(this Length<Lengths.Uscs.Yards, T> length) where T : struct, IComparable, IConvertible
+        public static T YardsValue<T>(this Length<Lengths.Uscs.Yards, T> length) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return length.LengthValue;
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static Nullable<T> YardsValue<T>(this Nullable<Length<Lengths.Uscs.Yards, T>> length) where T : struct, IComparable, IConvertible
+        public static Nullable<T> YardsValue<T>(this Nullable<Length<Lengths.Uscs.Yards, T>> length) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             if (length.HasValue)
             {
@@ -47,17 +54,36 @@ namespace NGenericDimensions.Extensions
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static T SquareYardsValue<T>(this Area<Lengths.Uscs.Yards, T> area) where T : struct, IComparable, IConvertible
+        public static T SquareYardsValue<T>(this Area<Lengths.Uscs.Yards, T> area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return area.AreaValue;
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static Nullable<T> SquareYardsValue<T>(this Nullable<Area<Lengths.Uscs.Yards, T>> area) where T : struct, IComparable, IConvertible
+        public static Nullable<T> SquareYardsValue<T>(this Nullable<Area<Lengths.Uscs.Yards, T>> area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             if (area.HasValue)
             {
                 return area.Value.AreaValue;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static T CubeYardsValue<T>(this Volume<Lengths.Uscs.Yards, T> volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
+        {
+            return volume.VolumeValue;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static Nullable<T> CubeYardsValue<T>(this Nullable<Volume<Lengths.Uscs.Yards, T>> volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
+        {
+            if (volume.HasValue)
+            {
+                return volume.Value.VolumeValue;
             }
             else
             {
@@ -76,15 +102,21 @@ namespace NGenericDimensions.Extensions.Numbers
     {
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static Length<Lengths.Uscs.Yards, T> yards<T>(this T length) where T : struct, IComparable, IConvertible
+        public static Length<Lengths.Uscs.Yards, T> yards<T>(this T length) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return length;
         }
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static Area<Lengths.Uscs.Yards, T> yards<T>(this LengthSquareExtension<T> area) where T : struct, IComparable, IConvertible
+        public static Area<Lengths.Uscs.Yards, T> yards<T>(this DimensionSquareExtension<T> area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
-            return area.Area;
+            return area.SquaredValue;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static Volume<Lengths.Uscs.Yards, T> yards<T>(this DimensionCubeExtension<T> volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
+        {
+            return volume.CubedValue;
         }
 
     }

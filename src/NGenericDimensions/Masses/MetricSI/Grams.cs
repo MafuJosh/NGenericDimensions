@@ -10,7 +10,7 @@ using NGenericDimensions.MetricPrefix;
 namespace NGenericDimensions.Masses.MetricSI
 {
 
-    public class Grams : SIMassUnitOfMeasure
+    public class Grams : SIMassUnitOfMeasure, IDefinedUnitOfMeasure
     {
 
         protected override double GetMultiplier(bool stayWithinFamily)
@@ -18,9 +18,16 @@ namespace NGenericDimensions.Masses.MetricSI
             return 1;
         }
 
+        public override string UnitSymbol
+        {
+            get
+            {
+                return "g";
+            }
+        }
     }
 
-    public class Grams<T> : SIMassUnitOfMeasure where T : MetricPrefixBase
+    public class Grams<T> : SIMassUnitOfMeasure, IDefinedUnitOfMeasure where T : MetricPrefixBase
     {
 
         protected override double GetMultiplier(bool stayWithinFamily)
@@ -28,6 +35,28 @@ namespace NGenericDimensions.Masses.MetricSI
             return (double)UnitOfMeasureGlobals<T>.GlobalInstance.Multiplier;
         }
 
+        public override string UnitSymbol
+        {
+            get
+            {
+                return MetricPrefix.UnitSymbol + "g";
+            }
+        }
+
+        /// <summary>
+        /// Returns the simple name of the derived class.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return MetricPrefix.ToString() + "grams";
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public MetricPrefixBase MetricPrefix
+        {
+            get { return UnitOfMeasureGlobals<T>.GlobalInstance; }
+        }
     }
 
 }
@@ -39,13 +68,13 @@ namespace NGenericDimensions.Extensions
     {
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static T GramsValue<T>(this Mass<Masses.MetricSI.Grams, T> mass) where T : struct, IComparable, IConvertible
+        public static T GramsValue<T>(this Mass<Masses.MetricSI.Grams, T> mass) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return mass.MassValue;
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static Nullable<T> GramsValue<T>(this Nullable<Mass<Masses.MetricSI.Grams, T>> mass) where T : struct, IComparable, IConvertible
+        public static Nullable<T> GramsValue<T>(this Nullable<Mass<Masses.MetricSI.Grams, T>> mass) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             if (mass.HasValue)
             {
@@ -68,7 +97,7 @@ namespace NGenericDimensions.Extensions.Numbers
     {
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static Mass<Masses.MetricSI.Grams, T> grams<T>(this T mass) where T : struct, IComparable, IConvertible
+        public static Mass<Masses.MetricSI.Grams, T> grams<T>(this T mass) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return mass;
         }

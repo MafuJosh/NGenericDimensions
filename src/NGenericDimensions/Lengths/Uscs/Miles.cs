@@ -5,11 +5,12 @@ using System.Data;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.ComponentModel;
+using NGenericDimensions.Durations;
 
 namespace NGenericDimensions.Lengths.Uscs
 {
 
-    public class Miles : UscsLengthUnitOfMeasure
+    public class Miles : UscsLengthUnitOfMeasure, IDefinedUnitOfMeasure
     {
 
         protected override double GetMultiplier(bool stayWithinFamily)
@@ -17,6 +18,22 @@ namespace NGenericDimensions.Lengths.Uscs
             return base.GetMultiplier(stayWithinFamily) * 5280;
         }
 
+        public override string UnitSymbol
+        {
+            get
+            {
+                return "mi.";
+            }
+        }
+
+        protected override string DimensionUnitSymbol(IDimension dimension)
+        {
+            if (((ISpeed)dimension).DurationUnitOfMeasure == UnitOfMeasureGlobals<Hours>.GlobalInstance)
+            {
+                return "mph";
+            }
+            return base.DimensionUnitSymbol(dimension);
+        }
     }
 
 }
@@ -28,13 +45,13 @@ namespace NGenericDimensions.Extensions
     {
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static T MilesValue<T>(this Length<Lengths.Uscs.Miles, T> length) where T : struct, IComparable, IConvertible
+        public static T MilesValue<T>(this Length<Lengths.Uscs.Miles, T> length) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return length.LengthValue;
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static Nullable<T> MilesValue<T>(this Nullable<Length<Lengths.Uscs.Miles, T>> length) where T : struct, IComparable, IConvertible
+        public static Nullable<T> MilesValue<T>(this Nullable<Length<Lengths.Uscs.Miles, T>> length) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             if (length.HasValue)
             {
@@ -47,17 +64,36 @@ namespace NGenericDimensions.Extensions
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static T SquareMilesValue<T>(this Area<Lengths.Uscs.Miles, T> area) where T : struct, IComparable, IConvertible
+        public static T SquareMilesValue<T>(this Area<Lengths.Uscs.Miles, T> area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return area.AreaValue;
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static Nullable<T> SquareMilesValue<T>(this Nullable<Area<Lengths.Uscs.Miles, T>> area) where T : struct, IComparable, IConvertible
+        public static Nullable<T> SquareMilesValue<T>(this Nullable<Area<Lengths.Uscs.Miles, T>> area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             if (area.HasValue)
             {
                 return area.Value.AreaValue;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static T CubeMilesValue<T>(this Volume<Lengths.Uscs.Miles, T> volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
+        {
+            return volume.VolumeValue;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static Nullable<T> CubeMilesValue<T>(this Nullable<Volume<Lengths.Uscs.Miles, T>> volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
+        {
+            if (volume.HasValue)
+            {
+                return volume.Value.VolumeValue;
             }
             else
             {
@@ -76,15 +112,21 @@ namespace NGenericDimensions.Extensions.Numbers
     {
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static Length<Lengths.Uscs.Miles, T> miles<T>(this T length) where T : struct, IComparable, IConvertible
+        public static Length<Lengths.Uscs.Miles, T> miles<T>(this T length) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return length;
         }
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static Area<Lengths.Uscs.Miles, T> miles<T>(this LengthSquareExtension<T> area) where T : struct, IComparable, IConvertible
+        public static Area<Lengths.Uscs.Miles, T> miles<T>(this DimensionSquareExtension<T> area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
-            return area.Area;
+            return area.SquaredValue;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static Volume<Lengths.Uscs.Miles, T> miles<T>(this DimensionCubeExtension<T> volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
+        {
+            return volume.CubedValue;
         }
 
     }

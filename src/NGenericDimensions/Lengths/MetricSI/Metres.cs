@@ -10,7 +10,7 @@ using NGenericDimensions.MetricPrefix;
 namespace NGenericDimensions.Lengths.MetricSI
 {
 
-    public class Metres : SILengthUnitOfMeasure
+    public class Metres : SILengthUnitOfMeasure, IDefinedUnitOfMeasure
     {
 
         protected override double GetMultiplier(bool stayWithinFamily)
@@ -18,9 +18,16 @@ namespace NGenericDimensions.Lengths.MetricSI
             return 1;
         }
 
+        public override string UnitSymbol
+        {
+            get
+            {
+                return "m";
+            }
+        }
     }
 
-    public class Metres<T> : SILengthUnitOfMeasure where T : MetricPrefixBase
+    public class Metres<T> : SILengthUnitOfMeasure, IDefinedUnitOfMeasure where T : MetricPrefixBase
     {
 
         protected override double GetMultiplier(bool stayWithinFamily)
@@ -28,6 +35,28 @@ namespace NGenericDimensions.Lengths.MetricSI
             return (double)(UnitOfMeasureGlobals<T>.GlobalInstance.Multiplier);
         }
 
+        public override string UnitSymbol
+        {
+            get
+            {
+                return MetricPrefix.UnitSymbol + "m";
+            }
+        }
+
+        /// <summary>
+        /// Returns the simple name of the derived class.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return MetricPrefix.ToString() + "metres";
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public MetricPrefixBase MetricPrefix
+        {
+            get { return UnitOfMeasureGlobals<T>.GlobalInstance; }
+        }
     }
 
 }
@@ -39,13 +68,13 @@ namespace NGenericDimensions.Extensions
     {
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static T MetresValue<T>(this Length<Lengths.MetricSI.Metres, T> length) where T : struct, IComparable, IConvertible
+        public static T MetresValue<T>(this Length<Lengths.MetricSI.Metres, T> length) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return length.LengthValue;
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static Nullable<T> MetresValue<T>(this Nullable<Length<Lengths.MetricSI.Metres, T>> length) where T : struct, IComparable, IConvertible
+        public static Nullable<T> MetresValue<T>(this Nullable<Length<Lengths.MetricSI.Metres, T>> length) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             if (length.HasValue)
             {
@@ -58,17 +87,36 @@ namespace NGenericDimensions.Extensions
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static T SquareMetresValue<T>(this Area<Lengths.MetricSI.Metres, T> area) where T : struct, IComparable, IConvertible
+        public static T SquareMetresValue<T>(this Area<Lengths.MetricSI.Metres, T> area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return area.AreaValue;
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static Nullable<T> SquareMetresValue<T>(this Nullable<Area<Lengths.MetricSI.Metres, T>> area) where T : struct, IComparable, IConvertible
+        public static Nullable<T> SquareMetresValue<T>(this Nullable<Area<Lengths.MetricSI.Metres, T>> area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             if (area.HasValue)
             {
                 return area.Value.AreaValue;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static T CubeMetresValue<T>(this Volume<Lengths.MetricSI.Metres, T> volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
+        {
+            return volume.VolumeValue;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static Nullable<T> CubeMetresValue<T>(this Nullable<Volume<Lengths.MetricSI.Metres, T>> volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
+        {
+            if (volume.HasValue)
+            {
+                return volume.Value.VolumeValue;
             }
             else
             {
@@ -87,15 +135,21 @@ namespace NGenericDimensions.Extensions.Numbers
     {
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static Length<Lengths.MetricSI.Metres, T> metres<T>(this T length) where T : struct, IComparable, IConvertible
+        public static Length<Lengths.MetricSI.Metres, T> metres<T>(this T length) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return length;
         }
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static Area<Lengths.MetricSI.Metres, T> metres<T>(this LengthSquareExtension<T> area) where T : struct, IComparable, IConvertible
+        public static Area<Lengths.MetricSI.Metres, T> metres<T>(this DimensionSquareExtension<T> area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
-            return area.Area;
+            return area.SquaredValue;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static Volume<Lengths.MetricSI.Metres, T> metres<T>(this DimensionCubeExtension<T> volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
+        {
+            return volume.CubedValue;
         }
 
     }

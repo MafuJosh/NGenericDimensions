@@ -11,9 +11,32 @@ using System.Runtime.CompilerServices;
 namespace NGenericDimensions.MetricPrefix
 {
 
-    public abstract class MetricPrefixBase
+    public abstract class MetricPrefixBase : IFormattable
     {
         protected internal decimal Multiplier;
+        public abstract string UnitSymbol { get; }
+
+        /// <summary>
+        /// Returns the simple name of the derived class.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return this.GetType().Name;
+        }
+
+        public string ToString(string format, IFormatProvider formatProvider)
+        {
+            if (format == "NU")
+            {
+                return "";
+            }
+            else if (format == "SU")
+            {
+                return UnitSymbol;
+            }
+            return ToString();
+        }
     }
 
     public class Deca : MetricPrefixBase
@@ -22,6 +45,11 @@ namespace NGenericDimensions.MetricPrefix
         public Deca()
         {
             Multiplier = 10m;
+        }
+
+        public override string UnitSymbol
+        {
+            get { return "da"; }
         }
     }
 
@@ -32,6 +60,11 @@ namespace NGenericDimensions.MetricPrefix
         {
             Multiplier = 100m;
         }
+
+        public override string UnitSymbol
+        {
+            get { return "h"; }
+        }
     }
 
     public class Kilo : MetricPrefixBase
@@ -40,6 +73,11 @@ namespace NGenericDimensions.MetricPrefix
         public Kilo()
         {
             Multiplier = 1000m;
+        }
+
+        public override string UnitSymbol
+        {
+            get { return "k"; }
         }
     }
 
@@ -50,6 +88,11 @@ namespace NGenericDimensions.MetricPrefix
         {
             Multiplier = 1000000m;
         }
+
+        public override string UnitSymbol
+        {
+            get { return "M"; }
+        }
     }
 
     public class Giga : MetricPrefixBase
@@ -58,6 +101,11 @@ namespace NGenericDimensions.MetricPrefix
         public Giga()
         {
             Multiplier = 1000000000m;
+        }
+
+        public override string UnitSymbol
+        {
+            get { return "G"; }
         }
     }
 
@@ -68,6 +116,11 @@ namespace NGenericDimensions.MetricPrefix
         {
             Multiplier = 1000000000000m;
         }
+
+        public override string UnitSymbol
+        {
+            get { return "T"; }
+        }
     }
 
     public class Peta : MetricPrefixBase
@@ -76,6 +129,11 @@ namespace NGenericDimensions.MetricPrefix
         public Peta()
         {
             Multiplier = 1000000000000000m;
+        }
+
+        public override string UnitSymbol
+        {
+            get { return "P"; }
         }
     }
 
@@ -86,6 +144,11 @@ namespace NGenericDimensions.MetricPrefix
         {
             Multiplier = 1000000000000000000m;
         }
+
+        public override string UnitSymbol
+        {
+            get { return "E"; }
+        }
     }
 
     public class Zetta : MetricPrefixBase
@@ -94,6 +157,11 @@ namespace NGenericDimensions.MetricPrefix
         public Zetta()
         {
             Multiplier = 1000000000000000000000m;
+        }
+
+        public override string UnitSymbol
+        {
+            get { return "Z"; }
         }
     }
 
@@ -104,6 +172,11 @@ namespace NGenericDimensions.MetricPrefix
         {
             Multiplier = 1000000000000000000000000m;
         }
+
+        public override string UnitSymbol
+        {
+            get { return "Y"; }
+        }
     }
 
     public class Deci : MetricPrefixBase
@@ -112,6 +185,11 @@ namespace NGenericDimensions.MetricPrefix
         public Deci()
         {
             Multiplier = 0.1m;
+        }
+
+        public override string UnitSymbol
+        {
+            get { return "d"; }
         }
     }
 
@@ -122,6 +200,11 @@ namespace NGenericDimensions.MetricPrefix
         {
             Multiplier = 0.01m;
         }
+
+        public override string UnitSymbol
+        {
+            get { return "c"; }
+        }
     }
 
     public class Milli : MetricPrefixBase
@@ -130,6 +213,11 @@ namespace NGenericDimensions.MetricPrefix
         public Milli()
         {
             Multiplier = 0.001m;
+        }
+
+        public override string UnitSymbol
+        {
+            get { return "m"; }
         }
     }
 
@@ -140,6 +228,11 @@ namespace NGenericDimensions.MetricPrefix
         {
             Multiplier = 0.000001m;
         }
+
+        public override string UnitSymbol
+        {
+            get { return "µ"; }
+        }
     }
 
     public class Nano : MetricPrefixBase
@@ -148,6 +241,11 @@ namespace NGenericDimensions.MetricPrefix
         public Nano()
         {
             Multiplier = 0.000000001m;
+        }
+
+        public override string UnitSymbol
+        {
+            get { return "n"; }
         }
     }
 
@@ -158,6 +256,11 @@ namespace NGenericDimensions.MetricPrefix
         {
             Multiplier = 0.000000000001m;
         }
+
+        public override string UnitSymbol
+        {
+            get { return "p"; }
+        }
     }
 
     public class Femto : MetricPrefixBase
@@ -166,6 +269,11 @@ namespace NGenericDimensions.MetricPrefix
         public Femto()
         {
             Multiplier = 0.000000000000001m;
+        }
+
+        public override string UnitSymbol
+        {
+            get { return "f"; }
         }
     }
 
@@ -176,6 +284,11 @@ namespace NGenericDimensions.MetricPrefix
         {
             Multiplier = 0.000000000000000001m;
         }
+
+        public override string UnitSymbol
+        {
+            get { return "a"; }
+        }
     }
 
     public class Zepto : MetricPrefixBase
@@ -185,6 +298,11 @@ namespace NGenericDimensions.MetricPrefix
         {
             Multiplier = 0.000000000000000000001m;
         }
+
+        public override string UnitSymbol
+        {
+            get { return "z"; }
+        }
     }
 
     public class Yocto : MetricPrefixBase
@@ -193,6 +311,11 @@ namespace NGenericDimensions.MetricPrefix
         public Yocto()
         {
             Multiplier = 0.000000000000000000000001m;
+        }
+
+        public override string UnitSymbol
+        {
+            get { return "y"; }
         }
     }
 

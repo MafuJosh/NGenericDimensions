@@ -24,13 +24,13 @@ namespace NGenericDimensions.Extensions
     {
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static T MillisecondsValue<T>(this Duration<Durations.Milliseconds, T> duration) where T : struct, IComparable, IConvertible
+        public static T MillisecondsValue<T>(this Duration<Durations.Milliseconds, T> duration) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return duration.DurationValue;
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static Nullable<T> MillisecondsValue<T>(this Nullable<Duration<Durations.Milliseconds, T>> duration) where T : struct, IComparable, IConvertible
+        public static Nullable<T> MillisecondsValue<T>(this Nullable<Duration<Durations.Milliseconds, T>> duration) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             if (duration.HasValue)
             {
@@ -43,11 +43,11 @@ namespace NGenericDimensions.Extensions
         }
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static Speed<TUnitOfMeasure, Durations.Milliseconds, TDataType> millisecond<TUnitOfMeasure, TDataType>(this LengthPerExtension<TUnitOfMeasure, TDataType> length)
-            where TUnitOfMeasure : Lengths.Length1DUnitOfMeasure
-            where TDataType : struct, IComparable, IConvertible
+        public static Speed<TUnitOfMeasure, Durations.Milliseconds, TDataType> millisecond<TUnitOfMeasure, TDataType>(this DimensionPerExtension<Length<TUnitOfMeasure, TDataType>> length)
+            where TUnitOfMeasure : Lengths.Length1DUnitOfMeasure, IDefinedUnitOfMeasure
+            where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
         {
-            return length.Length.LengthValue;
+            return length.PerValue.LengthValue;
         }
 
     }
@@ -61,7 +61,7 @@ namespace NGenericDimensions.Extensions.Numbers
     {
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static Duration<Durations.Milliseconds, T> milliseconds<T>(this T duration) where T : struct, IComparable, IConvertible
+        public static Duration<Durations.Milliseconds, T> milliseconds<T>(this T duration) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return duration;
         }

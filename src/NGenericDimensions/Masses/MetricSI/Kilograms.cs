@@ -24,13 +24,13 @@ namespace NGenericDimensions.Extensions
     {
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static T KilogramsValue<T>(this Mass<Masses.MetricSI.Kilograms, T> mass) where T : struct, IComparable, IConvertible
+        public static T KilogramsValue<T>(this Mass<Masses.MetricSI.Kilograms, T> mass) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return mass.MassValue;
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static Nullable<T> KilogramsValue<T>(this Nullable<Mass<Masses.MetricSI.Kilograms, T>> mass) where T : struct, IComparable, IConvertible
+        public static Nullable<T> KilogramsValue<T>(this Nullable<Mass<Masses.MetricSI.Kilograms, T>> mass) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             if (mass.HasValue)
             {
@@ -53,7 +53,7 @@ namespace NGenericDimensions.Extensions.Numbers
     {
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static Mass<Masses.MetricSI.Kilograms, T> kilograms<T>(this T mass) where T : struct, IComparable, IConvertible
+        public static Mass<Masses.MetricSI.Kilograms, T> kilograms<T>(this T mass) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return mass;
         }

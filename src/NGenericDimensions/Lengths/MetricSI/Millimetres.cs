@@ -24,13 +24,13 @@ namespace NGenericDimensions.Extensions
     {
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static T MillimetresValue<T>(this Length<Lengths.MetricSI.Millimetres, T> length) where T : struct, IComparable, IConvertible
+        public static T MillimetresValue<T>(this Length<Lengths.MetricSI.Millimetres, T> length) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return length.LengthValue;
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static Nullable<T> MillimetresValue<T>(this Nullable<Length<Lengths.MetricSI.Millimetres, T>> length) where T : struct, IComparable, IConvertible
+        public static Nullable<T> MillimetresValue<T>(this Nullable<Length<Lengths.MetricSI.Millimetres, T>> length) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             if (length.HasValue)
             {
@@ -43,17 +43,36 @@ namespace NGenericDimensions.Extensions
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static T SquareMillimetresValue<T>(this Area<Lengths.MetricSI.Millimetres, T> area) where T : struct, IComparable, IConvertible
+        public static T SquareMillimetresValue<T>(this Area<Lengths.MetricSI.Millimetres, T> area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return area.AreaValue;
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static Nullable<T> SquareMillimetresValue<T>(this Nullable<Area<Lengths.MetricSI.Millimetres, T>> area) where T : struct, IComparable, IConvertible
+        public static Nullable<T> SquareMillimetresValue<T>(this Nullable<Area<Lengths.MetricSI.Millimetres, T>> area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             if (area.HasValue)
             {
                 return area.Value.AreaValue;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static T CubeMillimetresValue<T>(this Volume<Lengths.MetricSI.Millimetres, T> volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
+        {
+            return volume.VolumeValue;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static Nullable<T> CubeMillimetresValue<T>(this Nullable<Volume<Lengths.MetricSI.Millimetres, T>> volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
+        {
+            if (volume.HasValue)
+            {
+                return volume.Value.VolumeValue;
             }
             else
             {
@@ -72,15 +91,21 @@ namespace NGenericDimensions.Extensions.Numbers
     {
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static Length<Lengths.MetricSI.Millimetres, T> millimetres<T>(this T length) where T : struct, IComparable, IConvertible
+        public static Length<Lengths.MetricSI.Millimetres, T> millimetres<T>(this T length) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return length;
         }
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static Area<Lengths.MetricSI.Millimetres, T> millimetres<T>(this LengthSquareExtension<T> area) where T : struct, IComparable, IConvertible
+        public static Area<Lengths.MetricSI.Millimetres, T> millimetres<T>(this DimensionSquareExtension<T> area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
-            return area.Area;
+            return area.SquaredValue;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static Volume<Lengths.MetricSI.Millimetres, T> millimetres<T>(this DimensionCubeExtension<T> volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
+        {
+            return volume.CubedValue;
         }
 
     }

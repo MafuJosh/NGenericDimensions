@@ -7,6 +7,7 @@ using System.Data;
 using System.Diagnostics;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using NGenericDimensions.Lengths;
 
 namespace NGenericDimensions
 {
@@ -20,12 +21,13 @@ namespace NGenericDimensions
     }
 
     public struct Volume<TUnitOfMeasure, TDataType> : IVolume<TUnitOfMeasure>
-        where TUnitOfMeasure : Lengths.LengthUnitOfMeasure
-        where TDataType : struct, IComparable, IConvertible
+        where TUnitOfMeasure : Lengths.LengthUnitOfMeasure, IExponent1Or3, IDefinedUnitOfMeasure
+        where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
     {
 
-
         private TDataType mVolume;
+
+        #region Constructors
         public Volume(TDataType volume)
         {
             mVolume = volume;
@@ -38,15 +40,29 @@ namespace NGenericDimensions
 
         public Volume(IVolume volumeToConvertFrom)
         {
-            mVolume = (TDataType)(object)(volumeToConvertFrom.Value * (volumeToConvertFrom.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3)));
+            mVolume = (TDataType)(Convert.ChangeType(volumeToConvertFrom.Value * (volumeToConvertFrom.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3)), typeof(TDataType)));
         }
+        #endregion
 
+        #region Value
         [EditorBrowsable(EditorBrowsableState.Always)]
         public TDataType VolumeValue
         {
             get { return mVolume; }
         }
 
+        private double ValueAsDouble
+        {
+            get { return Convert.ToDouble((object)mVolume); }
+        }
+
+        double IDimension.Value
+        {
+            get { return ValueAsDouble; }
+        }
+        #endregion
+
+        #region UnitOfMeasure
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public TUnitOfMeasure UnitOfMeasure
         {
@@ -61,21 +77,25 @@ namespace NGenericDimensions
         {
             get { return UnitOfMeasure1; }
         }
+        #endregion
 
+        #region ConvertTo
         [EditorBrowsable(EditorBrowsableState.Always)]
         public Volume<TNewUnitOfMeasure, TNewDataType> ConvertTo<TNewUnitOfMeasure, TNewDataType>()
-            where TNewUnitOfMeasure : Lengths.LengthUnitOfMeasure
-            where TNewDataType : struct, IComparable, IConvertible
+            where TNewUnitOfMeasure : Lengths.LengthUnitOfMeasure, IExponent1Or3, IDefinedUnitOfMeasure
+            where TNewDataType : struct, IComparable, IFormattable, IComparable<TNewDataType>, IEquatable<TNewDataType>
         {
-            return (TNewDataType)(object)(ValueAsDouble * (UnitOfMeasure1.GetCompleteMultiplier<TNewUnitOfMeasure>(3)));
+            return (TNewDataType)(Convert.ChangeType(ValueAsDouble * (UnitOfMeasure1.GetCompleteMultiplier<TNewUnitOfMeasure>(3)), typeof(TNewDataType)));
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public Volume<TUnitOfMeasure, TNewDataType> ConvertTo<TNewDataType>() where TNewDataType : struct, IComparable, IConvertible
+        public Volume<TUnitOfMeasure, TNewDataType> ConvertTo<TNewDataType>() where TNewDataType : struct, IComparable, IFormattable, IComparable<TNewDataType>, IEquatable<TNewDataType>
         {
-            return (TNewDataType)(object)mVolume;
+            return (TNewDataType)(Convert.ChangeType(mVolume, typeof(TNewDataType)));
         }
+        #endregion
 
+        #region Casting Operators
         public static implicit operator Volume<TUnitOfMeasure, TDataType>(TDataType volume)
         {
             return new Volume<TUnitOfMeasure, TDataType>(volume);
@@ -85,7 +105,9 @@ namespace NGenericDimensions
         {
             return volume.mVolume;
         }
+        #endregion
 
+        #region + Operators
         public static Volume<TUnitOfMeasure, TDataType> operator +(Volume<TUnitOfMeasure, TDataType> volume1, Volume<TUnitOfMeasure, TDataType> volume2)
         {
             return new Volume<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Add(volume1.mVolume, volume2.mVolume));
@@ -95,7 +117,9 @@ namespace NGenericDimensions
         {
             return volume1.ValueAsDouble + (volume2.Value * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3)));
         }
+        #endregion
 
+        #region - Operators
         public static Volume<TUnitOfMeasure, TDataType> operator -(Volume<TUnitOfMeasure, TDataType> volume1, Volume<TUnitOfMeasure, TDataType> volume2)
         {
             return new Volume<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Subtract(volume1.mVolume, volume2.mVolume));
@@ -105,7 +129,9 @@ namespace NGenericDimensions
         {
             return volume1.ValueAsDouble - (volume2.Value * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3)));
         }
+        #endregion
 
+        #region * Operators
         public static Volume<TUnitOfMeasure, TDataType> operator *(TDataType volume1, Volume<TUnitOfMeasure, TDataType> volume2)
         {
             return new Volume<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Multiply(volume1, volume2.mVolume));
@@ -115,17 +141,31 @@ namespace NGenericDimensions
         {
             return new Volume<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Multiply(volume1.mVolume, volume2));
         }
+        #endregion
 
+        #region / Operators
         public static Volume<TUnitOfMeasure, double> operator /(Volume<TUnitOfMeasure, TDataType> volume1, double volume2)
         {
             return new Volume<TUnitOfMeasure, double>(Convert.ToDouble((object)volume1.mVolume) / volume2);
         }
 
-        public static double operator /(Volume<TUnitOfMeasure, TDataType> volume1, Volume<TUnitOfMeasure, TDataType> volume2)
+        public static Volume<TUnitOfMeasure, double> operator /(Volume<TUnitOfMeasure, TDataType> volume1, decimal volume2)
         {
-            return volume1.ValueAsDouble / volume2.ValueAsDouble;
+            return new Volume<TUnitOfMeasure, double>(Convert.ToDouble((object)volume1.mVolume) / Convert.ToDouble(volume2));
+        }
+        
+        public static Volume<TUnitOfMeasure, double> operator /(Volume<TUnitOfMeasure, TDataType> volume1, Int64 volume2)
+        {
+            return new Volume<TUnitOfMeasure, double>(Convert.ToDouble((object)volume1.mVolume) / volume2);
         }
 
+        public static double operator /(Volume<TUnitOfMeasure, TDataType> volume1, IVolume volume2)
+        {
+            return volume1.ValueAsDouble / (new Volume<TUnitOfMeasure, double>(volume2).VolumeValue);
+        }
+        #endregion
+
+        #region == Operators
         public static bool operator ==(Volume<TUnitOfMeasure, TDataType> volume1, Volume<TUnitOfMeasure, TDataType> volume2)
         {
             return volume1.mVolume.CompareTo(volume2.mVolume) == 0;
@@ -135,7 +175,9 @@ namespace NGenericDimensions
         {
             return volume1.ValueAsDouble.CompareTo(volume2.Value * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3))) == 0;
         }
+        #endregion
 
+        #region != Operators
         public static bool operator !=(Volume<TUnitOfMeasure, TDataType> volume1, Volume<TUnitOfMeasure, TDataType> volume2)
         {
             return volume1.mVolume.CompareTo(volume2.mVolume) != 0;
@@ -145,7 +187,9 @@ namespace NGenericDimensions
         {
             return volume1.ValueAsDouble.CompareTo(volume2.Value * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3))) != 0;
         }
+        #endregion
 
+        #region > Operators
         public static bool operator >(Volume<TUnitOfMeasure, TDataType> volume1, Volume<TUnitOfMeasure, TDataType> volume2)
         {
             return volume1.mVolume.CompareTo(volume2.mVolume) > 0;
@@ -155,7 +199,9 @@ namespace NGenericDimensions
         {
             return volume1.ValueAsDouble.CompareTo(volume2.Value * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3))) > 0;
         }
+        #endregion
 
+        #region < Operators
         public static bool operator <(Volume<TUnitOfMeasure, TDataType> volume1, Volume<TUnitOfMeasure, TDataType> volume2)
         {
             return volume1.mVolume.CompareTo(volume2.mVolume) < 0;
@@ -165,7 +211,9 @@ namespace NGenericDimensions
         {
             return volume1.ValueAsDouble.CompareTo(volume2.Value * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3))) < 0;
         }
+        #endregion
 
+        #region >= Operators
         public static bool operator >=(Volume<TUnitOfMeasure, TDataType> volume1, Volume<TUnitOfMeasure, TDataType> volume2)
         {
             return volume1.mVolume.CompareTo(volume2.mVolume) >= 0;
@@ -175,7 +223,9 @@ namespace NGenericDimensions
         {
             return volume1.ValueAsDouble.CompareTo(volume2.Value * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3))) >= 0;
         }
+        #endregion
 
+        #region <= Operators
         public static bool operator <=(Volume<TUnitOfMeasure, TDataType> volume1, Volume<TUnitOfMeasure, TDataType> volume2)
         {
             return volume1.mVolume.CompareTo(volume2.mVolume) <= 0;
@@ -185,16 +235,37 @@ namespace NGenericDimensions
         {
             return volume1.ValueAsDouble.CompareTo(volume2.Value * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3))) <= 0;
         }
+        #endregion
 
-        private double ValueAsDouble
+        #region ToString
+        public override string ToString()
         {
-            get { return Convert.ToDouble((object)mVolume); }
-        }
-        double IDimension.Value
-        {
-            get { return ValueAsDouble; }
+            return ToString(null, null);
         }
 
+        public string ToString(string format, IFormatProvider formatProvider)
+        {
+            if (format == null)
+            { }
+            else if (format.Contains("NU"))
+            {
+                return UnitOfMeasure.ToString(mVolume, format, formatProvider);
+            }
+            else if (format.Contains("SU"))
+            {
+                var length1DUom = UnitOfMeasure as Length1DUnitOfMeasure;
+                if (length1DUom != null)
+                {
+                    return UnitOfMeasure.ToString(mVolume, format.Replace("SU", "NU"), formatProvider) + @" " + length1DUom.VolumeUnitSymbol;
+                }
+                else
+                {
+                    return UnitOfMeasure.ToString(mVolume, format, formatProvider);
+                }
+            }
+            return mVolume.ToString((format ?? "").Replace("LU", ""), formatProvider) + @" Cubic " + UnitOfMeasure.ToString(format, formatProvider);
+        }
+        #endregion
     }
 }
 
@@ -205,11 +276,11 @@ namespace NGenericDimensions.Extensions
     {
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static TDataType VolumeValue<TUnitOfMeasure, TDataType>(this Nullable<Volume<TUnitOfMeasure, TDataType>> volume)
-            where TUnitOfMeasure : Lengths.LengthUnitOfMeasure, new()
-            where TDataType : struct, IComparable, IConvertible
+        public static Nullable<TDataType> VolumeValue<TUnitOfMeasure, TDataType>(this Nullable<Volume<TUnitOfMeasure, TDataType>> volume)
+            where TUnitOfMeasure : Lengths.LengthUnitOfMeasure, IExponent1Or3, IDefinedUnitOfMeasure, new()
+            where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
         {
-            return volume.Value.VolumeValue;
+            return volume.HasValue ? volume.Value.VolumeValue : (TDataType?)null;
         }
 
     }
