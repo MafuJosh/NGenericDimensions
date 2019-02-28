@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2020
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NGenericDimensions", "NGenericDimensions.csproj", "{41C7014F-945B-4298-9F07-8ECE84FBC8C8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NGenericDimensions", "NGenericDimensions\NGenericDimensions.csproj", "{41C7014F-945B-4298-9F07-8ECE84FBC8C8}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "NGenericDimensionsVbDemo", "..\NGenericDimensionsVbDemo\NGenericDimensionsVbDemo.vbproj", "{2CF5E410-A6DC-4CD5-887C-C2D7F92A9F5C}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "NGenericDimensionsVbDemo", "NGenericDimensionsVbDemo\NGenericDimensionsVbDemo.vbproj", "{2CF5E410-A6DC-4CD5-887C-C2D7F92A9F5C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NGenericDimensionsCSharpDemo", "..\NGenericDimensionsCSharpDemo\NGenericDimensionsCSharpDemo.csproj", "{1A73D198-A772-4DC1-A48F-FC5EA11F4CC7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NGenericDimensionsCSharpDemo", "NGenericDimensionsCSharpDemo\NGenericDimensionsCSharpDemo.csproj", "{1A73D198-A772-4DC1-A48F-FC5EA11F4CC7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NGenericDimensionsUnitTests", "..\NGenericDimensionsUnitTests\NGenericDimensionsUnitTests.csproj", "{038AFE80-83BF-439D-8878-614D97BE50A5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NGenericDimensionsUnitTests", "NGenericDimensionsUnitTests\NGenericDimensionsUnitTests.csproj", "{038AFE80-83BF-439D-8878-614D97BE50A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
