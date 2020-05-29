@@ -39,14 +39,14 @@ namespace NGenericDimensions
             mSpeed = (TDataType)Convert.ChangeType(speedToConvertFrom.Value * speedToConvertFrom.LengthUnitOfMeasure.GetCompleteMultiplier<TLengthUnitOfMeasure>(1) / speedToConvertFrom.DurationUnitOfMeasure.GetCompleteMultiplier<TDurationUnitOfMeasure>(1), typeof(TDataType));
         }
 
-        public Speed(ILength<TLengthUnitOfMeasure> length, IDuration<TDurationUnitOfMeasure> duration)
+        public Speed(LengthDouble<TLengthUnitOfMeasure> length, IDuration<TDurationUnitOfMeasure> duration)
         {
-            mSpeed = (TDataType)Convert.ChangeType((new Length<TLengthUnitOfMeasure, double>(length)).LengthValue / (new Duration<TDurationUnitOfMeasure, double>(duration)).DurationValue, typeof(TDataType));
+            mSpeed = (TDataType)Convert.ChangeType((new Length<TLengthUnitOfMeasure, double>(length.ValueAsDouble)).LengthValue / (new Duration<TDurationUnitOfMeasure, double>(duration)).DurationValue, typeof(TDataType));
         }
 
-        public Speed(ILength<TLengthUnitOfMeasure> length, TimeSpan duration)
+        public Speed(LengthDouble<TLengthUnitOfMeasure> length, TimeSpan duration)
         {
-            mSpeed = (TDataType)(Convert.ChangeType((new Length<TLengthUnitOfMeasure, double>(length)).LengthValue / (new Duration<TDurationUnitOfMeasure, double>(duration)).DurationValue, typeof(TDataType)));
+            mSpeed = (TDataType)(Convert.ChangeType((new Length<TLengthUnitOfMeasure, double>(length.ValueAsDouble)).LengthValue / (new Duration<TDurationUnitOfMeasure, double>(duration)).DurationValue, typeof(TDataType)));
         }
         #endregion
 

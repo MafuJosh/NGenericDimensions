@@ -97,7 +97,6 @@ namespace NGenericDimensionsUnitTests
             Assert.AreSame(typeof(Kilometres), ((ILength)(new Length<Kilometres, Int32>(33))).UnitOfMeasure.GetType());
         }
 
-
         [TestMethod]
         public void TestLengthConvertToFunction()
         {
