@@ -27,32 +27,28 @@ namespace NGenericDimensions
         #region Constructors
         public Mass(TDataType mass)
         {
-            mMass = mass;
+            MassValue = mass;
         }
 
         public Mass(Mass<TUnitOfMeasure, TDataType> mass)
         {
-            mMass = mass.mMass;
+            MassValue = mass.MassValue;
         }
 
         public Mass(IMass massToConvertFrom)
         {
-            mMass = (TDataType)(Convert.ChangeType(massToConvertFrom.Value * massToConvertFrom.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1), typeof(TDataType)));
+            MassValue = (TDataType)(Convert.ChangeType(massToConvertFrom.Value * massToConvertFrom.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1), typeof(TDataType)));
         }
         #endregion
 
         #region Value
-        private readonly TDataType mMass;
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public TDataType MassValue
-        {
-            get { return mMass; }
-        }
+        public TDataType MassValue { get; }
 
         private double ValueAsDouble
         {
-            get { return Convert.ToDouble((object)mMass); }
+            get { return Convert.ToDouble((object)MassValue); }
         }
         double IDimension.Value
         {
@@ -97,14 +93,14 @@ namespace NGenericDimensions
 
         public static explicit operator TDataType(Mass<TUnitOfMeasure, TDataType> mass)
         {
-            return mass.mMass;
+            return mass.MassValue;
         }
         #endregion
 
         #region + Operators
         public static Mass<TUnitOfMeasure, TDataType> operator +(Mass<TUnitOfMeasure, TDataType> mass1, Mass<TUnitOfMeasure, TDataType> mass2)
         {
-            return new Mass<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Add(mass1.mMass, mass2.mMass));
+            return new Mass<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Add(mass1.MassValue, mass2.MassValue));
         }
 
         public static Mass<TUnitOfMeasure, double> operator +(Mass<TUnitOfMeasure, TDataType> mass1, IMass mass2)
@@ -116,7 +112,7 @@ namespace NGenericDimensions
         #region - Operators
         public static Mass<TUnitOfMeasure, TDataType> operator -(Mass<TUnitOfMeasure, TDataType> mass1, Mass<TUnitOfMeasure, TDataType> mass2)
         {
-            return new Mass<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Subtract(mass1.mMass, mass2.mMass));
+            return new Mass<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Subtract(mass1.MassValue, mass2.MassValue));
         }
 
         public static Mass<TUnitOfMeasure, double> operator -(Mass<TUnitOfMeasure, TDataType> mass1, IMass mass2)
@@ -128,29 +124,29 @@ namespace NGenericDimensions
         #region * Operators
         public static Mass<TUnitOfMeasure, TDataType> operator *(TDataType mass1, Mass<TUnitOfMeasure, TDataType> mass2)
         {
-            return new Mass<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Multiply(mass1, mass2.mMass));
+            return new Mass<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Multiply(mass1, mass2.MassValue));
         }
 
         public static Mass<TUnitOfMeasure, TDataType> operator *(Mass<TUnitOfMeasure, TDataType> mass1, TDataType mass2)
         {
-            return new Mass<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Multiply(mass1.mMass, mass2));
+            return new Mass<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Multiply(mass1.MassValue, mass2));
         }
         #endregion
 
         #region / Operators
         public static Mass<TUnitOfMeasure, double> operator /(Mass<TUnitOfMeasure, TDataType> mass1, double mass2)
         {
-            return new Mass<TUnitOfMeasure, double>(Convert.ToDouble((object)mass1.mMass) / mass2);
+            return new Mass<TUnitOfMeasure, double>(Convert.ToDouble((object)mass1.MassValue) / mass2);
         }
 
         public static Mass<TUnitOfMeasure, double> operator /(Mass<TUnitOfMeasure, TDataType> mass1, decimal mass2)
         {
-            return new Mass<TUnitOfMeasure, double>(Convert.ToDouble((object)mass1.mMass) / Convert.ToDouble(mass2));
+            return new Mass<TUnitOfMeasure, double>(Convert.ToDouble((object)mass1.MassValue) / Convert.ToDouble(mass2));
         }
         
         public static Mass<TUnitOfMeasure, double> operator /(Mass<TUnitOfMeasure, TDataType> mass1, Int64 mass2)
         {
-            return new Mass<TUnitOfMeasure, double>(Convert.ToDouble((object)mass1.mMass) / mass2);
+            return new Mass<TUnitOfMeasure, double>(Convert.ToDouble((object)mass1.MassValue) / mass2);
         }
 
         public static double operator /(Mass<TUnitOfMeasure, TDataType> mass1, IMass mass2)
@@ -162,7 +158,7 @@ namespace NGenericDimensions
         #region == Operators
         public static bool operator ==(Mass<TUnitOfMeasure, TDataType> mass1, Mass<TUnitOfMeasure, TDataType> mass2)
         {
-            return mass1.mMass.CompareTo(mass2.mMass) == 0;
+            return mass1.MassValue.CompareTo(mass2.MassValue) == 0;
         }
 
         public static bool operator ==(Mass<TUnitOfMeasure, TDataType> mass1, IMass mass2)
@@ -174,7 +170,7 @@ namespace NGenericDimensions
         #region != Operators
         public static bool operator !=(Mass<TUnitOfMeasure, TDataType> mass1, Mass<TUnitOfMeasure, TDataType> mass2)
         {
-            return mass1.mMass.CompareTo(mass2.mMass) != 0;
+            return mass1.MassValue.CompareTo(mass2.MassValue) != 0;
         }
 
         public static bool operator !=(Mass<TUnitOfMeasure, TDataType> mass1, IMass mass2)
@@ -186,7 +182,7 @@ namespace NGenericDimensions
         #region > Operators
         public static bool operator >(Mass<TUnitOfMeasure, TDataType> mass1, Mass<TUnitOfMeasure, TDataType> mass2)
         {
-            return mass1.mMass.CompareTo(mass2.mMass) > 0;
+            return mass1.MassValue.CompareTo(mass2.MassValue) > 0;
         }
 
         public static bool operator >(Mass<TUnitOfMeasure, TDataType> mass1, IMass mass2)
@@ -198,7 +194,7 @@ namespace NGenericDimensions
         #region < Operators
         public static bool operator <(Mass<TUnitOfMeasure, TDataType> mass1, Mass<TUnitOfMeasure, TDataType> mass2)
         {
-            return mass1.mMass.CompareTo(mass2.mMass) < 0;
+            return mass1.MassValue.CompareTo(mass2.MassValue) < 0;
         }
 
         public static bool operator <(Mass<TUnitOfMeasure, TDataType> mass1, IMass mass2)
@@ -210,7 +206,7 @@ namespace NGenericDimensions
         #region >= Operators
         public static bool operator >=(Mass<TUnitOfMeasure, TDataType> mass1, Mass<TUnitOfMeasure, TDataType> mass2)
         {
-            return mass1.mMass.CompareTo(mass2.mMass) >= 0;
+            return mass1.MassValue.CompareTo(mass2.MassValue) >= 0;
         }
 
         public static bool operator >=(Mass<TUnitOfMeasure, TDataType> mass1, IMass mass2)
@@ -222,7 +218,7 @@ namespace NGenericDimensions
         #region <= Operators
         public static bool operator <=(Mass<TUnitOfMeasure, TDataType> mass1, Mass<TUnitOfMeasure, TDataType> mass2)
         {
-            return mass1.mMass.CompareTo(mass2.mMass) <= 0;
+            return mass1.MassValue.CompareTo(mass2.MassValue) <= 0;
         }
 
         public static bool operator <=(Mass<TUnitOfMeasure, TDataType> mass1, IMass mass2)
@@ -234,12 +230,12 @@ namespace NGenericDimensions
         #region ToString
         public override string ToString()
         {
-            return UnitOfMeasure.ToString(mMass, null, null);
+            return UnitOfMeasure.ToString(MassValue, null, null);
         }
 
         public string ToString(string format, IFormatProvider formatProvider)
         {
-            return UnitOfMeasure.ToString(mMass, format, formatProvider);
+            return UnitOfMeasure.ToString(MassValue, format, formatProvider);
         }
         #endregion
     }
