@@ -58,17 +58,17 @@ namespace NGenericDimensions
         #region Constructors
         public Length(TDataType length)
         {
-            mLength = length;
+            LengthValue = length;
         }
 
         public Length(Length<TUnitOfMeasure, TDataType> length)
         {
-            mLength = length.mLength;
+            LengthValue = length.LengthValue;
         }
 
         public Length(LengthDouble lengthToConvertFrom)
         {
-            mLength = GenericOperatorMath<TDataType>.ConvertFromDouble(lengthToConvertFrom.ValueAsDouble * lengthToConvertFrom.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1));
+            LengthValue = GenericOperatorMath<TDataType>.ConvertFromDouble(lengthToConvertFrom.ValueAsDouble * lengthToConvertFrom.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1));
         }
 
         //public Length(ILength lengthToConvertFrom)
@@ -79,17 +79,12 @@ namespace NGenericDimensions
         #endregion
 
         #region Value
-        private readonly TDataType mLength;
-
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public TDataType LengthValue
-        {
-            get { return mLength; }
-        }
+        public TDataType LengthValue { get; }
 
         private double ValueAsDouble
         {
-            get { return GenericOperatorMath<TDataType>.ConvertToDouble(mLength); }
+            get { return GenericOperatorMath<TDataType>.ConvertToDouble(LengthValue); }
         }
         double IDimension.Value
         {
@@ -134,7 +129,7 @@ namespace NGenericDimensions
 
         public static explicit operator TDataType(Length<TUnitOfMeasure, TDataType> length)
         {
-            return length.mLength;
+            return length.LengthValue;
         }
 
         public static implicit operator LengthDouble(Length<TUnitOfMeasure, TDataType> length)
@@ -151,7 +146,7 @@ namespace NGenericDimensions
         #region + Operators
         public static Length<TUnitOfMeasure, TDataType> operator +(Length<TUnitOfMeasure, TDataType> length1, Length<TUnitOfMeasure, TDataType> length2)
         {
-            return new Length<TUnitOfMeasure, TDataType>(GenericOperatorMath<TDataType>.Add(length1.mLength, length2.mLength));
+            return new Length<TUnitOfMeasure, TDataType>(GenericOperatorMath<TDataType>.Add(length1.LengthValue, length2.LengthValue));
         }
 
         public static Length<TUnitOfMeasure, double> operator +(Length<TUnitOfMeasure, TDataType> length1, LengthDouble length2)
@@ -163,7 +158,7 @@ namespace NGenericDimensions
         #region - Operators
         public static Length<TUnitOfMeasure, TDataType> operator -(Length<TUnitOfMeasure, TDataType> length1, Length<TUnitOfMeasure, TDataType> length2)
         {
-            return new Length<TUnitOfMeasure, TDataType>(GenericOperatorMath<TDataType>.Subtract(length1.mLength, length2.mLength));
+            return new Length<TUnitOfMeasure, TDataType>(GenericOperatorMath<TDataType>.Subtract(length1.LengthValue, length2.LengthValue));
         }
 
         public static Length<TUnitOfMeasure, double> operator -(Length<TUnitOfMeasure, TDataType> length1, LengthDouble length2)
@@ -175,17 +170,17 @@ namespace NGenericDimensions
         #region * Operators
         public static Length<TUnitOfMeasure, TDataType> operator *(TDataType length1, Length<TUnitOfMeasure, TDataType> length2)
         {
-            return new Length<TUnitOfMeasure, TDataType>(GenericOperatorMath<TDataType>.Multiply(length1, length2.mLength));
+            return new Length<TUnitOfMeasure, TDataType>(GenericOperatorMath<TDataType>.Multiply(length1, length2.LengthValue));
         }
 
         public static Length<TUnitOfMeasure, TDataType> operator *(Length<TUnitOfMeasure, TDataType> length1, TDataType length2)
         {
-            return new Length<TUnitOfMeasure, TDataType>(GenericOperatorMath<TDataType>.Multiply(length1.mLength, length2));
+            return new Length<TUnitOfMeasure, TDataType>(GenericOperatorMath<TDataType>.Multiply(length1.LengthValue, length2));
         }
 
         public static Area<TUnitOfMeasure, TDataType> operator *(Length<TUnitOfMeasure, TDataType> length1, Length<TUnitOfMeasure, TDataType> length2)
         {
-            return GenericOperatorMath<TDataType>.Multiply(length1.mLength, length2.mLength);
+            return GenericOperatorMath<TDataType>.Multiply(length1.LengthValue, length2.LengthValue);
         }
 
         public static Area<TUnitOfMeasure, double> operator *(Length<TUnitOfMeasure, TDataType> length1, LengthDouble length2)
@@ -195,12 +190,12 @@ namespace NGenericDimensions
 
         public static Volume<TUnitOfMeasure, TDataType> operator *(Length<TUnitOfMeasure, TDataType> length1, Area<TUnitOfMeasure, TDataType> area2)
         {
-            return GenericOperatorMath<TDataType>.Multiply(length1.mLength, area2.AreaValue);
+            return GenericOperatorMath<TDataType>.Multiply(length1.LengthValue, area2.AreaValue);
         }
 
         public static Volume<TUnitOfMeasure, TDataType> operator *(Area<TUnitOfMeasure, TDataType> area1, Length<TUnitOfMeasure, TDataType> length2)
         {
-            return GenericOperatorMath<TDataType>.Multiply(area1.AreaValue, length2.mLength);
+            return GenericOperatorMath<TDataType>.Multiply(area1.AreaValue, length2.LengthValue);
         }
 
         public static Volume<TUnitOfMeasure, double> operator *(Length<TUnitOfMeasure, TDataType> length1, IArea area2)
@@ -379,7 +374,7 @@ namespace NGenericDimensions
         #region == Operators
         public static bool operator ==(Length<TUnitOfMeasure, TDataType> length1, Length<TUnitOfMeasure, TDataType> length2)
         {
-            return EqualityComparer<TDataType>.Default.Equals(length1.mLength, length2.mLength);
+            return EqualityComparer<TDataType>.Default.Equals(length1.LengthValue, length2.LengthValue);
         }
 
         public static bool operator ==(Length<TUnitOfMeasure, TDataType> length1, LengthDouble length2)
@@ -391,7 +386,7 @@ namespace NGenericDimensions
         #region != Operators
         public static bool operator !=(Length<TUnitOfMeasure, TDataType> length1, Length<TUnitOfMeasure, TDataType> length2)
         {
-            return !EqualityComparer<TDataType>.Default.Equals(length1.mLength, length2.mLength);
+            return !EqualityComparer<TDataType>.Default.Equals(length1.LengthValue, length2.LengthValue);
         }
 
         public static bool operator !=(Length<TUnitOfMeasure, TDataType> length1, LengthDouble length2)
@@ -403,7 +398,7 @@ namespace NGenericDimensions
         #region > Operators
         public static bool operator >(Length<TUnitOfMeasure, TDataType> length1, Length<TUnitOfMeasure, TDataType> length2)
         {
-            return GenericOperatorMath<TDataType>.GreaterThan(length1.mLength, length2.mLength);
+            return GenericOperatorMath<TDataType>.GreaterThan(length1.LengthValue, length2.LengthValue);
         }
 
         public static bool operator >(Length<TUnitOfMeasure, TDataType> length1, LengthDouble length2)
@@ -415,7 +410,7 @@ namespace NGenericDimensions
         #region < Operators
         public static bool operator <(Length<TUnitOfMeasure, TDataType> length1, Length<TUnitOfMeasure, TDataType> length2)
         {
-            return GenericOperatorMath<TDataType>.LessThan(length1.mLength, length2.mLength);
+            return GenericOperatorMath<TDataType>.LessThan(length1.LengthValue, length2.LengthValue);
         }
 
         public static bool operator <(Length<TUnitOfMeasure, TDataType> length1, LengthDouble length2)
@@ -427,7 +422,7 @@ namespace NGenericDimensions
         #region >= Operators
         public static bool operator >=(Length<TUnitOfMeasure, TDataType> length1, Length<TUnitOfMeasure, TDataType> length2)
         {
-            return GenericOperatorMath<TDataType>.GreaterThanOrEqualTo(length1.mLength, length2.mLength);
+            return GenericOperatorMath<TDataType>.GreaterThanOrEqualTo(length1.LengthValue, length2.LengthValue);
         }
 
         public static bool operator >=(Length<TUnitOfMeasure, TDataType> length1, LengthDouble length2)
@@ -439,7 +434,7 @@ namespace NGenericDimensions
         #region <= Operators
         public static bool operator <=(Length<TUnitOfMeasure, TDataType> length1, Length<TUnitOfMeasure, TDataType> length2)
         {
-            return GenericOperatorMath<TDataType>.LessThanOrEqualTo(length1.mLength, length2.mLength);
+            return GenericOperatorMath<TDataType>.LessThanOrEqualTo(length1.LengthValue, length2.LengthValue);
         }
 
         public static bool operator <=(Length<TUnitOfMeasure, TDataType> length1, LengthDouble length2)
@@ -451,40 +446,40 @@ namespace NGenericDimensions
         #region squared, cubed
         public Area<TUnitOfMeasure, TDataType> Squared
         {
-            get { return GenericOperatorMath<TDataType>.Multiply(mLength, mLength); }
+            get { return GenericOperatorMath<TDataType>.Multiply(LengthValue, LengthValue); }
         }
 
         public Volume<TUnitOfMeasure, TDataType> Cubed
         {
-            get { return GenericOperatorMath<TDataType>.Multiply(GenericOperatorMath<TDataType>.Multiply(mLength, mLength), mLength); }
+            get { return GenericOperatorMath<TDataType>.Multiply(GenericOperatorMath<TDataType>.Multiply(LengthValue, LengthValue), LengthValue); }
         }
         #endregion
 
         #region ToString
         public override string ToString()
         {
-            return UnitOfMeasure.ToString(mLength, null, null);
+            return UnitOfMeasure.ToString(LengthValue, null, null);
         }
 
         public string ToString(string format, IFormatProvider formatProvider)
         {
-            return UnitOfMeasure.ToString(mLength, format, formatProvider);
+            return UnitOfMeasure.ToString(LengthValue, format, formatProvider);
         }
         #endregion
 
         public override bool Equals(object obj)
         {
-            return obj != null && obj is Length<TUnitOfMeasure, TDataType> && EqualityComparer<TDataType>.Default.Equals(mLength, ((Length<TUnitOfMeasure, TDataType>)obj).mLength);
+            return obj != null && obj is Length<TUnitOfMeasure, TDataType> && EqualityComparer<TDataType>.Default.Equals(LengthValue, ((Length<TUnitOfMeasure, TDataType>)obj).LengthValue);
         }
 
         public override int GetHashCode()
         {
-            return EqualityComparer<TDataType>.Default.GetHashCode(mLength);
+            return EqualityComparer<TDataType>.Default.GetHashCode(LengthValue);
         }
 
         bool IEquatable<Length<TUnitOfMeasure, TDataType>>.Equals(Length<TUnitOfMeasure, TDataType> other)
         {
-            return EqualityComparer<TDataType>.Default.Equals(mLength, other.mLength);
+            return EqualityComparer<TDataType>.Default.Equals(LengthValue, other.LengthValue);
         }
     }
 }
