@@ -18,7 +18,7 @@ namespace NGenericDimensions
     {
     }
 
-    public struct LengthDouble
+    public readonly struct LengthDouble
     {
         internal readonly double ValueAsDouble;
         internal readonly Length1DUnitOfMeasure UnitOfMeasure;
@@ -28,9 +28,14 @@ namespace NGenericDimensions
             ValueAsDouble = valueAsDouble;
             UnitOfMeasure = unitOfMeasure;
         }
+
+        public override bool Equals(object obj) => obj != null && obj is LengthDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.UnitOfMeasure.Equals(UnitOfMeasure);
+        public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
+        public static bool operator ==(LengthDouble left, LengthDouble right) => left.Equals(right);
+        public static bool operator !=(LengthDouble left, LengthDouble right) => !(left == right);
     }
 
-    public struct LengthDouble<TUnitOfMeasure>
+    public readonly struct LengthDouble<TUnitOfMeasure>
         where TUnitOfMeasure : Length1DUnitOfMeasure, IDefinedUnitOfMeasure
     {
         internal readonly double ValueAsDouble;
@@ -39,6 +44,11 @@ namespace NGenericDimensions
         {
             ValueAsDouble = valueAsDouble;
         }
+
+        public override bool Equals(object obj) => obj != null && obj is LengthDouble<TUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
+        public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
+        public static bool operator ==(LengthDouble<TUnitOfMeasure> left, LengthDouble<TUnitOfMeasure> right) => left.Equals(right);
+        public static bool operator !=(LengthDouble<TUnitOfMeasure> left, LengthDouble<TUnitOfMeasure> right) => !(left == right);
     }
 
     public struct Length<TUnitOfMeasure, TDataType> : ILength<TUnitOfMeasure>, IEquatable<Length<TUnitOfMeasure, TDataType>>
