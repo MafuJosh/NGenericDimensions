@@ -20,6 +20,39 @@ namespace NGenericDimensions
     {
     }
 
+    public readonly struct DurationDouble
+    {
+        internal readonly double ValueAsDouble;
+        internal readonly Durations.DurationUnitOfMeasure UnitOfMeasure;
+
+        internal DurationDouble(double valueAsDouble, Durations.DurationUnitOfMeasure unitOfMeasure)
+        {
+            ValueAsDouble = valueAsDouble;
+            UnitOfMeasure = unitOfMeasure;
+        }
+
+        public override bool Equals(object obj) => obj != null && obj is DurationDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.UnitOfMeasure.Equals(UnitOfMeasure);
+        public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
+        public static bool operator ==(DurationDouble left, DurationDouble right) => left.Equals(right);
+        public static bool operator !=(DurationDouble left, DurationDouble right) => !(left == right);
+    }
+
+    public readonly struct DurationDouble<TUnitOfMeasure>
+        where TUnitOfMeasure : Durations.DurationUnitOfMeasure, IDefinedUnitOfMeasure
+    {
+        internal readonly double ValueAsDouble;
+
+        internal DurationDouble(double valueAsDouble)
+        {
+            ValueAsDouble = valueAsDouble;
+        }
+
+        public override bool Equals(object obj) => obj != null && obj is DurationDouble<TUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
+        public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
+        public static bool operator ==(DurationDouble<TUnitOfMeasure> left, DurationDouble<TUnitOfMeasure> right) => left.Equals(right);
+        public static bool operator !=(DurationDouble<TUnitOfMeasure> left, DurationDouble<TUnitOfMeasure> right) => !(left == right);
+    }
+
     public readonly struct Duration<TUnitOfMeasure, TDataType> : IDuration<TUnitOfMeasure>
         where TUnitOfMeasure : Durations.DurationUnitOfMeasure, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
@@ -47,9 +80,9 @@ namespace NGenericDimensions
             DurationValue = duration.DurationValue;
         }
 
-        public Duration(IDuration durationToConvertFrom)
+        public Duration(DurationDouble durationToConvertFrom)
         {
-            DurationValue = (TDataType)(Convert.ChangeType(durationToConvertFrom.Value * durationToConvertFrom.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1), typeof(TDataType)));
+            DurationValue = (TDataType)(Convert.ChangeType(durationToConvertFrom.ValueAsDouble * durationToConvertFrom.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1), typeof(TDataType)));
         }
         #endregion
 
@@ -123,6 +156,16 @@ namespace NGenericDimensions
         {
             return new Duration<TUnitOfMeasure, TDataType>(durationSpan);
         }
+
+        public static implicit operator DurationDouble(Duration<TUnitOfMeasure, TDataType> duration)
+        {
+            return new DurationDouble(duration.ValueAsDouble, duration.UnitOfMeasure);
+        }
+
+        public static implicit operator DurationDouble<TUnitOfMeasure>(Duration<TUnitOfMeasure, TDataType> duration)
+        {
+            return new DurationDouble<TUnitOfMeasure>(duration.ValueAsDouble);
+        }
         #endregion
 
         #region + Operators
@@ -131,9 +174,9 @@ namespace NGenericDimensions
             return new Duration<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Add(duration1.DurationValue, duration2.DurationValue));
         }
 
-        public static Duration<TUnitOfMeasure, double> operator +(Duration<TUnitOfMeasure, TDataType> duration1, IDuration duration2)
+        public static Duration<TUnitOfMeasure, double> operator +(Duration<TUnitOfMeasure, TDataType> duration1, DurationDouble duration2)
         {
-            return duration1.ValueAsDouble + (duration2.Value * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1));
+            return duration1.ValueAsDouble + (duration2.ValueAsDouble * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1));
         }
         #endregion
 
@@ -143,9 +186,9 @@ namespace NGenericDimensions
             return new Duration<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Subtract(duration1.DurationValue, duration2.DurationValue));
         }
 
-        public static Duration<TUnitOfMeasure, double> operator -(Duration<TUnitOfMeasure, TDataType> duration1, IDuration duration2)
+        public static Duration<TUnitOfMeasure, double> operator -(Duration<TUnitOfMeasure, TDataType> duration1, DurationDouble duration2)
         {
-            return duration1.ValueAsDouble - (duration2.Value * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1));
+            return duration1.ValueAsDouble - (duration2.ValueAsDouble * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1));
         }
         #endregion
 
@@ -177,9 +220,9 @@ namespace NGenericDimensions
             return new Duration<TUnitOfMeasure, double>(Convert.ToDouble((object)duration1.DurationValue) / duration2);
         }
 
-        public static double operator /(Duration<TUnitOfMeasure, TDataType> duration1, IDuration duration2)
+        public static double operator /(Duration<TUnitOfMeasure, TDataType> duration1, DurationDouble duration2)
         {
-            return duration1.ValueAsDouble / (new Duration<TUnitOfMeasure, double>(duration2).DurationValue);
+            return duration1.ValueAsDouble / (new Duration<TUnitOfMeasure, double>(duration2.ValueAsDouble).DurationValue);
         }
         #endregion
 
@@ -189,9 +232,9 @@ namespace NGenericDimensions
             return duration1.DurationValue.CompareTo(duration2.DurationValue) == 0;
         }
 
-        public static bool operator ==(Duration<TUnitOfMeasure, TDataType> duration1, IDuration duration2)
+        public static bool operator ==(Duration<TUnitOfMeasure, TDataType> duration1, DurationDouble duration2)
         {
-            return duration1.ValueAsDouble.CompareTo(duration2.Value * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) == 0;
+            return duration1.ValueAsDouble.CompareTo(duration2.ValueAsDouble * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) == 0;
         }
         #endregion
 
@@ -201,9 +244,9 @@ namespace NGenericDimensions
             return duration1.DurationValue.CompareTo(duration2.DurationValue) != 0;
         }
 
-        public static bool operator !=(Duration<TUnitOfMeasure, TDataType> duration1, IDuration duration2)
+        public static bool operator !=(Duration<TUnitOfMeasure, TDataType> duration1, DurationDouble duration2)
         {
-            return duration1.ValueAsDouble.CompareTo(duration2.Value * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) != 0;
+            return duration1.ValueAsDouble.CompareTo(duration2.ValueAsDouble * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) != 0;
         }
         #endregion
 
@@ -213,9 +256,9 @@ namespace NGenericDimensions
             return duration1.DurationValue.CompareTo(duration2.DurationValue) > 0;
         }
 
-        public static bool operator >(Duration<TUnitOfMeasure, TDataType> duration1, IDuration duration2)
+        public static bool operator >(Duration<TUnitOfMeasure, TDataType> duration1, DurationDouble duration2)
         {
-            return duration1.ValueAsDouble.CompareTo(duration2.Value * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) > 0;
+            return duration1.ValueAsDouble.CompareTo(duration2.ValueAsDouble * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) > 0;
         }
         #endregion
 
@@ -225,9 +268,9 @@ namespace NGenericDimensions
             return duration1.DurationValue.CompareTo(duration2.DurationValue) < 0;
         }
 
-        public static bool operator <(Duration<TUnitOfMeasure, TDataType> duration1, IDuration duration2)
+        public static bool operator <(Duration<TUnitOfMeasure, TDataType> duration1, DurationDouble duration2)
         {
-            return duration1.ValueAsDouble.CompareTo(duration2.Value * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) < 0;
+            return duration1.ValueAsDouble.CompareTo(duration2.ValueAsDouble * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) < 0;
         }
         #endregion
 
@@ -237,9 +280,9 @@ namespace NGenericDimensions
             return duration1.DurationValue.CompareTo(duration2.DurationValue) >= 0;
         }
 
-        public static bool operator >=(Duration<TUnitOfMeasure, TDataType> duration1, IDuration duration2)
+        public static bool operator >=(Duration<TUnitOfMeasure, TDataType> duration1, DurationDouble duration2)
         {
-            return duration1.ValueAsDouble.CompareTo(duration2.Value * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) >= 0;
+            return duration1.ValueAsDouble.CompareTo(duration2.ValueAsDouble * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) >= 0;
         }
         #endregion
 
@@ -249,9 +292,9 @@ namespace NGenericDimensions
             return duration1.DurationValue.CompareTo(duration2.DurationValue) <= 0;
         }
 
-        public static bool operator <=(Duration<TUnitOfMeasure, TDataType> duration1, IDuration duration2)
+        public static bool operator <=(Duration<TUnitOfMeasure, TDataType> duration1, DurationDouble duration2)
         {
-            return duration1.ValueAsDouble.CompareTo(duration2.Value * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) <= 0;
+            return duration1.ValueAsDouble.CompareTo(duration2.ValueAsDouble * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) <= 0;
         }
         #endregion
 

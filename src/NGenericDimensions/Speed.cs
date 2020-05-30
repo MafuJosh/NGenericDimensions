@@ -39,9 +39,9 @@ namespace NGenericDimensions
             SpeedValue = (TDataType)Convert.ChangeType(speedToConvertFrom.Value * speedToConvertFrom.LengthUnitOfMeasure.GetCompleteMultiplier<TLengthUnitOfMeasure>(1) / speedToConvertFrom.DurationUnitOfMeasure.GetCompleteMultiplier<TDurationUnitOfMeasure>(1), typeof(TDataType));
         }
 
-        public Speed(LengthDouble<TLengthUnitOfMeasure> length, IDuration<TDurationUnitOfMeasure> duration)
+        public Speed(LengthDouble<TLengthUnitOfMeasure> length, DurationDouble<TDurationUnitOfMeasure> duration)
         {
-            SpeedValue = (TDataType)Convert.ChangeType((new Length<TLengthUnitOfMeasure, double>(length.ValueAsDouble)).LengthValue / (new Duration<TDurationUnitOfMeasure, double>(duration)).DurationValue, typeof(TDataType));
+            SpeedValue = (TDataType)Convert.ChangeType((new Length<TLengthUnitOfMeasure, double>(length.ValueAsDouble)).LengthValue / (new Duration<TDurationUnitOfMeasure, double>(duration.ValueAsDouble)).DurationValue, typeof(TDataType));
         }
 
         public Speed(LengthDouble<TLengthUnitOfMeasure> length, TimeSpan duration)
@@ -181,12 +181,12 @@ namespace NGenericDimensions
             return new Length<TLengthUnitOfMeasure, double>(speed1.ValueAsDouble * duration2.Value);
         }
 
-        public static Length<TLengthUnitOfMeasure, double> operator *(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, IDuration duration2)
+        public static Length<TLengthUnitOfMeasure, double> operator *(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, DurationDouble duration2)
         {
             return new Length<TLengthUnitOfMeasure, double>(speed1.ValueAsDouble * (new Duration<TDurationUnitOfMeasure, double>(duration2)).DurationValue);
         }
 
-        public static Length<TLengthUnitOfMeasure, double> operator *(IDuration duration2, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1)
+        public static Length<TLengthUnitOfMeasure, double> operator *(DurationDouble duration2, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1)
         {
             return new Length<TLengthUnitOfMeasure, double>(speed1.ValueAsDouble * (new Duration<TDurationUnitOfMeasure, double>(duration2)).DurationValue);
         }
