@@ -17,7 +17,7 @@ namespace NGenericDimensions
         Durations.DurationUnitOfMeasure DurationUnitOfMeasure { get; }
     }
 
-    public struct Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> : ISpeed
+    public readonly struct Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> : ISpeed
         where TLengthUnitOfMeasure : Lengths.Length1DUnitOfMeasure, IDefinedUnitOfMeasure
         where TDurationUnitOfMeasure : Durations.DurationUnitOfMeasure, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
@@ -51,7 +51,7 @@ namespace NGenericDimensions
         #endregion
 
         #region Value
-        private TDataType mSpeed;
+        private readonly TDataType mSpeed;
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public TDataType SpeedValue

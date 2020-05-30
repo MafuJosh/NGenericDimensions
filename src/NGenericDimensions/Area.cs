@@ -21,12 +21,12 @@ namespace NGenericDimensions
     {
     }
 
-    public struct Area<TUnitOfMeasure, TDataType> : IArea<TUnitOfMeasure>
+    public readonly struct Area<TUnitOfMeasure, TDataType> : IArea<TUnitOfMeasure>
         where TUnitOfMeasure : Lengths.LengthUnitOfMeasure, IExponent1Or2, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
     {
 
-        private TDataType mArea;
+        private readonly TDataType mArea;
 
         #region Constructors
         public Area(TDataType area)

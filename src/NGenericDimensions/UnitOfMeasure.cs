@@ -20,27 +20,42 @@ public interface IDimension : IFormattable
 public interface IDimensionSupportsPerExtension { }
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public struct DimensionPerExtension<TDimension>
+public readonly struct DimensionPerExtension<TDimension>
     where TDimension : IDimension, IDimensionSupportsPerExtension
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal TDimension PerValue;
+    internal readonly TDimension PerValue;
+
+    internal DimensionPerExtension(TDimension perValue)
+    {
+        PerValue = perValue;
+    }
 }
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public struct DimensionSquareExtension<TDataType>
+public readonly struct DimensionSquareExtension<TDataType>
     where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal TDataType SquaredValue;
+    internal readonly TDataType SquaredValue;
+
+    internal DimensionSquareExtension(TDataType squaredValue)
+    {
+        SquaredValue = squaredValue;
+    }
 }
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public struct DimensionCubeExtension<TDataType>
+public readonly struct DimensionCubeExtension<TDataType>
     where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal TDataType CubedValue;
+    internal readonly TDataType CubedValue;
+
+    internal DimensionCubeExtension(TDataType cubedValue)
+    {
+        CubedValue = cubedValue;
+    }
 }
 
 /// <summary>
@@ -197,19 +212,19 @@ namespace NGenericDimensions.Extensions
         public static DimensionPerExtension<TDimension> per<TDimension>(this TDimension dimensionValue)
             where TDimension : IDimension, IDimensionSupportsPerExtension
         {
-            return new DimensionPerExtension<TDimension> { PerValue = dimensionValue };
+            return new DimensionPerExtension<TDimension>(dimensionValue);
         }
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static DimensionSquareExtension<TDataType> square<TDataType>(this TDataType squaredValue) where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
         {
-            return new DimensionSquareExtension<TDataType> { SquaredValue = squaredValue };
+            return new DimensionSquareExtension<TDataType>(squaredValue);
         }
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static DimensionCubeExtension<TDataType> cube<TDataType>(this TDataType cubedValue) where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
         {
-            return new DimensionCubeExtension<TDataType> { CubedValue = cubedValue };
+            return new DimensionCubeExtension<TDataType>(cubedValue);
         }
     }
 }

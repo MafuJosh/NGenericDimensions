@@ -20,7 +20,7 @@ namespace NGenericDimensions
     {
     }
 
-    public struct Mass<TUnitOfMeasure, TDataType> : IMass<TUnitOfMeasure>
+    public readonly struct Mass<TUnitOfMeasure, TDataType> : IMass<TUnitOfMeasure>
         where TUnitOfMeasure : Masses.MassUnitOfMeasure, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
     {
@@ -42,7 +42,7 @@ namespace NGenericDimensions
         #endregion
 
         #region Value
-        private TDataType mMass;
+        private readonly TDataType mMass;
 
         [EditorBrowsable(EditorBrowsableState.Always)]
         public TDataType MassValue

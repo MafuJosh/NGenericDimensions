@@ -20,7 +20,7 @@ namespace NGenericDimensions
     {
     }
 
-    public struct Duration<TUnitOfMeasure, TDataType> : IDuration<TUnitOfMeasure>
+    public readonly struct Duration<TUnitOfMeasure, TDataType> : IDuration<TUnitOfMeasure>
         where TUnitOfMeasure : Durations.DurationUnitOfMeasure, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
     {
@@ -54,7 +54,7 @@ namespace NGenericDimensions
         #endregion
 
         #region Value
-        private TDataType mDuration;
+        private readonly TDataType mDuration;
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public TDataType DurationValue

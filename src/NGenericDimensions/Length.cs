@@ -51,7 +51,7 @@ namespace NGenericDimensions
         public static bool operator !=(LengthDouble<TUnitOfMeasure> left, LengthDouble<TUnitOfMeasure> right) => !(left == right);
     }
 
-    public struct Length<TUnitOfMeasure, TDataType> : ILength<TUnitOfMeasure>, IEquatable<Length<TUnitOfMeasure, TDataType>>
+    public readonly struct Length<TUnitOfMeasure, TDataType> : ILength<TUnitOfMeasure>, IEquatable<Length<TUnitOfMeasure, TDataType>>
         where TUnitOfMeasure : Length1DUnitOfMeasure, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
     {
@@ -79,7 +79,7 @@ namespace NGenericDimensions
         #endregion
 
         #region Value
-        private TDataType mLength;
+        private readonly TDataType mLength;
 
         [EditorBrowsable(EditorBrowsableState.Always)]
         public TDataType LengthValue

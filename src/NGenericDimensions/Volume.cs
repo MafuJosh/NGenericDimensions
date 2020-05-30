@@ -20,12 +20,12 @@ namespace NGenericDimensions
     {
     }
 
-    public struct Volume<TUnitOfMeasure, TDataType> : IVolume<TUnitOfMeasure>
+    public readonly struct Volume<TUnitOfMeasure, TDataType> : IVolume<TUnitOfMeasure>
         where TUnitOfMeasure : Lengths.LengthUnitOfMeasure, IExponent1Or3, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
     {
 
-        private TDataType mVolume;
+        private readonly TDataType mVolume;
 
         #region Constructors
         public Volume(TDataType volume)
