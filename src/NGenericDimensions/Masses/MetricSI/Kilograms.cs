@@ -1,45 +1,26 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using NGenericDimensions.Masses.MetricSI;
 using NGenericDimensions.MetricPrefix;
 
 namespace NGenericDimensions.Masses.MetricSI
 {
-
     public class Kilograms : Grams<Kilo>
     {
-
     }
-
 }
 
 namespace NGenericDimensions.Extensions
 {
-
     public static class KilogramsExtensionMethods
     {
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static T KilogramsValue<T>(this Mass<Kilograms, T> mass) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => mass.MassValue;
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static T KilogramsValue<T>(this Mass<Masses.MetricSI.Kilograms, T> mass) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
-        {
-            return mass.MassValue;
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Always)]
-        public static Nullable<T> KilogramsValue<T>(this Nullable<Mass<Masses.MetricSI.Kilograms, T>> mass) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
-        {
-            if (mass.HasValue)
-            {
-                return mass.Value.MassValue;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
+        public static T? KilogramsValue<T>(this Mass<Kilograms, T>? mass) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => mass?.MassValue;
     }
-
 }
 
 namespace NGenericDimensions.Extensions.Numbers
@@ -48,9 +29,6 @@ namespace NGenericDimensions.Extensions.Numbers
     public static class KilogramsNumberExtensionMethods
     {
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static Mass<Masses.MetricSI.Kilograms, T> kilograms<T>(this T mass) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
-        {
-            return mass;
-        }
+        public static Mass<Kilograms, T> kilograms<T>(this T mass) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => mass;
     }
 }

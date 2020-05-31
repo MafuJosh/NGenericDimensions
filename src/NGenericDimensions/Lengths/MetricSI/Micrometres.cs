@@ -5,37 +5,22 @@ using NGenericDimensions.MetricPrefix;
 
 namespace NGenericDimensions.Lengths.MetricSI
 {
-
     public class Micrometres : Metres<Micro>
     {
-
     }
-
 }
 
 namespace NGenericDimensions.Extensions
 {
-
     public static class MicrometresExtensionMethods
     {
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static T MicrometresValue<T>(this Length<Lengths.MetricSI.Micrometres, T> length) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => length.LengthValue;
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static T MicrometresValue<T>(this Length<Lengths.MetricSI.Micrometres, T> length) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
+        public static T? MicrometresValue<T>(this Nullable<Length<Lengths.MetricSI.Micrometres, T>> length) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
-            return length.LengthValue;
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Always)]
-        public static Nullable<T> MicrometresValue<T>(this Nullable<Length<Lengths.MetricSI.Micrometres, T>> length) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
-        {
-            if (length.HasValue)
-            {
-                return length.Value.LengthValue;
-            }
-            else
-            {
-                return null;
-            }
+            return length?.LengthValue;
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
@@ -45,7 +30,7 @@ namespace NGenericDimensions.Extensions
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static Nullable<T> SquareMicrometresValue<T>(this Nullable<Area<Lengths.MetricSI.Micrometres, T>> area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
+        public static T? SquareMicrometresValue<T>(this Nullable<Area<Lengths.MetricSI.Micrometres, T>> area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             if (area.HasValue)
             {
@@ -64,7 +49,7 @@ namespace NGenericDimensions.Extensions
         }
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static Nullable<T> CubeMicrometresValue<T>(this Nullable<Volume<Lengths.MetricSI.Micrometres, T>> volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
+        public static T? CubeMicrometresValue<T>(this Nullable<Volume<Lengths.MetricSI.Micrometres, T>> volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             if (volume.HasValue)
             {

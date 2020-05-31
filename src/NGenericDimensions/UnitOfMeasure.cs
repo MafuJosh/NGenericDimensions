@@ -19,12 +19,7 @@ public readonly struct DimensionPerExtension<TDimension>
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal readonly TDimension PerValue;
-
-    internal DimensionPerExtension(TDimension perValue)
-    {
-        PerValue = perValue;
-    }
-
+    internal DimensionPerExtension(TDimension perValue) => PerValue = perValue;
     public override bool Equals(object obj) => obj != null && obj is DimensionPerExtension<TDimension> o && o.PerValue.Equals(PerValue);
     public override int GetHashCode() => HashCode.Combine(PerValue);
     public static bool operator ==(DimensionPerExtension<TDimension> left, DimensionPerExtension<TDimension> right) => left.Equals(right);
@@ -37,12 +32,7 @@ public readonly struct DimensionSquareExtension<TDataType>
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal readonly TDataType SquaredValue;
-
-    internal DimensionSquareExtension(TDataType squaredValue)
-    {
-        SquaredValue = squaredValue;
-    }
-
+    internal DimensionSquareExtension(TDataType squaredValue) => SquaredValue = squaredValue;
     public override bool Equals(object obj) => obj != null && obj is DimensionSquareExtension<TDataType> o && o.SquaredValue.Equals(SquaredValue);
     public override int GetHashCode() => HashCode.Combine(SquaredValue);
     public static bool operator ==(DimensionSquareExtension<TDataType> left, DimensionSquareExtension<TDataType> right) => left.Equals(right);
@@ -55,12 +45,7 @@ public readonly struct DimensionCubeExtension<TDataType>
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal readonly TDataType CubedValue;
-
-    internal DimensionCubeExtension(TDataType cubedValue)
-    {
-        CubedValue = cubedValue;
-    }
-
+    internal DimensionCubeExtension(TDataType cubedValue) => CubedValue = cubedValue;
     public override bool Equals(object obj) => obj != null && obj is DimensionCubeExtension<TDataType> o && o.CubedValue.Equals(CubedValue);
     public override int GetHashCode() => HashCode.Combine(CubedValue);
     public static bool operator ==(DimensionCubeExtension<TDataType> left, DimensionCubeExtension<TDataType> right) => left.Equals(right);
@@ -90,13 +75,9 @@ public interface IExponent1Or3 { }
 
 public abstract class UnitOfMeasure : IFormattable
 {
-
     protected abstract double GetMultiplier(bool stayWithinFamily);
     protected abstract bool IsSameFamily(Type typeOfUnitOfMeasure);
-    protected virtual int Exponent
-    {
-        get { return 1; }
-    }
+    protected virtual int Exponent => 1;
 
     protected internal double GetCompleteMultiplier<T>(int exponent) where T : UnitOfMeasure
     {
@@ -106,8 +87,8 @@ public abstract class UnitOfMeasure : IFormattable
         }
         else
         {
-            dynamic stayWithinFamily = this.IsSameFamily(typeof(T));
-            double myMultiplier = ApplyExponentToMultiplier(this.GetMultiplier(stayWithinFamily), this.Exponent, exponent);
+            dynamic stayWithinFamily = IsSameFamily(typeof(T));
+            double myMultiplier = ApplyExponentToMultiplier(GetMultiplier(stayWithinFamily), Exponent, exponent);
             double otherMultiplier = ApplyExponentToMultiplier(UnitOfMeasureGlobals<T>.GlobalInstance.GetMultiplier(stayWithinFamily), UnitOfMeasureGlobals<T>.GlobalInstance.Exponent, exponent);
             return myMultiplier / otherMultiplier;
         }
@@ -115,8 +96,8 @@ public abstract class UnitOfMeasure : IFormattable
 
     private static double ApplyExponentToMultiplier(double multiplier, int lengthExponent, int requestedExponent)
     {
-        double newMultiplier = multiplier;
-        for (int i = (lengthExponent + 1); i <= requestedExponent; i++)
+        var newMultiplier = multiplier;
+        for (var i = (lengthExponent + 1); i <= requestedExponent; i++)
         {
             newMultiplier *= multiplier;
         }
@@ -127,10 +108,7 @@ public abstract class UnitOfMeasure : IFormattable
     /// Returns the simple name of the derived class.
     /// </summary>
     /// <returns></returns>
-    public override string ToString()
-    {
-        return this.GetType().Name;
-    }
+    public override string ToString() => GetType().Name;
 
     /// <summary>
     /// Return the singular form of the name of the derived class.
@@ -162,18 +140,11 @@ public abstract class UnitOfMeasure : IFormattable
         }
         else if (format == "LUS")
         {
-
         }
         return ToString();
     }
 
-    public virtual string UnitSymbol
-    {
-        get
-        {
-            return ToString();
-        }
-    }
+    public virtual string UnitSymbol => ToString();
 
     internal virtual string ToString(IFormattable value, string format, IFormatProvider formatProvider)
     {
@@ -195,21 +166,11 @@ public abstract class UnitOfMeasure : IFormattable
     /// </summary>
     /// <param name="dimension"></param>
     /// <returns></returns>
-    protected virtual string DimensionUnitSymbol(IDimension dimension)
-    {
-        return null;
-    }
+    protected virtual string DimensionUnitSymbol(IDimension dimension) => null;
 
-    internal string GetDimensionalUnitSymbol(IDimension dimension)
-    {
-        return DimensionUnitSymbol(dimension);
-    }
+    internal string GetDimensionalUnitSymbol(IDimension dimension) => DimensionUnitSymbol(dimension);
 
-    protected static string TrimCustomFormat(string format)
-    {
-        if (format == null) return null;
-        return format.Replace("NU", "").Replace("LU", "").Replace("SU", "");
-    }
+    protected static string TrimCustomFormat(string format) => format?.Replace("NU", "").Replace("LU", "").Replace("SU", "");
 }
 
 namespace NGenericDimensions.Extensions
@@ -219,21 +180,12 @@ namespace NGenericDimensions.Extensions
     {
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static DimensionPerExtension<TDimension> per<TDimension>(this TDimension dimensionValue)
-            where TDimension : IDimension, IDimensionSupportsPerExtension
-        {
-            return new DimensionPerExtension<TDimension>(dimensionValue);
-        }
+            where TDimension : IDimension, IDimensionSupportsPerExtension => new DimensionPerExtension<TDimension>(dimensionValue);
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static DimensionSquareExtension<TDataType> square<TDataType>(this TDataType squaredValue) where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
-        {
-            return new DimensionSquareExtension<TDataType>(squaredValue);
-        }
+        public static DimensionSquareExtension<TDataType> square<TDataType>(this TDataType squaredValue) where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType> => new DimensionSquareExtension<TDataType>(squaredValue);
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static DimensionCubeExtension<TDataType> cube<TDataType>(this TDataType cubedValue) where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
-        {
-            return new DimensionCubeExtension<TDataType>(cubedValue);
-        }
+        public static DimensionCubeExtension<TDataType> cube<TDataType>(this TDataType cubedValue) where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType> => new DimensionCubeExtension<TDataType>(cubedValue);
     }
 }

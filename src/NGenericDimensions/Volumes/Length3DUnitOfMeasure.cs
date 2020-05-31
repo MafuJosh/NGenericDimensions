@@ -1,14 +1,9 @@
-﻿namespace NGenericDimensions.Volumes
+﻿using NGenericDimensions.Lengths;
+
+namespace NGenericDimensions.Volumes
 {
-
-    public abstract class Length3DUnitOfMeasure : Lengths.LengthUnitOfMeasure, IExponent1Or3
+    public abstract class Length3DUnitOfMeasure : LengthUnitOfMeasure, IExponent1Or3
     {
-
-        protected override int Exponent
-        {
-            get { return 3; }
-        }
-
+        protected override int Exponent => 3;
     }
-
 }
