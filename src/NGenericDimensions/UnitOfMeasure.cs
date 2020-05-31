@@ -121,7 +121,7 @@ public abstract class UnitOfMeasure : IFormattable
         // use some default logic to try to figure out the singular form of the unit
         if (name.EndsWith("s"))
         {
-            return name.Substring(0, name.Length - 1);
+            return name[0..^1];
         }
 
         // otherwise just return the name - if this name is plural, then the inheriting class should override this function
