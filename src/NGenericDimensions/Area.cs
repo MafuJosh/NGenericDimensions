@@ -21,6 +21,39 @@ namespace NGenericDimensions
     {
     }
 
+    public readonly struct AreaDouble
+    {
+        internal readonly double ValueAsDouble;
+        internal readonly Lengths.LengthUnitOfMeasure UnitOfMeasure;
+
+        internal AreaDouble(double valueAsDouble, Lengths.LengthUnitOfMeasure unitOfMeasure)
+        {
+            ValueAsDouble = valueAsDouble;
+            UnitOfMeasure = unitOfMeasure;
+        }
+
+        public override bool Equals(object obj) => obj != null && obj is AreaDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.UnitOfMeasure.Equals(UnitOfMeasure);
+        public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
+        public static bool operator ==(AreaDouble left, AreaDouble right) => left.Equals(right);
+        public static bool operator !=(AreaDouble left, AreaDouble right) => !(left == right);
+    }
+
+    public readonly struct AreaDouble<TUnitOfMeasure>
+        where TUnitOfMeasure : Lengths.LengthUnitOfMeasure, IExponent1Or2, IDefinedUnitOfMeasure
+    {
+        internal readonly double ValueAsDouble;
+
+        internal AreaDouble(double valueAsDouble)
+        {
+            ValueAsDouble = valueAsDouble;
+        }
+
+        public override bool Equals(object obj) => obj != null && obj is AreaDouble<TUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
+        public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
+        public static bool operator ==(AreaDouble<TUnitOfMeasure> left, AreaDouble<TUnitOfMeasure> right) => left.Equals(right);
+        public static bool operator !=(AreaDouble<TUnitOfMeasure> left, AreaDouble<TUnitOfMeasure> right) => !(left == right);
+    }
+
     public readonly struct Area<TUnitOfMeasure, TDataType> : IArea<TUnitOfMeasure>
         where TUnitOfMeasure : Lengths.LengthUnitOfMeasure, IExponent1Or2, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
@@ -37,9 +70,9 @@ namespace NGenericDimensions
             AreaValue = area.AreaValue;
         }
 
-        public Area(IArea areaToConvertFrom)
+        public Area(AreaDouble areaToConvertFrom)
         {
-            AreaValue = (TDataType)(Convert.ChangeType(areaToConvertFrom.Value * (areaToConvertFrom.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2)), typeof(TDataType)));
+            AreaValue = (TDataType)(Convert.ChangeType(areaToConvertFrom.ValueAsDouble * (areaToConvertFrom.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2)), typeof(TDataType)));
         }
         #endregion
 
@@ -101,6 +134,16 @@ namespace NGenericDimensions
         {
             return area.AreaValue;
         }
+        
+        public static implicit operator AreaDouble(Area<TUnitOfMeasure, TDataType> area)
+        {
+            return new AreaDouble(area.ValueAsDouble, area.UnitOfMeasure);
+        }
+
+        public static implicit operator AreaDouble<TUnitOfMeasure>(Area<TUnitOfMeasure, TDataType> area)
+        {
+            return new AreaDouble<TUnitOfMeasure>(area.ValueAsDouble);
+        }
         #endregion
 
         #region + Operators
@@ -109,9 +152,9 @@ namespace NGenericDimensions
             return new Area<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Add(area1.AreaValue, area2.AreaValue));
         }
 
-        public static Area<TUnitOfMeasure, double> operator +(Area<TUnitOfMeasure, TDataType> area1, IArea area2)
+        public static Area<TUnitOfMeasure, double> operator +(Area<TUnitOfMeasure, TDataType> area1, AreaDouble area2)
         {
-            return area1.ValueAsDouble + (area2.Value * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2)));
+            return area1.ValueAsDouble + (area2.ValueAsDouble * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2)));
         }
         #endregion
 
@@ -121,9 +164,9 @@ namespace NGenericDimensions
             return new Area<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Subtract(area1.AreaValue, area2.AreaValue));
         }
 
-        public static Area<TUnitOfMeasure, double> operator -(Area<TUnitOfMeasure, TDataType> area1, IArea area2)
+        public static Area<TUnitOfMeasure, double> operator -(Area<TUnitOfMeasure, TDataType> area1, AreaDouble area2)
         {
-            return area1.ValueAsDouble - (area2.Value * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2)));
+            return area1.ValueAsDouble - (area2.ValueAsDouble * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2)));
         }
         #endregion
 
@@ -155,7 +198,7 @@ namespace NGenericDimensions
             return new Area<TUnitOfMeasure, double>(Convert.ToDouble((object)area1.AreaValue) / area2);
         }
 
-        public static double operator /(Area<TUnitOfMeasure, TDataType> area1, IArea area2)
+        public static double operator /(Area<TUnitOfMeasure, TDataType> area1, AreaDouble area2)
         {
             return area1.ValueAsDouble / (new Area<TUnitOfMeasure, double>(area2).AreaValue);
         }
@@ -167,9 +210,9 @@ namespace NGenericDimensions
             return area1.AreaValue.CompareTo(area2.AreaValue) == 0;
         }
 
-        public static bool operator ==(Area<TUnitOfMeasure, TDataType> area1, IArea area2)
+        public static bool operator ==(Area<TUnitOfMeasure, TDataType> area1, AreaDouble area2)
         {
-            return area1.ValueAsDouble.CompareTo(area2.Value * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2))) == 0;
+            return area1.ValueAsDouble.CompareTo(area2.ValueAsDouble * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2))) == 0;
         }
         #endregion
 
@@ -179,9 +222,9 @@ namespace NGenericDimensions
             return area1.AreaValue.CompareTo(area2.AreaValue) != 0;
         }
 
-        public static bool operator !=(Area<TUnitOfMeasure, TDataType> area1, IArea area2)
+        public static bool operator !=(Area<TUnitOfMeasure, TDataType> area1, AreaDouble area2)
         {
-            return area1.ValueAsDouble.CompareTo(area2.Value * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2))) != 0;
+            return area1.ValueAsDouble.CompareTo(area2.ValueAsDouble * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2))) != 0;
         }
         #endregion
 
@@ -191,9 +234,9 @@ namespace NGenericDimensions
             return area1.AreaValue.CompareTo(area2.AreaValue) > 0;
         }
 
-        public static bool operator >(Area<TUnitOfMeasure, TDataType> area1, IArea area2)
+        public static bool operator >(Area<TUnitOfMeasure, TDataType> area1, AreaDouble area2)
         {
-            return area1.ValueAsDouble.CompareTo(area2.Value * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2))) > 0;
+            return area1.ValueAsDouble.CompareTo(area2.ValueAsDouble * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2))) > 0;
         }
         #endregion
 
@@ -203,9 +246,9 @@ namespace NGenericDimensions
             return area1.AreaValue.CompareTo(area2.AreaValue) < 0;
         }
 
-        public static bool operator <(Area<TUnitOfMeasure, TDataType> area1, IArea area2)
+        public static bool operator <(Area<TUnitOfMeasure, TDataType> area1, AreaDouble area2)
         {
-            return area1.ValueAsDouble.CompareTo(area2.Value * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2))) < 0;
+            return area1.ValueAsDouble.CompareTo(area2.ValueAsDouble * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2))) < 0;
         }
         #endregion
 
@@ -215,9 +258,9 @@ namespace NGenericDimensions
             return area1.AreaValue.CompareTo(area2.AreaValue) >= 0;
         }
 
-        public static bool operator >=(Area<TUnitOfMeasure, TDataType> area1, IArea area2)
+        public static bool operator >=(Area<TUnitOfMeasure, TDataType> area1, AreaDouble area2)
         {
-            return area1.ValueAsDouble.CompareTo(area2.Value * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2))) >= 0;
+            return area1.ValueAsDouble.CompareTo(area2.ValueAsDouble * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2))) >= 0;
         }
         #endregion
 
@@ -227,9 +270,9 @@ namespace NGenericDimensions
             return area1.AreaValue.CompareTo(area2.AreaValue) <= 0;
         }
 
-        public static bool operator <=(Area<TUnitOfMeasure, TDataType> area1, IArea area2)
+        public static bool operator <=(Area<TUnitOfMeasure, TDataType> area1, AreaDouble area2)
         {
-            return area1.ValueAsDouble.CompareTo(area2.Value * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2))) <= 0;
+            return area1.ValueAsDouble.CompareTo(area2.ValueAsDouble * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2))) <= 0;
         }
         #endregion
 

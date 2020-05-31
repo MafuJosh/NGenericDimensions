@@ -225,7 +225,7 @@ namespace NGenericDimensions
             return length1.ValueAsDouble / length2.ValueAsDouble;
         }
 
-        public static Length<TUnitOfMeasure, double> operator /(IArea area1, Length<TUnitOfMeasure, TDataType> length2)
+        public static Length<TUnitOfMeasure, double> operator /(AreaDouble area1, Length<TUnitOfMeasure, TDataType> length2)
         {
             return new Length<TUnitOfMeasure, double>((new Area<TUnitOfMeasure, double>(area1)).AreaValue / length2.ValueAsDouble);
         }
