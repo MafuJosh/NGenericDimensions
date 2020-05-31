@@ -1,12 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections;
-using System.Data;
-using System.Diagnostics;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Diagnostics.CodeAnalysis;
 
 /// <summary>

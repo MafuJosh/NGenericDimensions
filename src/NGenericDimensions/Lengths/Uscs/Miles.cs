@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.ComponentModel;
 using NGenericDimensions.Durations;
 using System.Diagnostics.CodeAnalysis;

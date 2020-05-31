@@ -1,18 +1,11 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace NGenericDimensions.Areas.MetricNonSI
 {
-
     public class Hectares : MetricNonSIAreaUnitOfMeasure, IDefinedUnitOfMeasure
     {
-
         protected override double GetMultiplier(bool stayWithinFamily)
         {
             return base.GetMultiplier(stayWithinFamily);
@@ -26,7 +19,6 @@ namespace NGenericDimensions.Areas.MetricNonSI
             }
         }
     }
-
 }
 
 namespace NGenericDimensions.Extensions

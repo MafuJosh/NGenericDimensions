@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-namespace NGenericDimensions.Lengths.Uscs
+﻿namespace NGenericDimensions.Lengths.Uscs
 {
 
     public abstract class UscsLengthUnitOfMeasure : Length1DUnitOfMeasure
