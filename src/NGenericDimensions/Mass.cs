@@ -20,6 +20,39 @@ namespace NGenericDimensions
     {
     }
 
+    public readonly struct MassDouble
+    {
+        internal readonly double ValueAsDouble;
+        internal readonly Masses.MassUnitOfMeasure UnitOfMeasure;
+
+        internal MassDouble(double valueAsDouble, Masses.MassUnitOfMeasure unitOfMeasure)
+        {
+            ValueAsDouble = valueAsDouble;
+            UnitOfMeasure = unitOfMeasure;
+        }
+
+        public override bool Equals(object obj) => obj != null && obj is MassDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.UnitOfMeasure.Equals(UnitOfMeasure);
+        public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
+        public static bool operator ==(MassDouble left, MassDouble right) => left.Equals(right);
+        public static bool operator !=(MassDouble left, MassDouble right) => !(left == right);
+    }
+
+    public readonly struct MassDouble<TUnitOfMeasure>
+        where TUnitOfMeasure : Masses.MassUnitOfMeasure, IDefinedUnitOfMeasure
+    {
+        internal readonly double ValueAsDouble;
+
+        internal MassDouble(double valueAsDouble)
+        {
+            ValueAsDouble = valueAsDouble;
+        }
+
+        public override bool Equals(object obj) => obj != null && obj is MassDouble<TUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
+        public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
+        public static bool operator ==(MassDouble<TUnitOfMeasure> left, MassDouble<TUnitOfMeasure> right) => left.Equals(right);
+        public static bool operator !=(MassDouble<TUnitOfMeasure> left, MassDouble<TUnitOfMeasure> right) => !(left == right);
+    }
+
     public readonly struct Mass<TUnitOfMeasure, TDataType> : IMass<TUnitOfMeasure>
         where TUnitOfMeasure : Masses.MassUnitOfMeasure, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
@@ -35,9 +68,9 @@ namespace NGenericDimensions
             MassValue = mass.MassValue;
         }
 
-        public Mass(IMass massToConvertFrom)
+        public Mass(MassDouble massToConvertFrom)
         {
-            MassValue = (TDataType)(Convert.ChangeType(massToConvertFrom.Value * massToConvertFrom.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1), typeof(TDataType)));
+            MassValue = (TDataType)(Convert.ChangeType(massToConvertFrom.ValueAsDouble * massToConvertFrom.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1), typeof(TDataType)));
         }
         #endregion
 
@@ -95,6 +128,16 @@ namespace NGenericDimensions
         {
             return mass.MassValue;
         }
+
+        public static implicit operator MassDouble(Mass<TUnitOfMeasure, TDataType> mass)
+        {
+            return new MassDouble(mass.ValueAsDouble, mass.UnitOfMeasure);
+        }
+
+        public static implicit operator MassDouble<TUnitOfMeasure>(Mass<TUnitOfMeasure, TDataType> mass)
+        {
+            return new MassDouble<TUnitOfMeasure>(mass.ValueAsDouble);
+        }
         #endregion
 
         #region + Operators
@@ -103,9 +146,9 @@ namespace NGenericDimensions
             return new Mass<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Add(mass1.MassValue, mass2.MassValue));
         }
 
-        public static Mass<TUnitOfMeasure, double> operator +(Mass<TUnitOfMeasure, TDataType> mass1, IMass mass2)
+        public static Mass<TUnitOfMeasure, double> operator +(Mass<TUnitOfMeasure, TDataType> mass1, MassDouble mass2)
         {
-            return mass1.ValueAsDouble + (mass2.Value * mass2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1));
+            return mass1.ValueAsDouble + (mass2.ValueAsDouble * mass2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1));
         }
         #endregion
 
@@ -115,9 +158,9 @@ namespace NGenericDimensions
             return new Mass<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Subtract(mass1.MassValue, mass2.MassValue));
         }
 
-        public static Mass<TUnitOfMeasure, double> operator -(Mass<TUnitOfMeasure, TDataType> mass1, IMass mass2)
+        public static Mass<TUnitOfMeasure, double> operator -(Mass<TUnitOfMeasure, TDataType> mass1, MassDouble mass2)
         {
-            return mass1.ValueAsDouble - (mass2.Value * mass2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1));
+            return mass1.ValueAsDouble - (mass2.ValueAsDouble * mass2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1));
         }
         #endregion
 
@@ -149,7 +192,7 @@ namespace NGenericDimensions
             return new Mass<TUnitOfMeasure, double>(Convert.ToDouble((object)mass1.MassValue) / mass2);
         }
 
-        public static double operator /(Mass<TUnitOfMeasure, TDataType> mass1, IMass mass2)
+        public static double operator /(Mass<TUnitOfMeasure, TDataType> mass1, MassDouble mass2)
         {
             return mass1.ValueAsDouble / (new Mass<TUnitOfMeasure, double>(mass2).MassValue);
         }
@@ -161,9 +204,9 @@ namespace NGenericDimensions
             return mass1.MassValue.CompareTo(mass2.MassValue) == 0;
         }
 
-        public static bool operator ==(Mass<TUnitOfMeasure, TDataType> mass1, IMass mass2)
+        public static bool operator ==(Mass<TUnitOfMeasure, TDataType> mass1, MassDouble mass2)
         {
-            return mass1.ValueAsDouble.CompareTo(mass2.Value * mass2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) == 0;
+            return mass1.ValueAsDouble.CompareTo(mass2.ValueAsDouble * mass2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) == 0;
         }
         #endregion
 
@@ -173,9 +216,9 @@ namespace NGenericDimensions
             return mass1.MassValue.CompareTo(mass2.MassValue) != 0;
         }
 
-        public static bool operator !=(Mass<TUnitOfMeasure, TDataType> mass1, IMass mass2)
+        public static bool operator !=(Mass<TUnitOfMeasure, TDataType> mass1, MassDouble mass2)
         {
-            return mass1.ValueAsDouble.CompareTo(mass2.Value * mass2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) != 0;
+            return mass1.ValueAsDouble.CompareTo(mass2.ValueAsDouble * mass2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) != 0;
         }
         #endregion
 
@@ -185,9 +228,9 @@ namespace NGenericDimensions
             return mass1.MassValue.CompareTo(mass2.MassValue) > 0;
         }
 
-        public static bool operator >(Mass<TUnitOfMeasure, TDataType> mass1, IMass mass2)
+        public static bool operator >(Mass<TUnitOfMeasure, TDataType> mass1, MassDouble mass2)
         {
-            return mass1.ValueAsDouble.CompareTo(mass2.Value * mass2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) > 0;
+            return mass1.ValueAsDouble.CompareTo(mass2.ValueAsDouble * mass2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) > 0;
         }
         #endregion
 
@@ -197,9 +240,9 @@ namespace NGenericDimensions
             return mass1.MassValue.CompareTo(mass2.MassValue) < 0;
         }
 
-        public static bool operator <(Mass<TUnitOfMeasure, TDataType> mass1, IMass mass2)
+        public static bool operator <(Mass<TUnitOfMeasure, TDataType> mass1, MassDouble mass2)
         {
-            return mass1.ValueAsDouble.CompareTo(mass2.Value * mass2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) < 0;
+            return mass1.ValueAsDouble.CompareTo(mass2.ValueAsDouble * mass2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) < 0;
         }
         #endregion
 
@@ -209,9 +252,9 @@ namespace NGenericDimensions
             return mass1.MassValue.CompareTo(mass2.MassValue) >= 0;
         }
 
-        public static bool operator >=(Mass<TUnitOfMeasure, TDataType> mass1, IMass mass2)
+        public static bool operator >=(Mass<TUnitOfMeasure, TDataType> mass1, MassDouble mass2)
         {
-            return mass1.ValueAsDouble.CompareTo(mass2.Value * mass2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) >= 0;
+            return mass1.ValueAsDouble.CompareTo(mass2.ValueAsDouble * mass2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) >= 0;
         }
         #endregion
 
@@ -221,9 +264,9 @@ namespace NGenericDimensions
             return mass1.MassValue.CompareTo(mass2.MassValue) <= 0;
         }
 
-        public static bool operator <=(Mass<TUnitOfMeasure, TDataType> mass1, IMass mass2)
+        public static bool operator <=(Mass<TUnitOfMeasure, TDataType> mass1, MassDouble mass2)
         {
-            return mass1.ValueAsDouble.CompareTo(mass2.Value * mass2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) <= 0;
+            return mass1.ValueAsDouble.CompareTo(mass2.ValueAsDouble * mass2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) <= 0;
         }
         #endregion
 
