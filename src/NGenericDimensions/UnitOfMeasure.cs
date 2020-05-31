@@ -31,6 +31,11 @@ public readonly struct DimensionPerExtension<TDimension>
     {
         PerValue = perValue;
     }
+
+    public override bool Equals(object obj) => obj != null && obj is DimensionPerExtension<TDimension> o && o.PerValue.Equals(PerValue);
+    public override int GetHashCode() => HashCode.Combine(PerValue);
+    public static bool operator ==(DimensionPerExtension<TDimension> left, DimensionPerExtension<TDimension> right) => left.Equals(right);
+    public static bool operator !=(DimensionPerExtension<TDimension> left, DimensionPerExtension<TDimension> right) => !(left == right);
 }
 
 [EditorBrowsable(EditorBrowsableState.Never)]
@@ -44,6 +49,11 @@ public readonly struct DimensionSquareExtension<TDataType>
     {
         SquaredValue = squaredValue;
     }
+
+    public override bool Equals(object obj) => obj != null && obj is DimensionSquareExtension<TDataType> o && o.SquaredValue.Equals(SquaredValue);
+    public override int GetHashCode() => HashCode.Combine(SquaredValue);
+    public static bool operator ==(DimensionSquareExtension<TDataType> left, DimensionSquareExtension<TDataType> right) => left.Equals(right);
+    public static bool operator !=(DimensionSquareExtension<TDataType> left, DimensionSquareExtension<TDataType> right) => !(left == right);
 }
 
 [EditorBrowsable(EditorBrowsableState.Never)]
@@ -57,6 +67,11 @@ public readonly struct DimensionCubeExtension<TDataType>
     {
         CubedValue = cubedValue;
     }
+
+    public override bool Equals(object obj) => obj != null && obj is DimensionCubeExtension<TDataType> o && o.CubedValue.Equals(CubedValue);
+    public override int GetHashCode() => HashCode.Combine(CubedValue);
+    public static bool operator ==(DimensionCubeExtension<TDataType> left, DimensionCubeExtension<TDataType> right) => left.Equals(right);
+    public static bool operator !=(DimensionCubeExtension<TDataType> left, DimensionCubeExtension<TDataType> right) => !(left == right);
 }
 
 /// <summary>

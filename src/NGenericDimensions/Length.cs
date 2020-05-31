@@ -7,8 +7,6 @@ using NGenericDimensions.Lengths;
 
 namespace NGenericDimensions
 {
-    // TODO: can we get rid of ILength now?  LengthDouble replaced it fully I think, without boxing.  We might still be using IDimension, etc., so maybe could get rid of ILength and implement IDimension directly
-
     public interface ILength : IDimension, IDimensionSupportsPerExtension
     {
         Length1DUnitOfMeasure UnitOfMeasure { get; }
