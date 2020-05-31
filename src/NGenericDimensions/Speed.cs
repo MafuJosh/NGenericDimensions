@@ -17,6 +17,42 @@ namespace NGenericDimensions
         Durations.DurationUnitOfMeasure DurationUnitOfMeasure { get; }
     }
 
+    public readonly struct SpeedDouble
+    {
+        internal readonly double ValueAsDouble;
+        internal readonly Lengths.Length1DUnitOfMeasure LengthUnitOfMeasure;
+        internal readonly Durations.DurationUnitOfMeasure DurationUnitOfMeasure;
+
+        internal SpeedDouble(double valueAsDouble, Lengths.Length1DUnitOfMeasure lengthUnitOfMeasure, Durations.DurationUnitOfMeasure durationUnitOfMeasure)
+        {
+            ValueAsDouble = valueAsDouble;
+            LengthUnitOfMeasure = lengthUnitOfMeasure;
+            DurationUnitOfMeasure = durationUnitOfMeasure;
+        }
+
+        public override bool Equals(object obj) => obj != null && obj is SpeedDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.LengthUnitOfMeasure.Equals(LengthUnitOfMeasure) && o.DurationUnitOfMeasure.Equals(DurationUnitOfMeasure);
+        public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
+        public static bool operator ==(SpeedDouble left, SpeedDouble right) => left.Equals(right);
+        public static bool operator !=(SpeedDouble left, SpeedDouble right) => !(left == right);
+    }
+
+    public readonly struct SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure>
+        where TLengthUnitOfMeasure : Lengths.Length1DUnitOfMeasure, IDefinedUnitOfMeasure
+        where TDurationUnitOfMeasure : Durations.DurationUnitOfMeasure, IDefinedUnitOfMeasure
+    {
+        internal readonly double ValueAsDouble;
+
+        internal SpeedDouble(double valueAsDouble)
+        {
+            ValueAsDouble = valueAsDouble;
+        }
+
+        public override bool Equals(object obj) => obj != null && obj is SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
+        public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
+        public static bool operator ==(SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure> left, SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure> right) => left.Equals(right);
+        public static bool operator !=(SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure> left, SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure> right) => !(left == right);
+    }
+
     public readonly struct Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> : ISpeed
         where TLengthUnitOfMeasure : Lengths.Length1DUnitOfMeasure, IDefinedUnitOfMeasure
         where TDurationUnitOfMeasure : Durations.DurationUnitOfMeasure, IDefinedUnitOfMeasure
@@ -34,9 +70,9 @@ namespace NGenericDimensions
             SpeedValue = speed.SpeedValue;
         }
 
-        public Speed(ISpeed speedToConvertFrom)
+        public Speed(SpeedDouble speedToConvertFrom)
         {
-            SpeedValue = (TDataType)Convert.ChangeType(speedToConvertFrom.Value * speedToConvertFrom.LengthUnitOfMeasure.GetCompleteMultiplier<TLengthUnitOfMeasure>(1) / speedToConvertFrom.DurationUnitOfMeasure.GetCompleteMultiplier<TDurationUnitOfMeasure>(1), typeof(TDataType));
+            SpeedValue = (TDataType)Convert.ChangeType(speedToConvertFrom.ValueAsDouble * speedToConvertFrom.LengthUnitOfMeasure.GetCompleteMultiplier<TLengthUnitOfMeasure>(1) / speedToConvertFrom.DurationUnitOfMeasure.GetCompleteMultiplier<TDurationUnitOfMeasure>(1), typeof(TDataType));
         }
 
         public Speed(LengthDouble<TLengthUnitOfMeasure> length, DurationDouble<TDurationUnitOfMeasure> duration)
@@ -124,6 +160,16 @@ namespace NGenericDimensions
         {
             return speed.SpeedValue;
         }
+
+        public static implicit operator SpeedDouble(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed)
+        {
+            return new SpeedDouble(speed.ValueAsDouble, speed.LengthUnitOfMeasure, speed.DurationUnitOfMeasure);
+        }
+
+        public static implicit operator SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure>(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed)
+        {
+            return new SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure>(speed.ValueAsDouble);
+        }
         #endregion
 
         #region + Operators
@@ -132,7 +178,7 @@ namespace NGenericDimensions
             return new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Add(speed1.SpeedValue, speed2.SpeedValue));
         }
 
-        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double> operator +(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, ISpeed speed2)
+        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double> operator +(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2)
         {
             return speed1.ValueAsDouble + (new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double>(speed2)).ValueAsDouble;
         }
@@ -144,7 +190,7 @@ namespace NGenericDimensions
             return new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Subtract(speed1.SpeedValue, speed2.SpeedValue));
         }
 
-        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double> operator -(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, ISpeed speed2)
+        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double> operator -(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2)
         {
             return speed1.ValueAsDouble - (new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double>(speed2)).ValueAsDouble;
         }
@@ -218,9 +264,9 @@ namespace NGenericDimensions
             return new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double>(Convert.ToDouble((object)speed1.SpeedValue) / speed2);
         }
 
-        public static double operator /(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, ISpeed speed2)
+        public static double operator /(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2)
         {
-            return speed1.ValueAsDouble / speed2.Value;
+            return speed1.ValueAsDouble / speed2.ValueAsDouble;
         }
         #endregion
 
@@ -230,7 +276,7 @@ namespace NGenericDimensions
             return speed1.SpeedValue.CompareTo(speed2.SpeedValue) == 0;
         }
 
-        public static bool operator ==(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, ISpeed speed2)
+        public static bool operator ==(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2)
         {
             return speed1.ValueAsDouble.CompareTo((new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(speed2)).ValueAsDouble) == 0;
         }
@@ -242,7 +288,7 @@ namespace NGenericDimensions
             return speed1.SpeedValue.CompareTo(speed2.SpeedValue) != 0;
         }
 
-        public static bool operator !=(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, ISpeed speed2)
+        public static bool operator !=(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2)
         {
             return speed1.ValueAsDouble.CompareTo((new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(speed2)).ValueAsDouble) != 0;
         }
@@ -254,7 +300,7 @@ namespace NGenericDimensions
             return speed1.SpeedValue.CompareTo(speed2.SpeedValue) > 0;
         }
 
-        public static bool operator >(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, ISpeed speed2)
+        public static bool operator >(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2)
         {
             return speed1.ValueAsDouble.CompareTo((new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(speed2)).ValueAsDouble) > 0;
         }
@@ -266,7 +312,7 @@ namespace NGenericDimensions
             return speed1.SpeedValue.CompareTo(speed2.SpeedValue) < 0;
         }
 
-        public static bool operator <(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, ISpeed speed2)
+        public static bool operator <(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2)
         {
             return speed1.ValueAsDouble.CompareTo((new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(speed2)).ValueAsDouble) < 0;
         }
@@ -278,7 +324,7 @@ namespace NGenericDimensions
             return speed1.SpeedValue.CompareTo(speed2.SpeedValue) >= 0;
         }
 
-        public static bool operator >=(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, ISpeed speed2)
+        public static bool operator >=(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2)
         {
             return speed1.ValueAsDouble.CompareTo((new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(speed2)).ValueAsDouble) >= 0;
         }
@@ -290,7 +336,7 @@ namespace NGenericDimensions
             return speed1.SpeedValue.CompareTo(speed2.SpeedValue) <= 0;
         }
 
-        public static bool operator <=(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, ISpeed speed2)
+        public static bool operator <=(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2)
         {
             return speed1.ValueAsDouble.CompareTo((new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(speed2)).ValueAsDouble) <= 0;
         }
