@@ -286,8 +286,7 @@ namespace NGenericDimensions
             }
             else if (format.Contains("SU"))
             {
-                var length1DUom = UnitOfMeasure as Length1DUnitOfMeasure;
-                if (length1DUom != null)
+                if (UnitOfMeasure is Length1DUnitOfMeasure length1DUom)
                 {
                     return UnitOfMeasure.ToString(AreaValue, format.Replace("SU", "NU"), formatProvider) + @" " + length1DUom.AreaUnitSymbol;
                 }

@@ -131,7 +131,9 @@ namespace NGenericDimensionsUnitTests
         public void TestDurationCastingOperators()
         {
             // implicit cast to duration
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
             Duration<Minutes, Double> durationA = 2.2;
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
             AssertCompilationFails("Cannot implicitly convert type", @"NGenericDimensions.Duration<NGenericDimensions.Durations.Minutes, System.Double> durationB = System.Convert.ToDecimal(5.5);");
 
             // explicit cast from duration

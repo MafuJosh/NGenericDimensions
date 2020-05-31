@@ -900,7 +900,9 @@ namespace NGenericDimensionsUnitTests
         public void TestSpeedCastingOperators()
         {
             // implicit cast to speed
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
             Speed<Inches, Minutes, Double> durationA = 2.2;
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
             AssertCompilationFails("Cannot implicitly convert type", @"NGenericDimensions.Speed<NGenericDimensions.Lengths.Uscs.Inches, NGenericDimensions.Durations.Minutes, System.Double> speedB = System.Convert.ToDecimal(5.5);");
 
             // explicit cast from speed
@@ -950,7 +952,7 @@ namespace NGenericDimensionsUnitTests
             Assert.Equal(7.2, speedG.SpeedValue);
 
             // don't allow adding a different dimension to it
-            var xyz = (new NGenericDimensions.Speed<NGenericDimensions.Lengths.Uscs.Inches, NGenericDimensions.Durations.Minutes, System.Double>(2.2)) + (new NGenericDimensions.Speed<NGenericDimensions.Lengths.Uscs.Inches, NGenericDimensions.Durations.Hours, System.Double>(3.3));
+            _ = (new NGenericDimensions.Speed<NGenericDimensions.Lengths.Uscs.Inches, NGenericDimensions.Durations.Minutes, System.Double>(2.2)) + (new NGenericDimensions.Speed<NGenericDimensions.Lengths.Uscs.Inches, NGenericDimensions.Durations.Hours, System.Double>(3.3));
             AssertCompilationFails(@"Operator '-' cannot be applied", @"_ = (new NGenericDimensions.Speed<NGenericDimensions.Lengths.Uscs.Inches, NGenericDimensions.Durations.Minutes, System.Double>(2.2)) - (new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, System.Double>(3.3));");
         }
 

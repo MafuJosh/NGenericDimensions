@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.ComponentModel;
 using NGenericDimensions.Durations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace NGenericDimensions.Lengths.Uscs
 {
@@ -107,7 +108,7 @@ namespace NGenericDimensions.Extensions
 
 namespace NGenericDimensions.Extensions.Numbers
 {
-
+    [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "In this case we want it to be lowercase, to appear different than other functions.")]
     public static class MilesNumberExtensionMethods
     {
 

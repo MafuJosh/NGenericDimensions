@@ -114,7 +114,9 @@ namespace NGenericDimensionsUnitTests
         public void TestAreaCastingOperators()
         {
             // implicit cast to area
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
             Area<Millimetres, Double> areaA = 2.2;
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
             AssertCompilationFails("Cannot implicitly convert type", @"NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Millimetres, System.Double> areaB = System.Convert.ToDecimal(5.5);");
 
             // explicit cast from length

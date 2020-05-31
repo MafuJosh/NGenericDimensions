@@ -104,7 +104,9 @@ namespace NGenericDimensionsUnitTests
         public void TestmassCastingOperators()
         {
             // implicit cast to mass
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
             Mass<Kilograms, Double> massA = 2.2;
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
             AssertCompilationFails("Cannot implicitly convert type", @"NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, System.Double> massB = System.Convert.ToDecimal(5.5);");
 
             // explicit cast from mass

@@ -108,7 +108,9 @@ namespace NGenericDimensionsUnitTests
         public void TestLengthCastingOperators()
         {
             // implicit cast to length
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
             Length<NGenericDimensions.Lengths.MetricSI.Millimetres, Double> lengthA = 2.2;
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
             AssertCompilationFails("Cannot implicitly convert type", @"NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Millimetres, System.Double> lengthB = System.Convert.ToDecimal(5.5);");
 
             // explicit cast from length

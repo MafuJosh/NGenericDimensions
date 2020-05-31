@@ -7,6 +7,7 @@ using System.Data;
 using System.Diagnostics;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Diagnostics.CodeAnalysis;
 
 /// <summary>
 /// IDimension is the base interface of all dimension data types. It can be used to identify if a datatype is a dimensional datatype and retrieve its value.
@@ -205,7 +206,7 @@ public abstract class UnitOfMeasure : IFormattable
 
 namespace NGenericDimensions.Extensions
 {
-
+    [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "In this case we want it to be lowercase, to appear different than other functions.")]
     public static class DimensionExtensionMethods
     {
         [EditorBrowsable(EditorBrowsableState.Advanced)]
