@@ -14,10 +14,6 @@ namespace NGenericDimensions
         Length1DUnitOfMeasure UnitOfMeasure { get; }
     }
 
-    public interface ILength<out TUnitOfMeasure> : ILength where TUnitOfMeasure : Length1DUnitOfMeasure
-    {
-    }
-
     public readonly struct LengthDouble
     {
         internal readonly double ValueAsDouble;
@@ -51,7 +47,7 @@ namespace NGenericDimensions
         public static bool operator !=(LengthDouble<TUnitOfMeasure> left, LengthDouble<TUnitOfMeasure> right) => !(left == right);
     }
 
-    public readonly struct Length<TUnitOfMeasure, TDataType> : ILength<TUnitOfMeasure>, IEquatable<Length<TUnitOfMeasure, TDataType>>
+    public readonly struct Length<TUnitOfMeasure, TDataType> : ILength, IEquatable<Length<TUnitOfMeasure, TDataType>>
         where TUnitOfMeasure : Length1DUnitOfMeasure, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
     {

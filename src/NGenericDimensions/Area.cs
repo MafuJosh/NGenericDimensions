@@ -11,10 +11,6 @@ namespace NGenericDimensions
         LengthUnitOfMeasure UnitOfMeasure { get; }
     }
 
-    public interface IArea<out TUnitOfMeasure> : IArea where TUnitOfMeasure : LengthUnitOfMeasure
-    {
-    }
-
     public readonly struct AreaDouble
     {
         internal readonly double ValueAsDouble;
@@ -48,7 +44,7 @@ namespace NGenericDimensions
         public static bool operator !=(AreaDouble<TUnitOfMeasure> left, AreaDouble<TUnitOfMeasure> right) => !(left == right);
     }
 
-    public readonly struct Area<TUnitOfMeasure, TDataType> : IArea<TUnitOfMeasure>, IEquatable<Area<TUnitOfMeasure, TDataType>>
+    public readonly struct Area<TUnitOfMeasure, TDataType> : IArea, IEquatable<Area<TUnitOfMeasure, TDataType>>
         where TUnitOfMeasure : Lengths.LengthUnitOfMeasure, IExponent1Or2, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
     {

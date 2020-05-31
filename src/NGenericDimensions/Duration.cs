@@ -16,10 +16,6 @@ namespace NGenericDimensions
         Durations.DurationUnitOfMeasure UnitOfMeasure { get; }
     }
 
-    public interface IDuration<out TUnitOfMeasure> : IDuration where TUnitOfMeasure : Durations.DurationUnitOfMeasure
-    {
-    }
-
     public readonly struct DurationDouble
     {
         internal readonly double ValueAsDouble;
@@ -53,7 +49,7 @@ namespace NGenericDimensions
         public static bool operator !=(DurationDouble<TUnitOfMeasure> left, DurationDouble<TUnitOfMeasure> right) => !(left == right);
     }
 
-    public readonly struct Duration<TUnitOfMeasure, TDataType> : IDuration<TUnitOfMeasure>, IEquatable<Duration<TUnitOfMeasure, TDataType>>
+    public readonly struct Duration<TUnitOfMeasure, TDataType> : IDuration, IEquatable<Duration<TUnitOfMeasure, TDataType>>
         where TUnitOfMeasure : Durations.DurationUnitOfMeasure, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
     {

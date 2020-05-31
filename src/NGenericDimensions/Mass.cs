@@ -16,10 +16,6 @@ namespace NGenericDimensions
         Masses.MassUnitOfMeasure UnitOfMeasure { get; }
     }
 
-    public interface IMass<out TUnitOfMeasure> : IMass where TUnitOfMeasure : Masses.MassUnitOfMeasure
-    {
-    }
-
     public readonly struct MassDouble
     {
         internal readonly double ValueAsDouble;
@@ -53,7 +49,7 @@ namespace NGenericDimensions
         public static bool operator !=(MassDouble<TUnitOfMeasure> left, MassDouble<TUnitOfMeasure> right) => !(left == right);
     }
 
-    public readonly struct Mass<TUnitOfMeasure, TDataType> : IMass<TUnitOfMeasure>, IEquatable<Mass<TUnitOfMeasure, TDataType>>
+    public readonly struct Mass<TUnitOfMeasure, TDataType> : IMass, IEquatable<Mass<TUnitOfMeasure, TDataType>>
         where TUnitOfMeasure : Masses.MassUnitOfMeasure, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
     {

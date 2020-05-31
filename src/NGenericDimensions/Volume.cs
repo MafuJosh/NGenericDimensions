@@ -16,10 +16,6 @@ namespace NGenericDimensions
         Lengths.LengthUnitOfMeasure UnitOfMeasure { get; }
     }
 
-    public interface IVolume<out TUnitOfMeasure> : IVolume where TUnitOfMeasure : Lengths.LengthUnitOfMeasure
-    {
-    }
-
     public readonly struct VolumeDouble
     {
         internal readonly double ValueAsDouble;
@@ -53,7 +49,7 @@ namespace NGenericDimensions
         public static bool operator !=(VolumeDouble<TUnitOfMeasure> left, VolumeDouble<TUnitOfMeasure> right) => !(left == right);
     }
 
-    public readonly struct Volume<TUnitOfMeasure, TDataType> : IVolume<TUnitOfMeasure>, IEquatable<Volume<TUnitOfMeasure, TDataType>>
+    public readonly struct Volume<TUnitOfMeasure, TDataType> : IVolume, IEquatable<Volume<TUnitOfMeasure, TDataType>>
         where TUnitOfMeasure : Lengths.LengthUnitOfMeasure, IExponent1Or3, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
     {
