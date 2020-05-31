@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace NGenericDimensions.Lengths.Uscs
 {
@@ -92,10 +93,9 @@ namespace NGenericDimensions.Extensions
 
 namespace NGenericDimensions.Extensions.Numbers
 {
-
+    [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "In this case we want it to be lowercase, to appear different than other functions.")]
     public static class InchesNumberExtensionMethods
     {
-
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static Length<Lengths.Uscs.Inches, T> inches<T>(this T length) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {

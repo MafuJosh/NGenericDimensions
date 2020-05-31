@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace NGenericDimensions.Lengths.Uscs
 {
@@ -92,7 +93,7 @@ namespace NGenericDimensions.Extensions
 
 namespace NGenericDimensions.Extensions.Numbers
 {
-
+    [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "In this case we want it to be lowercase, to appear different than other functions.")]
     public static class YardsNumberExtensionMethods
     {
 

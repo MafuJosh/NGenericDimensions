@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using NGenericDimensions.MetricPrefix;
 
 namespace NGenericDimensions.Masses.MetricSI
@@ -43,16 +44,13 @@ namespace NGenericDimensions.Extensions
 
 namespace NGenericDimensions.Extensions.Numbers
 {
-
+    [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "In this case we want it to be lowercase, to appear different than other functions.")]
     public static class KilogramsNumberExtensionMethods
     {
-
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static Mass<Masses.MetricSI.Kilograms, T> kilograms<T>(this T mass) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return mass;
         }
-
     }
-
 }

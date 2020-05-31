@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using NGenericDimensions.MetricPrefix;
 
 namespace NGenericDimensions.Lengths.MetricSI
@@ -81,7 +82,7 @@ namespace NGenericDimensions.Extensions
 
 namespace NGenericDimensions.Extensions.Numbers
 {
-
+    [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "In this case we want it to be lowercase, to appear different than other functions.")]
     public static class KilometresNumberExtensionMethods
     {
 
@@ -102,7 +103,5 @@ namespace NGenericDimensions.Extensions.Numbers
         {
             return volume.CubedValue;
         }
-
     }
-
 }

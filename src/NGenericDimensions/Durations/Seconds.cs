@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using NGenericDimensions.MetricPrefix;
 
 namespace NGenericDimensions.Durations
@@ -81,6 +82,7 @@ namespace NGenericDimensions.Extensions
             }
         }
 
+        [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "In this case we want it to be lowercase, to appear different than other functions.")]
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static Speed<TUnitOfMeasure, Durations.Seconds, TDataType> second<TUnitOfMeasure, TDataType>(this DimensionPerExtension<Length<TUnitOfMeasure, TDataType>> length)
             where TUnitOfMeasure : Lengths.Length1DUnitOfMeasure, IDefinedUnitOfMeasure
@@ -95,16 +97,13 @@ namespace NGenericDimensions.Extensions
 
 namespace NGenericDimensions.Extensions.Numbers
 {
-
+    [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "In this case we want it to be lowercase, to appear different than other functions.")]
     public static class SecondsNumberExtensionMethods
     {
-
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static Duration<Durations.Seconds, T> seconds<T>(this T duration) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return duration;
         }
-
     }
-
 }

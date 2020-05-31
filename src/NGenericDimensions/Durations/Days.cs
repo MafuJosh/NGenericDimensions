@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace NGenericDimensions.Durations
 {
@@ -53,6 +54,7 @@ namespace NGenericDimensions.Extensions
             }
         }
 
+        [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "In this case we want it to be lowercase, to appear different than other functions.")]
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static Speed<TUnitOfMeasure, Durations.Days, TDataType> day<TUnitOfMeasure, TDataType>(this DimensionPerExtension<Length<TUnitOfMeasure, TDataType>> length)
             where TUnitOfMeasure : Lengths.Length1DUnitOfMeasure, IDefinedUnitOfMeasure
@@ -67,16 +69,13 @@ namespace NGenericDimensions.Extensions
 
 namespace NGenericDimensions.Extensions.Numbers
 {
-
+    [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "In this case we want it to be lowercase, to appear different than other functions.")]
     public static class DaysNumberExtensionMethods
     {
-
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static Duration<Durations.Days, T> days<T>(this T duration) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
         {
             return duration;
         }
-
     }
-
 }
