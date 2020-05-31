@@ -20,6 +20,39 @@ namespace NGenericDimensions
     {
     }
 
+    public readonly struct VolumeDouble
+    {
+        internal readonly double ValueAsDouble;
+        internal readonly Lengths.LengthUnitOfMeasure UnitOfMeasure;
+
+        internal VolumeDouble(double valueAsDouble, Lengths.LengthUnitOfMeasure unitOfMeasure)
+        {
+            ValueAsDouble = valueAsDouble;
+            UnitOfMeasure = unitOfMeasure;
+        }
+
+        public override bool Equals(object obj) => obj != null && obj is VolumeDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.UnitOfMeasure.Equals(UnitOfMeasure);
+        public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
+        public static bool operator ==(VolumeDouble left, VolumeDouble right) => left.Equals(right);
+        public static bool operator !=(VolumeDouble left, VolumeDouble right) => !(left == right);
+    }
+
+    public readonly struct VolumeDouble<TUnitOfMeasure>
+        where TUnitOfMeasure : Lengths.LengthUnitOfMeasure, IExponent1Or3, IDefinedUnitOfMeasure
+    {
+        internal readonly double ValueAsDouble;
+
+        internal VolumeDouble(double valueAsDouble)
+        {
+            ValueAsDouble = valueAsDouble;
+        }
+
+        public override bool Equals(object obj) => obj != null && obj is VolumeDouble<TUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
+        public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
+        public static bool operator ==(VolumeDouble<TUnitOfMeasure> left, VolumeDouble<TUnitOfMeasure> right) => left.Equals(right);
+        public static bool operator !=(VolumeDouble<TUnitOfMeasure> left, VolumeDouble<TUnitOfMeasure> right) => !(left == right);
+    }
+
     public readonly struct Volume<TUnitOfMeasure, TDataType> : IVolume<TUnitOfMeasure>
         where TUnitOfMeasure : Lengths.LengthUnitOfMeasure, IExponent1Or3, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
@@ -36,9 +69,9 @@ namespace NGenericDimensions
             VolumeValue = volume.VolumeValue;
         }
 
-        public Volume(IVolume volumeToConvertFrom)
+        public Volume(VolumeDouble volumeToConvertFrom)
         {
-            VolumeValue = (TDataType)(Convert.ChangeType(volumeToConvertFrom.Value * (volumeToConvertFrom.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3)), typeof(TDataType)));
+            VolumeValue = (TDataType)(Convert.ChangeType(volumeToConvertFrom.ValueAsDouble * (volumeToConvertFrom.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3)), typeof(TDataType)));
         }
         #endregion
 
@@ -100,6 +133,16 @@ namespace NGenericDimensions
         {
             return volume.VolumeValue;
         }
+
+        public static implicit operator VolumeDouble(Volume<TUnitOfMeasure, TDataType> volume)
+        {
+            return new VolumeDouble(volume.ValueAsDouble, volume.UnitOfMeasure);
+        }
+
+        public static implicit operator VolumeDouble<TUnitOfMeasure>(Volume<TUnitOfMeasure, TDataType> volume)
+        {
+            return new VolumeDouble<TUnitOfMeasure>(volume.ValueAsDouble);
+        }
         #endregion
 
         #region + Operators
@@ -108,9 +151,9 @@ namespace NGenericDimensions
             return new Volume<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Add(volume1.VolumeValue, volume2.VolumeValue));
         }
 
-        public static Volume<TUnitOfMeasure, double> operator +(Volume<TUnitOfMeasure, TDataType> volume1, IVolume volume2)
+        public static Volume<TUnitOfMeasure, double> operator +(Volume<TUnitOfMeasure, TDataType> volume1, VolumeDouble volume2)
         {
-            return volume1.ValueAsDouble + (volume2.Value * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3)));
+            return volume1.ValueAsDouble + (volume2.ValueAsDouble * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3)));
         }
         #endregion
 
@@ -120,9 +163,9 @@ namespace NGenericDimensions
             return new Volume<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Subtract(volume1.VolumeValue, volume2.VolumeValue));
         }
 
-        public static Volume<TUnitOfMeasure, double> operator -(Volume<TUnitOfMeasure, TDataType> volume1, IVolume volume2)
+        public static Volume<TUnitOfMeasure, double> operator -(Volume<TUnitOfMeasure, TDataType> volume1, VolumeDouble volume2)
         {
-            return volume1.ValueAsDouble - (volume2.Value * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3)));
+            return volume1.ValueAsDouble - (volume2.ValueAsDouble * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3)));
         }
         #endregion
 
@@ -154,7 +197,7 @@ namespace NGenericDimensions
             return new Volume<TUnitOfMeasure, double>(Convert.ToDouble((object)volume1.VolumeValue) / volume2);
         }
 
-        public static double operator /(Volume<TUnitOfMeasure, TDataType> volume1, IVolume volume2)
+        public static double operator /(Volume<TUnitOfMeasure, TDataType> volume1, VolumeDouble volume2)
         {
             return volume1.ValueAsDouble / (new Volume<TUnitOfMeasure, double>(volume2).VolumeValue);
         }
@@ -166,9 +209,9 @@ namespace NGenericDimensions
             return volume1.VolumeValue.CompareTo(volume2.VolumeValue) == 0;
         }
 
-        public static bool operator ==(Volume<TUnitOfMeasure, TDataType> volume1, IVolume volume2)
+        public static bool operator ==(Volume<TUnitOfMeasure, TDataType> volume1, VolumeDouble volume2)
         {
-            return volume1.ValueAsDouble.CompareTo(volume2.Value * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3))) == 0;
+            return volume1.ValueAsDouble.CompareTo(volume2.ValueAsDouble * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3))) == 0;
         }
         #endregion
 
@@ -178,9 +221,9 @@ namespace NGenericDimensions
             return volume1.VolumeValue.CompareTo(volume2.VolumeValue) != 0;
         }
 
-        public static bool operator !=(Volume<TUnitOfMeasure, TDataType> volume1, IVolume volume2)
+        public static bool operator !=(Volume<TUnitOfMeasure, TDataType> volume1, VolumeDouble volume2)
         {
-            return volume1.ValueAsDouble.CompareTo(volume2.Value * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3))) != 0;
+            return volume1.ValueAsDouble.CompareTo(volume2.ValueAsDouble * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3))) != 0;
         }
         #endregion
 
@@ -190,9 +233,9 @@ namespace NGenericDimensions
             return volume1.VolumeValue.CompareTo(volume2.VolumeValue) > 0;
         }
 
-        public static bool operator >(Volume<TUnitOfMeasure, TDataType> volume1, IVolume volume2)
+        public static bool operator >(Volume<TUnitOfMeasure, TDataType> volume1, VolumeDouble volume2)
         {
-            return volume1.ValueAsDouble.CompareTo(volume2.Value * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3))) > 0;
+            return volume1.ValueAsDouble.CompareTo(volume2.ValueAsDouble * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3))) > 0;
         }
         #endregion
 
@@ -202,9 +245,9 @@ namespace NGenericDimensions
             return volume1.VolumeValue.CompareTo(volume2.VolumeValue) < 0;
         }
 
-        public static bool operator <(Volume<TUnitOfMeasure, TDataType> volume1, IVolume volume2)
+        public static bool operator <(Volume<TUnitOfMeasure, TDataType> volume1, VolumeDouble volume2)
         {
-            return volume1.ValueAsDouble.CompareTo(volume2.Value * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3))) < 0;
+            return volume1.ValueAsDouble.CompareTo(volume2.ValueAsDouble * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3))) < 0;
         }
         #endregion
 
@@ -214,9 +257,9 @@ namespace NGenericDimensions
             return volume1.VolumeValue.CompareTo(volume2.VolumeValue) >= 0;
         }
 
-        public static bool operator >=(Volume<TUnitOfMeasure, TDataType> volume1, IVolume volume2)
+        public static bool operator >=(Volume<TUnitOfMeasure, TDataType> volume1, VolumeDouble volume2)
         {
-            return volume1.ValueAsDouble.CompareTo(volume2.Value * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3))) >= 0;
+            return volume1.ValueAsDouble.CompareTo(volume2.ValueAsDouble * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3))) >= 0;
         }
         #endregion
 
@@ -226,9 +269,9 @@ namespace NGenericDimensions
             return volume1.VolumeValue.CompareTo(volume2.VolumeValue) <= 0;
         }
 
-        public static bool operator <=(Volume<TUnitOfMeasure, TDataType> volume1, IVolume volume2)
+        public static bool operator <=(Volume<TUnitOfMeasure, TDataType> volume1, VolumeDouble volume2)
         {
-            return volume1.ValueAsDouble.CompareTo(volume2.Value * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3))) <= 0;
+            return volume1.ValueAsDouble.CompareTo(volume2.ValueAsDouble * (volume2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(3))) <= 0;
         }
         #endregion
 
