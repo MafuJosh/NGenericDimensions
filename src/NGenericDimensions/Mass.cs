@@ -53,7 +53,7 @@ namespace NGenericDimensions
         public static bool operator !=(MassDouble<TUnitOfMeasure> left, MassDouble<TUnitOfMeasure> right) => !(left == right);
     }
 
-    public readonly struct Mass<TUnitOfMeasure, TDataType> : IMass<TUnitOfMeasure>
+    public readonly struct Mass<TUnitOfMeasure, TDataType> : IMass<TUnitOfMeasure>, IEquatable<Mass<TUnitOfMeasure, TDataType>>
         where TUnitOfMeasure : Masses.MassUnitOfMeasure, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
     {
@@ -280,6 +280,16 @@ namespace NGenericDimensions
         {
             return UnitOfMeasure.ToString(MassValue, format, formatProvider);
         }
+        #endregion
+
+        #region Equals
+        public override bool Equals(object obj) => obj != null && obj is Mass<TUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(MassValue, o.MassValue);
+
+        bool IEquatable<Mass<TUnitOfMeasure, TDataType>>.Equals(Mass<TUnitOfMeasure, TDataType> other) => EqualityComparer<TDataType>.Default.Equals(MassValue, other.MassValue);
+        #endregion
+
+        #region GetHashCode
+        public override int GetHashCode() => HashCode.Combine(MassValue);
         #endregion
     }
 }

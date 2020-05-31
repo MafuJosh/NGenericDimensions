@@ -53,7 +53,7 @@ namespace NGenericDimensions
         public static bool operator !=(SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure> left, SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure> right) => !(left == right);
     }
 
-    public readonly struct Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> : ISpeed
+    public readonly struct Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> : ISpeed, IEquatable<Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>>
         where TLengthUnitOfMeasure : Lengths.Length1DUnitOfMeasure, IDefinedUnitOfMeasure
         where TDurationUnitOfMeasure : Durations.DurationUnitOfMeasure, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
@@ -362,6 +362,16 @@ namespace NGenericDimensions
             }
             return LengthUnitOfMeasure.ToString(SpeedValue, "NU", formatProvider) + " " + LengthUnitOfMeasure.ToString(format, formatProvider) + @" per " + DurationUnitOfMeasure.ToSingularString();
         }
+        #endregion
+
+        #region Equals
+        public override bool Equals(object obj) => obj != null && obj is Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(SpeedValue, o.SpeedValue);
+
+        bool IEquatable<Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>>.Equals(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> other) => EqualityComparer<TDataType>.Default.Equals(SpeedValue, other.SpeedValue);
+        #endregion
+
+        #region GetHashCode
+        public override int GetHashCode() => HashCode.Combine(SpeedValue);
         #endregion
     }
 }

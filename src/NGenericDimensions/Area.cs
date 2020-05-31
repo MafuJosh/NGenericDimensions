@@ -1,12 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections;
-using System.Data;
-using System.Diagnostics;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using NGenericDimensions.Lengths;
 
 namespace NGenericDimensions
@@ -14,19 +8,19 @@ namespace NGenericDimensions
 
     public interface IArea : IDimension
     {
-        Lengths.LengthUnitOfMeasure UnitOfMeasure { get; }
+        LengthUnitOfMeasure UnitOfMeasure { get; }
     }
 
-    public interface IArea<out TUnitOfMeasure> : IArea where TUnitOfMeasure : Lengths.LengthUnitOfMeasure
+    public interface IArea<out TUnitOfMeasure> : IArea where TUnitOfMeasure : LengthUnitOfMeasure
     {
     }
 
     public readonly struct AreaDouble
     {
         internal readonly double ValueAsDouble;
-        internal readonly Lengths.LengthUnitOfMeasure UnitOfMeasure;
+        internal readonly LengthUnitOfMeasure UnitOfMeasure;
 
-        internal AreaDouble(double valueAsDouble, Lengths.LengthUnitOfMeasure unitOfMeasure)
+        internal AreaDouble(double valueAsDouble, LengthUnitOfMeasure unitOfMeasure)
         {
             ValueAsDouble = valueAsDouble;
             UnitOfMeasure = unitOfMeasure;
@@ -39,7 +33,7 @@ namespace NGenericDimensions
     }
 
     public readonly struct AreaDouble<TUnitOfMeasure>
-        where TUnitOfMeasure : Lengths.LengthUnitOfMeasure, IExponent1Or2, IDefinedUnitOfMeasure
+        where TUnitOfMeasure : LengthUnitOfMeasure, IExponent1Or2, IDefinedUnitOfMeasure
     {
         internal readonly double ValueAsDouble;
 
@@ -54,7 +48,7 @@ namespace NGenericDimensions
         public static bool operator !=(AreaDouble<TUnitOfMeasure> left, AreaDouble<TUnitOfMeasure> right) => !(left == right);
     }
 
-    public readonly struct Area<TUnitOfMeasure, TDataType> : IArea<TUnitOfMeasure>
+    public readonly struct Area<TUnitOfMeasure, TDataType> : IArea<TUnitOfMeasure>, IEquatable<Area<TUnitOfMeasure, TDataType>>
         where TUnitOfMeasure : Lengths.LengthUnitOfMeasure, IExponent1Or2, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
     {
@@ -306,6 +300,15 @@ namespace NGenericDimensions
         }
         #endregion
 
+        #region Equals
+        public override bool Equals(object obj) => obj != null && obj is Area<TUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(AreaValue, o.AreaValue);
+
+        bool IEquatable<Area<TUnitOfMeasure, TDataType>>.Equals(Area<TUnitOfMeasure, TDataType> other) => EqualityComparer<TDataType>.Default.Equals(AreaValue, other.AreaValue);
+        #endregion
+
+        #region GetHashCode
+        public override int GetHashCode() => HashCode.Combine(AreaValue);
+        #endregion
     }
 }
 

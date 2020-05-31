@@ -14,7 +14,7 @@ namespace NGenericDimensions
         Length1DUnitOfMeasure UnitOfMeasure { get; }
     }
 
-    public interface ILength<out TUnitOfMeasure> : ILength where TUnitOfMeasure : Lengths.Length1DUnitOfMeasure
+    public interface ILength<out TUnitOfMeasure> : ILength where TUnitOfMeasure : Length1DUnitOfMeasure
     {
     }
 
@@ -462,20 +462,15 @@ namespace NGenericDimensions
         }
         #endregion
 
-        public override bool Equals(object obj)
-        {
-            return obj != null && obj is Length<TUnitOfMeasure, TDataType> && EqualityComparer<TDataType>.Default.Equals(LengthValue, ((Length<TUnitOfMeasure, TDataType>)obj).LengthValue);
-        }
+        #region Equals
+        public override bool Equals(object obj) => obj != null && obj is Length<TUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(LengthValue, o.LengthValue);
 
-        public override int GetHashCode()
-        {
-            return EqualityComparer<TDataType>.Default.GetHashCode(LengthValue);
-        }
+        bool IEquatable<Length<TUnitOfMeasure, TDataType>>.Equals(Length<TUnitOfMeasure, TDataType> other) => EqualityComparer<TDataType>.Default.Equals(LengthValue, other.LengthValue);
+        #endregion
 
-        bool IEquatable<Length<TUnitOfMeasure, TDataType>>.Equals(Length<TUnitOfMeasure, TDataType> other)
-        {
-            return EqualityComparer<TDataType>.Default.Equals(LengthValue, other.LengthValue);
-        }
+        #region GetHashCode
+        public override int GetHashCode() => HashCode.Combine(LengthValue);
+        #endregion
     }
 }
 

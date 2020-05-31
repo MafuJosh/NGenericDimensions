@@ -53,7 +53,7 @@ namespace NGenericDimensions
         public static bool operator !=(DurationDouble<TUnitOfMeasure> left, DurationDouble<TUnitOfMeasure> right) => !(left == right);
     }
 
-    public readonly struct Duration<TUnitOfMeasure, TDataType> : IDuration<TUnitOfMeasure>
+    public readonly struct Duration<TUnitOfMeasure, TDataType> : IDuration<TUnitOfMeasure>, IEquatable<Duration<TUnitOfMeasure, TDataType>>
         where TUnitOfMeasure : Durations.DurationUnitOfMeasure, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
     {
@@ -309,7 +309,16 @@ namespace NGenericDimensions
             return UnitOfMeasure.ToString(DurationValue, format, formatProvider);
         }
         #endregion
-        
+
+        #region Equals
+        public override bool Equals(object obj) => obj != null && obj is Duration<TUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(DurationValue, o.DurationValue);
+
+        bool IEquatable<Duration<TUnitOfMeasure, TDataType>>.Equals(Duration<TUnitOfMeasure, TDataType> other) => EqualityComparer<TDataType>.Default.Equals(DurationValue, other.DurationValue);
+        #endregion
+
+        #region GetHashCode
+        public override int GetHashCode() => HashCode.Combine(DurationValue);
+        #endregion
     }
 }
 

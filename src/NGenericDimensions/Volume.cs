@@ -53,7 +53,7 @@ namespace NGenericDimensions
         public static bool operator !=(VolumeDouble<TUnitOfMeasure> left, VolumeDouble<TUnitOfMeasure> right) => !(left == right);
     }
 
-    public readonly struct Volume<TUnitOfMeasure, TDataType> : IVolume<TUnitOfMeasure>
+    public readonly struct Volume<TUnitOfMeasure, TDataType> : IVolume<TUnitOfMeasure>, IEquatable<Volume<TUnitOfMeasure, TDataType>>
         where TUnitOfMeasure : Lengths.LengthUnitOfMeasure, IExponent1Or3, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
     {
@@ -303,6 +303,16 @@ namespace NGenericDimensions
             }
             return VolumeValue.ToString((format ?? "").Replace("LU", ""), formatProvider) + @" Cubic " + UnitOfMeasure.ToString(format, formatProvider);
         }
+        #endregion
+
+        #region Equals
+        public override bool Equals(object obj) => obj != null && obj is Volume<TUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(VolumeValue, o.VolumeValue);
+
+        bool IEquatable<Volume<TUnitOfMeasure, TDataType>>.Equals(Volume<TUnitOfMeasure, TDataType> other) => EqualityComparer<TDataType>.Default.Equals(VolumeValue, other.VolumeValue);
+        #endregion
+
+        #region GetHashCode
+        public override int GetHashCode() => HashCode.Combine(VolumeValue);
         #endregion
     }
 }
