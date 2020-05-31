@@ -217,14 +217,14 @@ namespace NGenericDimensions
             return new Length<TLengthUnitOfMeasure, TDataType>(speed1.SpeedValue) * duration2.DurationValue;
         }
 
-        public static Length<TLengthUnitOfMeasure, double> operator *(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, IDuration<TDurationUnitOfMeasure> duration2)
+        public static Length<TLengthUnitOfMeasure, double> operator *(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, DurationDouble<TDurationUnitOfMeasure> duration2)
         {
-            return new Length<TLengthUnitOfMeasure, double>(speed1.ValueAsDouble * duration2.Value);
+            return new Length<TLengthUnitOfMeasure, double>(speed1.ValueAsDouble * duration2.ValueAsDouble);
         }
 
-        public static Length<TLengthUnitOfMeasure, double> operator *(IDuration<TDurationUnitOfMeasure> duration2, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1)
+        public static Length<TLengthUnitOfMeasure, double> operator *(DurationDouble<TDurationUnitOfMeasure> duration2, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1)
         {
-            return new Length<TLengthUnitOfMeasure, double>(speed1.ValueAsDouble * duration2.Value);
+            return new Length<TLengthUnitOfMeasure, double>(speed1.ValueAsDouble * duration2.ValueAsDouble);
         }
 
         public static Length<TLengthUnitOfMeasure, double> operator *(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, DurationDouble duration2)

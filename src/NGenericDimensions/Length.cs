@@ -193,14 +193,14 @@ namespace NGenericDimensions
             return GenericOperatorMath<TDataType>.Multiply(area1.AreaValue, length2.LengthValue);
         }
 
-        public static Volume<TUnitOfMeasure, double> operator *(Length<TUnitOfMeasure, TDataType> length1, IArea area2)
+        public static Volume<TUnitOfMeasure, double> operator *(Length<TUnitOfMeasure, TDataType> length1, AreaDouble area2)
         {
-            return length1.ValueAsDouble * (area2.Value * area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2));
+            return length1.ValueAsDouble * (area2.ValueAsDouble * area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2));
         }
 
-        public static Volume<TUnitOfMeasure, double> operator *(IArea area1, Length<TUnitOfMeasure, TDataType> length2)
+        public static Volume<TUnitOfMeasure, double> operator *(AreaDouble area1, Length<TUnitOfMeasure, TDataType> length2)
         {
-            return length2.ValueAsDouble * (area1.Value * area1.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2));
+            return length2.ValueAsDouble * (area1.ValueAsDouble * area1.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2));
         }
         #endregion
 
