@@ -4,6 +4,7 @@ using NGenericDimensions.MetricPrefix;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace NGenericDimensions
 {
@@ -12,7 +13,7 @@ namespace NGenericDimensions
         Length1DUnitOfMeasure UnitOfMeasure { get; }
     }
 
-    public readonly struct LengthDouble
+    public readonly struct LengthDouble : IEquatable<LengthDouble>
     {
         internal readonly double ValueAsDouble;
         internal readonly Length1DUnitOfMeasure UnitOfMeasure;
@@ -25,21 +26,24 @@ namespace NGenericDimensions
 
         public override bool Equals(object? obj) => obj != null && obj is LengthDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.UnitOfMeasure.Equals(UnitOfMeasure);
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
+        bool IEquatable<LengthDouble>.Equals(LengthDouble other) => EqualityComparer<double>.Default.Equals(ValueAsDouble, other.ValueAsDouble) && EqualityComparer<Length1DUnitOfMeasure>.Default.Equals(UnitOfMeasure, other.UnitOfMeasure);
         public static bool operator ==(LengthDouble left, LengthDouble right) => left.Equals(right);
         public static bool operator !=(LengthDouble left, LengthDouble right) => !(left == right);
     }
 
-    public readonly struct LengthDouble<TUnitOfMeasure>
+    public readonly struct LengthDouble<TUnitOfMeasure> : IEquatable<LengthDouble<TUnitOfMeasure>>
         where TUnitOfMeasure : Length1DUnitOfMeasure, IDefinedUnitOfMeasure
     {
         internal readonly double ValueAsDouble;
         internal LengthDouble(double valueAsDouble) => ValueAsDouble = valueAsDouble;
         public override bool Equals(object? obj) => obj != null && obj is LengthDouble<TUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
+        bool IEquatable<LengthDouble<TUnitOfMeasure>>.Equals(LengthDouble<TUnitOfMeasure> other) => EqualityComparer<double>.Default.Equals(ValueAsDouble, other.ValueAsDouble);
         public static bool operator ==(LengthDouble<TUnitOfMeasure> left, LengthDouble<TUnitOfMeasure> right) => left.Equals(right);
         public static bool operator !=(LengthDouble<TUnitOfMeasure> left, LengthDouble<TUnitOfMeasure> right) => !(left == right);
     }
 
+    [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "This is not needed yet.")]
     public readonly struct Length<TUnitOfMeasure, TDataType> : ILength, IEquatable<Length<TUnitOfMeasure, TDataType>>
         where TUnitOfMeasure : Length1DUnitOfMeasure, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>

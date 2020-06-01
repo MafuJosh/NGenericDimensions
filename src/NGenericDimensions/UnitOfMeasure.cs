@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
@@ -11,23 +12,25 @@ public interface IDimension : IFormattable
 }
 
 [EditorBrowsable(EditorBrowsableState.Never)]
+[SuppressMessage("Design", "CA1040:Avoid empty interfaces", Justification = "Empty interfaces are sometimes the only way to control a generic constraint.")]
 public interface IDimensionSupportsPerExtension { }
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public readonly struct DimensionPerExtension<TDimension>
+public readonly struct DimensionPerExtension<TDimension> : IEquatable<DimensionPerExtension<TDimension>>
     where TDimension : IDimension, IDimensionSupportsPerExtension
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal readonly TDimension PerValue;
     internal DimensionPerExtension(TDimension perValue) => PerValue = perValue;
     public override bool Equals(object? obj) => obj != null && obj is DimensionPerExtension<TDimension> o && o.PerValue.Equals(PerValue);
+    bool IEquatable<DimensionPerExtension<TDimension>>.Equals(DimensionPerExtension<TDimension> other) => EqualityComparer<TDimension>.Default.Equals(PerValue, other.PerValue);
     public override int GetHashCode() => HashCode.Combine(PerValue);
     public static bool operator ==(DimensionPerExtension<TDimension> left, DimensionPerExtension<TDimension> right) => left.Equals(right);
     public static bool operator !=(DimensionPerExtension<TDimension> left, DimensionPerExtension<TDimension> right) => !(left == right);
 }
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public readonly struct DimensionSquareExtension<TDataType>
+public readonly struct DimensionSquareExtension<TDataType> : IEquatable<DimensionSquareExtension<TDataType>>
     where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -35,18 +38,20 @@ public readonly struct DimensionSquareExtension<TDataType>
     internal DimensionSquareExtension(TDataType squaredValue) => SquaredValue = squaredValue;
     public override bool Equals(object? obj) => obj != null && obj is DimensionSquareExtension<TDataType> o && o.SquaredValue.Equals(SquaredValue);
     public override int GetHashCode() => HashCode.Combine(SquaredValue);
+    bool IEquatable<DimensionSquareExtension<TDataType>>.Equals(DimensionSquareExtension<TDataType> other) => EqualityComparer<TDataType>.Default.Equals(SquaredValue, other.SquaredValue);
     public static bool operator ==(DimensionSquareExtension<TDataType> left, DimensionSquareExtension<TDataType> right) => left.Equals(right);
     public static bool operator !=(DimensionSquareExtension<TDataType> left, DimensionSquareExtension<TDataType> right) => !(left == right);
 }
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public readonly struct DimensionCubeExtension<TDataType>
+public readonly struct DimensionCubeExtension<TDataType> : IEquatable<DimensionCubeExtension<TDataType>>
     where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal readonly TDataType CubedValue;
     internal DimensionCubeExtension(TDataType cubedValue) => CubedValue = cubedValue;
     public override bool Equals(object? obj) => obj != null && obj is DimensionCubeExtension<TDataType> o && o.CubedValue.Equals(CubedValue);
+    bool IEquatable<DimensionCubeExtension<TDataType>>.Equals(DimensionCubeExtension<TDataType> other) => EqualityComparer<TDataType>.Default.Equals(CubedValue, other.CubedValue);
     public override int GetHashCode() => HashCode.Combine(CubedValue);
     public static bool operator ==(DimensionCubeExtension<TDataType> left, DimensionCubeExtension<TDataType> right) => left.Equals(right);
     public static bool operator !=(DimensionCubeExtension<TDataType> left, DimensionCubeExtension<TDataType> right) => !(left == right);
@@ -65,12 +70,15 @@ internal static class UnitOfMeasureGlobals<T>
 /// <summary>
 /// This interface is used to detect if a class type is a derived class of UnitOfMeasure.  Only derived types should implement this.  This is used to restrict what classes can be used in the generic signatures.
 /// </summary>
+[SuppressMessage("Design", "CA1040:Avoid empty interfaces", Justification = "Empty interfaces are sometimes the only way to control a generic constraint.")]
 public interface IDefinedUnitOfMeasure { }
 
 /// <summary>
 /// These interfaces help control what UOMs of different dimensions are allowed (such as allowing using Millimeters for Area and Volume, but not acres for volume or length, etc.)
 /// </summary>
+[SuppressMessage("Design", "CA1040:Avoid empty interfaces", Justification = "Empty interfaces are sometimes the only way to control a generic constraint.")]
 public interface IExponent1Or2 { }
+[SuppressMessage("Design", "CA1040:Avoid empty interfaces", Justification = "Empty interfaces are sometimes the only way to control a generic constraint.")]
 public interface IExponent1Or3 { }
 
 public abstract class UnitOfMeasure : IFormattable
@@ -119,7 +127,7 @@ public abstract class UnitOfMeasure : IFormattable
         var name = ToString();
 
         // use some default logic to try to figure out the singular form of the unit
-        if (name.EndsWith("s"))
+        if (name.EndsWith("s", StringComparison.Ordinal))
         {
             return name[0..^1];
         }
@@ -150,11 +158,11 @@ public abstract class UnitOfMeasure : IFormattable
     {
         if (format == null)
         { }
-        else if (format.Contains("NU"))
+        else if (format.Contains("NU", StringComparison.Ordinal))
         {
             return value.ToString(TrimCustomFormat(format), formatProvider);
         }
-        else if (format.Contains("SU"))
+        else if (format.Contains("SU", StringComparison.Ordinal))
         {
             return value.ToString(TrimCustomFormat(format), formatProvider) + " " + ToString("SU", formatProvider);
         }
@@ -170,7 +178,7 @@ public abstract class UnitOfMeasure : IFormattable
 
     internal string? GetDimensionalUnitSymbol(IDimension dimension) => DimensionUnitSymbol(dimension);
 
-    protected static string? TrimCustomFormat(string? format) => format?.Replace("NU", "").Replace("LU", "").Replace("SU", "");
+    protected static string? TrimCustomFormat(string? format) => format?.Replace("NU", "", StringComparison.Ordinal).Replace("LU", "", StringComparison.Ordinal).Replace("SU", "", StringComparison.Ordinal);
 }
 
 namespace NGenericDimensions.Extensions

@@ -4,7 +4,7 @@ namespace NGenericDimensions.MetricPrefix
 {
     public abstract class MetricPrefixBase : IFormattable
     {
-        protected internal decimal Multiplier;
+        protected internal decimal Multiplier { get; set; }
         public abstract string UnitSymbol { get; }
 
         /// <summary>

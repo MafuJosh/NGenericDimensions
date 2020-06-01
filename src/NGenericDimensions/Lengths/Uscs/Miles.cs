@@ -13,6 +13,7 @@ namespace NGenericDimensions.Lengths.Uscs
 
         protected override string? DimensionUnitSymbol(IDimension dimension)
         {
+            if (dimension == null) return null;
             if (((ISpeed)dimension).DurationUnitOfMeasure == UnitOfMeasureGlobals<Hours>.GlobalInstance)
             {
                 return "mph";

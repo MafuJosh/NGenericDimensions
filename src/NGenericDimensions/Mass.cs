@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace NGenericDimensions
 {
@@ -9,7 +10,7 @@ namespace NGenericDimensions
         Masses.MassUnitOfMeasure UnitOfMeasure { get; }
     }
 
-    public readonly struct MassDouble
+    public readonly struct MassDouble : IEquatable<MassDouble>
     {
         internal readonly double ValueAsDouble;
         internal readonly Masses.MassUnitOfMeasure UnitOfMeasure;
@@ -22,21 +23,24 @@ namespace NGenericDimensions
 
         public override bool Equals(object? obj) => obj != null && obj is MassDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.UnitOfMeasure.Equals(UnitOfMeasure);
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
+        bool IEquatable<MassDouble>.Equals(MassDouble other) => EqualityComparer<double>.Default.Equals(ValueAsDouble, other.ValueAsDouble) && EqualityComparer<Masses.MassUnitOfMeasure>.Default.Equals(UnitOfMeasure, other.UnitOfMeasure);
         public static bool operator ==(MassDouble left, MassDouble right) => left.Equals(right);
         public static bool operator !=(MassDouble left, MassDouble right) => !(left == right);
     }
 
-    public readonly struct MassDouble<TUnitOfMeasure>
+    public readonly struct MassDouble<TUnitOfMeasure> : IEquatable<MassDouble<TUnitOfMeasure>>
         where TUnitOfMeasure : Masses.MassUnitOfMeasure, IDefinedUnitOfMeasure
     {
         internal readonly double ValueAsDouble;
         internal MassDouble(double valueAsDouble) => ValueAsDouble = valueAsDouble;
         public override bool Equals(object? obj) => obj != null && obj is MassDouble<TUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
+        bool IEquatable<MassDouble<TUnitOfMeasure>>.Equals(MassDouble<TUnitOfMeasure> other) => EqualityComparer<double>.Default.Equals(ValueAsDouble, other.ValueAsDouble);
         public static bool operator ==(MassDouble<TUnitOfMeasure> left, MassDouble<TUnitOfMeasure> right) => left.Equals(right);
         public static bool operator !=(MassDouble<TUnitOfMeasure> left, MassDouble<TUnitOfMeasure> right) => !(left == right);
     }
 
+    [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "This is not needed yet.")]
     public readonly struct Mass<TUnitOfMeasure, TDataType> : IMass, IEquatable<Mass<TUnitOfMeasure, TDataType>>
         where TUnitOfMeasure : Masses.MassUnitOfMeasure, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
@@ -46,14 +50,14 @@ namespace NGenericDimensions
 
         public Mass(Mass<TUnitOfMeasure, TDataType> mass) => MassValue = mass.MassValue;
 
-        public Mass(MassDouble massToConvertFrom) => MassValue = (TDataType)(Convert.ChangeType(massToConvertFrom.ValueAsDouble * massToConvertFrom.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1), typeof(TDataType)));
+        public Mass(MassDouble massToConvertFrom) => MassValue = (TDataType)(Convert.ChangeType(massToConvertFrom.ValueAsDouble * massToConvertFrom.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1), typeof(TDataType), null));
         #endregion
 
         #region Value
 
         [EditorBrowsable(EditorBrowsableState.Always)]
         public TDataType MassValue { get; }
-        private double ValueAsDouble => Convert.ToDouble((object)MassValue);
+        private double ValueAsDouble => Convert.ToDouble(MassValue, null);
         double IDimension.Value => ValueAsDouble;
         #endregion
 
@@ -102,11 +106,11 @@ namespace NGenericDimensions
         #endregion
 
         #region / Operators
-        public static Mass<TUnitOfMeasure, double> operator /(Mass<TUnitOfMeasure, TDataType> mass1, double mass2) => new Mass<TUnitOfMeasure, double>(Convert.ToDouble((object)mass1.MassValue) / mass2);
+        public static Mass<TUnitOfMeasure, double> operator /(Mass<TUnitOfMeasure, TDataType> mass1, double mass2) => new Mass<TUnitOfMeasure, double>(Convert.ToDouble(mass1.MassValue, null) / mass2);
 
-        public static Mass<TUnitOfMeasure, double> operator /(Mass<TUnitOfMeasure, TDataType> mass1, decimal mass2) => new Mass<TUnitOfMeasure, double>(Convert.ToDouble((object)mass1.MassValue) / Convert.ToDouble(mass2));
+        public static Mass<TUnitOfMeasure, double> operator /(Mass<TUnitOfMeasure, TDataType> mass1, decimal mass2) => new Mass<TUnitOfMeasure, double>(Convert.ToDouble(mass1.MassValue, null) / Convert.ToDouble(mass2));
 
-        public static Mass<TUnitOfMeasure, double> operator /(Mass<TUnitOfMeasure, TDataType> mass1, long mass2) => new Mass<TUnitOfMeasure, double>(Convert.ToDouble((object)mass1.MassValue) / mass2);
+        public static Mass<TUnitOfMeasure, double> operator /(Mass<TUnitOfMeasure, TDataType> mass1, long mass2) => new Mass<TUnitOfMeasure, double>(Convert.ToDouble(mass1.MassValue, null) / mass2);
 
         public static double operator /(Mass<TUnitOfMeasure, TDataType> mass1, MassDouble mass2) => mass1.ValueAsDouble / (new Mass<TUnitOfMeasure, double>(mass2).MassValue);
         #endregion
