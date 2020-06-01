@@ -1,7 +1,7 @@
-﻿using System;
+﻿using NGenericDimensions.MetricPrefix;
+using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using NGenericDimensions.MetricPrefix;
 
 namespace NGenericDimensions.Durations
 {

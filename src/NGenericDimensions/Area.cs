@@ -1,7 +1,7 @@
-﻿using System;
+﻿using NGenericDimensions.Lengths;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using NGenericDimensions.Lengths;
 
 namespace NGenericDimensions
 {

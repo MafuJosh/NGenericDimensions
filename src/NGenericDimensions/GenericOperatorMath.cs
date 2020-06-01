@@ -8,7 +8,7 @@ namespace NGenericDimensions.Math
         internal delegate bool TMathBoolean(T value1, T value2);
         internal delegate double ConvertTToDouble(T value);
         internal delegate T ConvertDoubleToT(double value);
-        
+
         public static TMath Add;
         public static TMath Subtract;
         public static TMath Multiply;
@@ -160,7 +160,7 @@ namespace NGenericDimensions.Math
                 throw new NotSupportedException();
             }
         }
-        
+
         #region "Delegate Casting"
         private static TDelegate CastDelegate<TDelegate>(Delegate source) where TDelegate : Delegate // use "class" instead of "Delegate" in older frameworks
         {

@@ -1,9 +1,9 @@
-﻿using System;
+﻿using NGenericDimensions.Lengths;
+using NGenericDimensions.Math;
+using NGenericDimensions.MetricPrefix;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using NGenericDimensions.MetricPrefix;
-using NGenericDimensions.Math;
-using NGenericDimensions.Lengths;
 
 namespace NGenericDimensions
 {

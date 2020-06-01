@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
-using System.Linq;
 using Xunit;
 
 namespace NGenericDimensionsUnitTests
@@ -11,7 +10,7 @@ namespace NGenericDimensionsUnitTests
         {
             try
             {
-                var references = new  [] { 
+                var references = new[] {
                     typeof(System.String).Assembly,
                     typeof(System.Numerics.BigInteger).Assembly,
                     typeof(NGenericDimensions.Masses.MetricSI.Grams).Assembly
@@ -23,7 +22,7 @@ namespace NGenericDimensionsUnitTests
                     .Compile();
 
                 Assert.NotEmpty(diagnostics);
-                Assert.All(diagnostics, d=> Assert.Contains(expectedError, $"{d.Severity} {d.Id}: {d.GetMessage()}"));
+                Assert.All(diagnostics, d => Assert.Contains(expectedError, $"{d.Severity} {d.Id}: {d.GetMessage()}"));
             }
             catch (CompilationErrorException e)
             {

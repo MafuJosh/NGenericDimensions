@@ -1,6 +1,6 @@
-﻿using System;
+﻿using NGenericDimensions.Durations;
+using System;
 using System.ComponentModel;
-using NGenericDimensions.Durations;
 using System.Diagnostics.CodeAnalysis;
 
 namespace NGenericDimensions.Lengths.Uscs

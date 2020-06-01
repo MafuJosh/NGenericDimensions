@@ -1,6 +1,6 @@
-﻿using System;
+﻿using NGenericDimensions.MetricPrefix;
+using System;
 using System.ComponentModel;
-using NGenericDimensions.MetricPrefix;
 using System.Diagnostics.CodeAnalysis;
 
 namespace NGenericDimensions.Durations

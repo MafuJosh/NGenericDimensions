@@ -65,7 +65,7 @@ internal static class UnitOfMeasureGlobals<T>
 /// <summary>
 /// This interface is used to detect if a class type is a derived class of UnitOfMeasure.  Only derived types should implement this.  This is used to restrict what classes can be used in the generic signatures.
 /// </summary>
-public interface IDefinedUnitOfMeasure {}
+public interface IDefinedUnitOfMeasure { }
 
 /// <summary>
 /// These interfaces help control what UOMs of different dimensions are allowed (such as allowing using Millimeters for Area and Volume, but not acres for volume or length, etc.)

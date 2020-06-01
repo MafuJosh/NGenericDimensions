@@ -1,10 +1,10 @@
-﻿using System;
-using NGenericDimensions;
-using NGenericDimensions.Lengths.Uscs;
+﻿using NGenericDimensions;
 using NGenericDimensions.Durations;
-using NGenericDimensions.MetricPrefix;
 using NGenericDimensions.Extensions;
 using NGenericDimensions.Extensions.Numbers;
+using NGenericDimensions.Lengths.Uscs;
+using NGenericDimensions.MetricPrefix;
+using System;
 using Xunit;
 
 namespace NGenericDimensionsUnitTests
@@ -41,18 +41,18 @@ namespace NGenericDimensionsUnitTests
             AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Length<NGenericDimensions.Lengths.Length1DUnitOfMeasure, double>(4.4);");
 
             // test number data types
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Double>(System.Convert.ToDouble(4.44444)); 
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Double>(System.Convert.ToSingle(4.44444)); 
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Single>(System.Convert.ToSingle(4.44444)); 
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Decimal>(System.Convert.ToDecimal(4.44444)); 
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int64>(System.Convert.ToInt64(4)); 
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int32>(System.Convert.ToInt32(4)); 
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int16>(System.Convert.ToInt16(4)); 
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Byte>(System.Convert.ToByte(4)); 
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.SByte>(System.Convert.ToSByte(4)); 
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.UInt16>(System.Convert.ToUInt16(4)); 
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.UInt32>(System.Convert.ToUInt32(4)); 
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.UInt64>(System.Convert.ToUInt64(4)); 
+            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Double>(System.Convert.ToDouble(4.44444));
+            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Double>(System.Convert.ToSingle(4.44444));
+            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Single>(System.Convert.ToSingle(4.44444));
+            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Decimal>(System.Convert.ToDecimal(4.44444));
+            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int64>(System.Convert.ToInt64(4));
+            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int32>(System.Convert.ToInt32(4));
+            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int16>(System.Convert.ToInt16(4));
+            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Byte>(System.Convert.ToByte(4));
+            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.SByte>(System.Convert.ToSByte(4));
+            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.UInt16>(System.Convert.ToUInt16(4));
+            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.UInt32>(System.Convert.ToUInt32(4));
+            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.UInt64>(System.Convert.ToUInt64(4));
             AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Char>(System.Convert.ToChar(4));");
             _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.DateTime>(new System.DateTime(1000)); // can't stop this from being allowed
             AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Boolean>(System.Convert.ToBoolean(4));");

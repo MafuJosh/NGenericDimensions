@@ -1,8 +1,8 @@
-﻿using System;
+﻿using NGenericDimensions.Masses.MetricSI;
+using NGenericDimensions.MetricPrefix;
+using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using NGenericDimensions.Masses.MetricSI;
-using NGenericDimensions.MetricPrefix;
 
 namespace NGenericDimensions.Masses.MetricSI
 {

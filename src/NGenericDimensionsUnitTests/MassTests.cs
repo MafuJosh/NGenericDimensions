@@ -1,13 +1,8 @@
-﻿using System;
-using NGenericDimensions;
-using NGenericDimensions.Masses;
-using NGenericDimensions.Masses.MetricSI;
-using NGenericDimensions.Volumes.MetricNonSI;
-using NGenericDimensions.Durations;
-using NGenericDimensions.MetricPrefix;
-using System.Linq;
+﻿using NGenericDimensions;
 using NGenericDimensions.Extensions;
 using NGenericDimensions.Extensions.Numbers;
+using NGenericDimensions.Masses.MetricSI;
+using System;
 using Xunit;
 
 namespace NGenericDimensionsUnitTests
