@@ -20,7 +20,7 @@ namespace NGenericDimensions
             UnitOfMeasure = unitOfMeasure;
         }
 
-        public override bool Equals(object obj) => obj != null && obj is MassDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.UnitOfMeasure.Equals(UnitOfMeasure);
+        public override bool Equals(object? obj) => obj != null && obj is MassDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.UnitOfMeasure.Equals(UnitOfMeasure);
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
         public static bool operator ==(MassDouble left, MassDouble right) => left.Equals(right);
         public static bool operator !=(MassDouble left, MassDouble right) => !(left == right);
@@ -31,7 +31,7 @@ namespace NGenericDimensions
     {
         internal readonly double ValueAsDouble;
         internal MassDouble(double valueAsDouble) => ValueAsDouble = valueAsDouble;
-        public override bool Equals(object obj) => obj != null && obj is MassDouble<TUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
+        public override bool Equals(object? obj) => obj != null && obj is MassDouble<TUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
         public static bool operator ==(MassDouble<TUnitOfMeasure> left, MassDouble<TUnitOfMeasure> right) => left.Equals(right);
         public static bool operator !=(MassDouble<TUnitOfMeasure> left, MassDouble<TUnitOfMeasure> right) => !(left == right);
@@ -150,11 +150,11 @@ namespace NGenericDimensions
         #region ToString
         public override string ToString() => UnitOfMeasure.ToString(MassValue, null, null);
 
-        public string ToString(string format, IFormatProvider formatProvider) => UnitOfMeasure.ToString(MassValue, format, formatProvider);
+        public string ToString(string? format, IFormatProvider? formatProvider) => UnitOfMeasure.ToString(MassValue, format, formatProvider);
         #endregion
 
         #region Equals
-        public override bool Equals(object obj) => obj != null && obj is Mass<TUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(MassValue, o.MassValue);
+        public override bool Equals(object? obj) => obj != null && obj is Mass<TUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(MassValue, o.MassValue);
 
         bool IEquatable<Mass<TUnitOfMeasure, TDataType>>.Equals(Mass<TUnitOfMeasure, TDataType> other) => EqualityComparer<TDataType>.Default.Equals(MassValue, other.MassValue);
         #endregion

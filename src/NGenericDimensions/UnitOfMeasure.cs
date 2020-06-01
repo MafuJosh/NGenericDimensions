@@ -20,7 +20,7 @@ public readonly struct DimensionPerExtension<TDimension>
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal readonly TDimension PerValue;
     internal DimensionPerExtension(TDimension perValue) => PerValue = perValue;
-    public override bool Equals(object obj) => obj != null && obj is DimensionPerExtension<TDimension> o && o.PerValue.Equals(PerValue);
+    public override bool Equals(object? obj) => obj != null && obj is DimensionPerExtension<TDimension> o && o.PerValue.Equals(PerValue);
     public override int GetHashCode() => HashCode.Combine(PerValue);
     public static bool operator ==(DimensionPerExtension<TDimension> left, DimensionPerExtension<TDimension> right) => left.Equals(right);
     public static bool operator !=(DimensionPerExtension<TDimension> left, DimensionPerExtension<TDimension> right) => !(left == right);
@@ -33,7 +33,7 @@ public readonly struct DimensionSquareExtension<TDataType>
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal readonly TDataType SquaredValue;
     internal DimensionSquareExtension(TDataType squaredValue) => SquaredValue = squaredValue;
-    public override bool Equals(object obj) => obj != null && obj is DimensionSquareExtension<TDataType> o && o.SquaredValue.Equals(SquaredValue);
+    public override bool Equals(object? obj) => obj != null && obj is DimensionSquareExtension<TDataType> o && o.SquaredValue.Equals(SquaredValue);
     public override int GetHashCode() => HashCode.Combine(SquaredValue);
     public static bool operator ==(DimensionSquareExtension<TDataType> left, DimensionSquareExtension<TDataType> right) => left.Equals(right);
     public static bool operator !=(DimensionSquareExtension<TDataType> left, DimensionSquareExtension<TDataType> right) => !(left == right);
@@ -46,7 +46,7 @@ public readonly struct DimensionCubeExtension<TDataType>
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal readonly TDataType CubedValue;
     internal DimensionCubeExtension(TDataType cubedValue) => CubedValue = cubedValue;
-    public override bool Equals(object obj) => obj != null && obj is DimensionCubeExtension<TDataType> o && o.CubedValue.Equals(CubedValue);
+    public override bool Equals(object? obj) => obj != null && obj is DimensionCubeExtension<TDataType> o && o.CubedValue.Equals(CubedValue);
     public override int GetHashCode() => HashCode.Combine(CubedValue);
     public static bool operator ==(DimensionCubeExtension<TDataType> left, DimensionCubeExtension<TDataType> right) => left.Equals(right);
     public static bool operator !=(DimensionCubeExtension<TDataType> left, DimensionCubeExtension<TDataType> right) => !(left == right);
@@ -128,7 +128,7 @@ public abstract class UnitOfMeasure : IFormattable
         return name;
     }
 
-    public string ToString(string format, IFormatProvider formatProvider)
+    public string ToString(string? format, IFormatProvider? formatProvider)
     {
         if (format == "NU")
         {
@@ -146,7 +146,7 @@ public abstract class UnitOfMeasure : IFormattable
 
     public virtual string UnitSymbol => ToString();
 
-    internal virtual string ToString(IFormattable value, string format, IFormatProvider formatProvider)
+    internal virtual string ToString(IFormattable value, string? format, IFormatProvider? formatProvider)
     {
         if (format == null)
         { }
@@ -166,11 +166,11 @@ public abstract class UnitOfMeasure : IFormattable
     /// </summary>
     /// <param name="dimension"></param>
     /// <returns></returns>
-    protected virtual string DimensionUnitSymbol(IDimension dimension) => null;
+    protected virtual string? DimensionUnitSymbol(IDimension dimension) => null;
 
-    internal string GetDimensionalUnitSymbol(IDimension dimension) => DimensionUnitSymbol(dimension);
+    internal string? GetDimensionalUnitSymbol(IDimension dimension) => DimensionUnitSymbol(dimension);
 
-    protected static string TrimCustomFormat(string format) => format?.Replace("NU", "").Replace("LU", "").Replace("SU", "");
+    protected static string? TrimCustomFormat(string? format) => format?.Replace("NU", "").Replace("LU", "").Replace("SU", "");
 }
 
 namespace NGenericDimensions.Extensions

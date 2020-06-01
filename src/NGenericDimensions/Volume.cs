@@ -21,7 +21,7 @@ namespace NGenericDimensions
             UnitOfMeasure = unitOfMeasure;
         }
 
-        public override bool Equals(object obj) => obj != null && obj is VolumeDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.UnitOfMeasure.Equals(UnitOfMeasure);
+        public override bool Equals(object? obj) => obj != null && obj is VolumeDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.UnitOfMeasure.Equals(UnitOfMeasure);
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
         public static bool operator ==(VolumeDouble left, VolumeDouble right) => left.Equals(right);
         public static bool operator !=(VolumeDouble left, VolumeDouble right) => !(left == right);
@@ -32,7 +32,7 @@ namespace NGenericDimensions
     {
         internal readonly double ValueAsDouble;
         internal VolumeDouble(double valueAsDouble) => ValueAsDouble = valueAsDouble;
-        public override bool Equals(object obj) => obj != null && obj is VolumeDouble<TUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
+        public override bool Equals(object? obj) => obj != null && obj is VolumeDouble<TUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
         public static bool operator ==(VolumeDouble<TUnitOfMeasure> left, VolumeDouble<TUnitOfMeasure> right) => left.Equals(right);
         public static bool operator !=(VolumeDouble<TUnitOfMeasure> left, VolumeDouble<TUnitOfMeasure> right) => !(left == right);
@@ -154,7 +154,7 @@ namespace NGenericDimensions
         #region ToString
         public override string ToString() => ToString(null, null);
 
-        public string ToString(string format, IFormatProvider formatProvider)
+        public string ToString(string? format, IFormatProvider? formatProvider)
         {
             if (format == null)
             { }
@@ -178,7 +178,7 @@ namespace NGenericDimensions
         #endregion
 
         #region Equals
-        public override bool Equals(object obj) => obj != null && obj is Volume<TUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(VolumeValue, o.VolumeValue);
+        public override bool Equals(object? obj) => obj != null && obj is Volume<TUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(VolumeValue, o.VolumeValue);
 
         bool IEquatable<Volume<TUnitOfMeasure, TDataType>>.Equals(Volume<TUnitOfMeasure, TDataType> other) => EqualityComparer<TDataType>.Default.Equals(VolumeValue, other.VolumeValue);
         #endregion

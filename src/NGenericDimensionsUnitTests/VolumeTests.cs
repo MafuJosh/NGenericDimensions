@@ -114,7 +114,9 @@ namespace NGenericDimensionsUnitTests
         public void TestVolumeCastingOperators()
         {
             // implicit cast to volume
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
             Volume<Millimetres, Double> volumeA = 2.2;
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
             AssertCompilationFails("Cannot implicitly convert type", @"NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Millimetres, System.Double> volumeB = System.Convert.ToDecimal(5.5);");
 
             // explicit cast from length

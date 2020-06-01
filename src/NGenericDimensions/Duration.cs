@@ -20,7 +20,7 @@ namespace NGenericDimensions
             UnitOfMeasure = unitOfMeasure;
         }
 
-        public override bool Equals(object obj) => obj != null && obj is DurationDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.UnitOfMeasure.Equals(UnitOfMeasure);
+        public override bool Equals(object? obj) => obj != null && obj is DurationDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.UnitOfMeasure.Equals(UnitOfMeasure);
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
         public static bool operator ==(DurationDouble left, DurationDouble right) => left.Equals(right);
         public static bool operator !=(DurationDouble left, DurationDouble right) => !(left == right);
@@ -31,7 +31,7 @@ namespace NGenericDimensions
     {
         internal readonly double ValueAsDouble;
         internal DurationDouble(double valueAsDouble) => ValueAsDouble = valueAsDouble;
-        public override bool Equals(object obj) => obj != null && obj is DurationDouble<TUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
+        public override bool Equals(object? obj) => obj != null && obj is DurationDouble<TUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
         public static bool operator ==(DurationDouble<TUnitOfMeasure> left, DurationDouble<TUnitOfMeasure> right) => left.Equals(right);
         public static bool operator !=(DurationDouble<TUnitOfMeasure> left, DurationDouble<TUnitOfMeasure> right) => !(left == right);
@@ -171,11 +171,11 @@ namespace NGenericDimensions
         #region ToString
         public override string ToString() => UnitOfMeasure.ToString(DurationValue, null, null);
 
-        public string ToString(string format, IFormatProvider formatProvider) => UnitOfMeasure.ToString(DurationValue, format, formatProvider);
+        public string ToString(string? format, IFormatProvider? formatProvider) => UnitOfMeasure.ToString(DurationValue, format, formatProvider);
         #endregion
 
         #region Equals
-        public override bool Equals(object obj) => obj != null && obj is Duration<TUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(DurationValue, o.DurationValue);
+        public override bool Equals(object? obj) => obj != null && obj is Duration<TUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(DurationValue, o.DurationValue);
 
         bool IEquatable<Duration<TUnitOfMeasure, TDataType>>.Equals(Duration<TUnitOfMeasure, TDataType> other) => EqualityComparer<TDataType>.Default.Equals(DurationValue, other.DurationValue);
         #endregion

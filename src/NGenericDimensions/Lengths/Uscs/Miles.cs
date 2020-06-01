@@ -11,7 +11,7 @@ namespace NGenericDimensions.Lengths.Uscs
 
         public override string UnitSymbol => "mi.";
 
-        protected override string DimensionUnitSymbol(IDimension dimension)
+        protected override string? DimensionUnitSymbol(IDimension dimension)
         {
             if (((ISpeed)dimension).DurationUnitOfMeasure == UnitOfMeasureGlobals<Hours>.GlobalInstance)
             {

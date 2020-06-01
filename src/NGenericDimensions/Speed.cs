@@ -23,7 +23,7 @@ namespace NGenericDimensions
             DurationUnitOfMeasure = durationUnitOfMeasure;
         }
 
-        public override bool Equals(object obj) => obj != null && obj is SpeedDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.LengthUnitOfMeasure.Equals(LengthUnitOfMeasure) && o.DurationUnitOfMeasure.Equals(DurationUnitOfMeasure);
+        public override bool Equals(object? obj) => obj != null && obj is SpeedDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.LengthUnitOfMeasure.Equals(LengthUnitOfMeasure) && o.DurationUnitOfMeasure.Equals(DurationUnitOfMeasure);
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
         public static bool operator ==(SpeedDouble left, SpeedDouble right) => left.Equals(right);
         public static bool operator !=(SpeedDouble left, SpeedDouble right) => !(left == right);
@@ -35,7 +35,7 @@ namespace NGenericDimensions
     {
         internal readonly double ValueAsDouble;
         internal SpeedDouble(double valueAsDouble) => ValueAsDouble = valueAsDouble;
-        public override bool Equals(object obj) => obj != null && obj is SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
+        public override bool Equals(object? obj) => obj != null && obj is SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
         public static bool operator ==(SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure> left, SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure> right) => left.Equals(right);
         public static bool operator !=(SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure> left, SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure> right) => !(left == right);
@@ -209,7 +209,7 @@ namespace NGenericDimensions
         #region ToString
         public override string ToString() => ToString(null, null);
 
-        public string ToString(string format, IFormatProvider formatProvider)
+        public string ToString(string? format, IFormatProvider? formatProvider)
         {
             if (format == null)
             { }
@@ -226,7 +226,7 @@ namespace NGenericDimensions
         #endregion
 
         #region Equals
-        public override bool Equals(object obj) => obj != null && obj is Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(SpeedValue, o.SpeedValue);
+        public override bool Equals(object? obj) => obj != null && obj is Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(SpeedValue, o.SpeedValue);
 
         bool IEquatable<Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>>.Equals(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> other) => EqualityComparer<TDataType>.Default.Equals(SpeedValue, other.SpeedValue);
         #endregion

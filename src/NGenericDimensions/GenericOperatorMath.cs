@@ -9,15 +9,15 @@ namespace NGenericDimensions.Math
         internal delegate double ConvertTToDouble(T value);
         internal delegate T ConvertDoubleToT(double value);
         
-        public static TMath Add = null;
-        public static TMath Subtract = null;
-        public static TMath Multiply = null;
-        public static TMathBoolean LessThan = null;
-        public static TMathBoolean GreaterThan = null;
-        public static TMathBoolean LessThanOrEqualTo = null;
-        public static TMathBoolean GreaterThanOrEqualTo = null;
-        public static ConvertTToDouble ConvertToDouble = null;
-        public static ConvertDoubleToT ConvertFromDouble = null;
+        public static TMath Add;
+        public static TMath Subtract;
+        public static TMath Multiply;
+        public static TMathBoolean LessThan;
+        public static TMathBoolean GreaterThan;
+        public static TMathBoolean LessThanOrEqualTo;
+        public static TMathBoolean GreaterThanOrEqualTo;
+        public static ConvertTToDouble ConvertToDouble;
+        public static ConvertDoubleToT ConvertFromDouble;
 
         [DebuggerStepThrough()]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1810:Initialize reference type static fields inline", Justification = "Don't know a cleaner way than this.")]
@@ -25,7 +25,7 @@ namespace NGenericDimensions.Math
         {
             if (ReferenceEquals(typeof(T), typeof(Int16)))
             {
-                Add = CastDelegate<TMath>((Func<Int16, Int16, Int16>)((Int16 a, Int16 b) => (Int16)(a + b))); ;
+                Add = CastDelegate<TMath>((Func<Int16, Int16, Int16>)((Int16 a, Int16 b) => (Int16)(a + b)));
                 Subtract = CastDelegate<TMath>((Func<Int16, Int16, Int16>)((Int16 a, Int16 b) => (Int16)(a - b)));
                 Multiply = CastDelegate<TMath>((Func<Int16, Int16, Int16>)((Int16 a, Int16 b) => (Int16)(a * b)));
                 LessThan = CastDelegate<TMathBoolean>((Func<Int16, Int16, bool>)((Int16 a, Int16 b) => a < b));
@@ -37,7 +37,7 @@ namespace NGenericDimensions.Math
             }
             else if (ReferenceEquals(typeof(T), typeof(Int32)))
             {
-                Add = CastDelegate<TMath>((Func<Int32, Int32, Int32>)((Int32 a, Int32 b) => a + b)); ;
+                Add = CastDelegate<TMath>((Func<Int32, Int32, Int32>)((Int32 a, Int32 b) => a + b));
                 Subtract = CastDelegate<TMath>((Func<Int32, Int32, Int32>)((Int32 a, Int32 b) => a - b));
                 Multiply = CastDelegate<TMath>((Func<Int32, Int32, Int32>)((Int32 a, Int32 b) => a * b));
                 LessThan = CastDelegate<TMathBoolean>((Func<Int32, Int32, bool>)((Int32 a, Int32 b) => a < b));
@@ -49,7 +49,7 @@ namespace NGenericDimensions.Math
             }
             else if (ReferenceEquals(typeof(T), typeof(Int64)))
             {
-                Add = CastDelegate<TMath>((Func<Int64, Int64, Int64>)((Int64 a, Int64 b) => a + b)); ;
+                Add = CastDelegate<TMath>((Func<Int64, Int64, Int64>)((Int64 a, Int64 b) => a + b));
                 Subtract = CastDelegate<TMath>((Func<Int64, Int64, Int64>)((Int64 a, Int64 b) => a - b));
                 Multiply = CastDelegate<TMath>((Func<Int64, Int64, Int64>)((Int64 a, Int64 b) => a * b));
                 LessThan = CastDelegate<TMathBoolean>((Func<Int64, Int64, bool>)((Int64 a, Int64 b) => a < b));
@@ -73,7 +73,7 @@ namespace NGenericDimensions.Math
             }
             else if (ReferenceEquals(typeof(T), typeof(UInt32)))
             {
-                Add = CastDelegate<TMath>((Func<UInt32, UInt32, UInt32>)((UInt32 a, UInt32 b) => a + b)); ;
+                Add = CastDelegate<TMath>((Func<UInt32, UInt32, UInt32>)((UInt32 a, UInt32 b) => a + b));
                 Subtract = CastDelegate<TMath>((Func<UInt32, UInt32, UInt32>)((UInt32 a, UInt32 b) => a - b));
                 Multiply = CastDelegate<TMath>((Func<UInt32, UInt32, UInt32>)((UInt32 a, UInt32 b) => a * b));
                 LessThan = CastDelegate<TMathBoolean>((Func<UInt32, UInt32, bool>)((UInt32 a, UInt32 b) => a < b));
@@ -85,7 +85,7 @@ namespace NGenericDimensions.Math
             }
             else if (ReferenceEquals(typeof(T), typeof(UInt64)))
             {
-                Add = CastDelegate<TMath>((Func<UInt64, UInt64, UInt64>)((UInt64 a, UInt64 b) => a + b)); ;
+                Add = CastDelegate<TMath>((Func<UInt64, UInt64, UInt64>)((UInt64 a, UInt64 b) => a + b));
                 Subtract = CastDelegate<TMath>((Func<UInt64, UInt64, UInt64>)((UInt64 a, UInt64 b) => a - b));
                 Multiply = CastDelegate<TMath>((Func<UInt64, UInt64, UInt64>)((UInt64 a, UInt64 b) => a * b));
                 LessThan = CastDelegate<TMathBoolean>((Func<UInt64, UInt64, bool>)((UInt64 a, UInt64 b) => a < b));
@@ -97,7 +97,7 @@ namespace NGenericDimensions.Math
             }
             else if (ReferenceEquals(typeof(T), typeof(float)))
             {
-                Add = CastDelegate<TMath>((Func<float, float, float>)((float a, float b) => a + b)); ;
+                Add = CastDelegate<TMath>((Func<float, float, float>)((float a, float b) => a + b));
                 Subtract = CastDelegate<TMath>((Func<float, float, float>)((float a, float b) => a - b));
                 Multiply = CastDelegate<TMath>((Func<float, float, float>)((float a, float b) => a * b));
                 LessThan = CastDelegate<TMathBoolean>((Func<float, float, bool>)((float a, float b) => a < b));
@@ -109,8 +109,8 @@ namespace NGenericDimensions.Math
             }
             else if (ReferenceEquals(typeof(T), typeof(double)))
             {
-                Add = CastDelegate<TMath>((Func<double, double, double>)((double a, double b) => a + b)); ;
-                Subtract = CastDelegate<TMath>((Func<double,double,double>)((double a, double b) => a - b));
+                Add = CastDelegate<TMath>((Func<double, double, double>)((double a, double b) => a + b));
+                Subtract = CastDelegate<TMath>((Func<double, double, double>)((double a, double b) => a - b));
                 Multiply = CastDelegate<TMath>((Func<double, double, double>)((double a, double b) => a * b));
                 LessThan = CastDelegate<TMathBoolean>((Func<double, double, bool>)((double a, double b) => a < b));
                 GreaterThan = CastDelegate<TMathBoolean>((Func<double, double, bool>)((double a, double b) => a > b));
@@ -121,7 +121,7 @@ namespace NGenericDimensions.Math
             }
             else if (ReferenceEquals(typeof(T), typeof(decimal)))
             {
-                Add = CastDelegate<TMath>((Func<decimal, decimal, decimal>)((decimal a, decimal b) => a + b)); ;
+                Add = CastDelegate<TMath>((Func<decimal, decimal, decimal>)((decimal a, decimal b) => a + b));
                 Subtract = CastDelegate<TMath>((Func<decimal, decimal, decimal>)((decimal a, decimal b) => a - b));
                 Multiply = CastDelegate<TMath>((Func<decimal, decimal, decimal>)((decimal a, decimal b) => a * b));
                 LessThan = CastDelegate<TMathBoolean>((Func<decimal, decimal, bool>)((decimal a, decimal b) => a < b));
@@ -133,7 +133,7 @@ namespace NGenericDimensions.Math
             }
             else if (ReferenceEquals(typeof(T), typeof(sbyte)))
             {
-                Add = CastDelegate<TMath>((Func<sbyte, sbyte, sbyte>)((sbyte a, sbyte b) => (sbyte)(a + b))); ;
+                Add = CastDelegate<TMath>((Func<sbyte, sbyte, sbyte>)((sbyte a, sbyte b) => (sbyte)(a + b)));
                 Subtract = CastDelegate<TMath>((Func<sbyte, sbyte, sbyte>)((sbyte a, sbyte b) => (sbyte)(a - b)));
                 Multiply = CastDelegate<TMath>((Func<sbyte, sbyte, sbyte>)((sbyte a, sbyte b) => (sbyte)(a * b)));
                 LessThan = CastDelegate<TMathBoolean>((Func<sbyte, sbyte, bool>)((sbyte a, sbyte b) => a < b));
@@ -145,7 +145,7 @@ namespace NGenericDimensions.Math
             }
             else if (ReferenceEquals(typeof(T), typeof(byte)))
             {
-                Add = CastDelegate<TMath>((Func<byte, byte, byte>)((byte a, byte b) => (byte)(a + b))); ;
+                Add = CastDelegate<TMath>((Func<byte, byte, byte>)((byte a, byte b) => (byte)(a + b)));
                 Subtract = CastDelegate<TMath>((Func<byte, byte, byte>)((byte a, byte b) => (byte)(a - b)));
                 Multiply = CastDelegate<TMath>((Func<byte, byte, byte>)((byte a, byte b) => (byte)(a * b)));
                 LessThan = CastDelegate<TMathBoolean>((Func<byte, byte, bool>)((byte a, byte b) => a < b));
@@ -155,14 +155,17 @@ namespace NGenericDimensions.Math
                 ConvertToDouble = CastDelegate<ConvertTToDouble>((Func<byte, double>)((byte v) => Convert.ToDouble(v)));
                 ConvertFromDouble = CastDelegate<ConvertDoubleToT>((Func<double, byte>)((double v) => Convert.ToByte(v)));
             }
+            else
+            {
+                throw new NotSupportedException();
+            }
         }
         
         #region "Delegate Casting"
         private static TDelegate CastDelegate<TDelegate>(Delegate source) where TDelegate : Delegate // use "class" instead of "Delegate" in older frameworks
         {
-            if (source == null) return null;
             var delegates = source.GetInvocationList();
-            return Delegate.CreateDelegate(typeof(TDelegate), delegates[0].Target, delegates[0].Method) as TDelegate;
+            return (TDelegate)Delegate.CreateDelegate(typeof(TDelegate), delegates[0].Target, delegates[0].Method);
         }
         #endregion
     }

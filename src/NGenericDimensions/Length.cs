@@ -23,7 +23,7 @@ namespace NGenericDimensions
             UnitOfMeasure = unitOfMeasure;
         }
 
-        public override bool Equals(object obj) => obj != null && obj is LengthDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.UnitOfMeasure.Equals(UnitOfMeasure);
+        public override bool Equals(object? obj) => obj != null && obj is LengthDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.UnitOfMeasure.Equals(UnitOfMeasure);
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
         public static bool operator ==(LengthDouble left, LengthDouble right) => left.Equals(right);
         public static bool operator !=(LengthDouble left, LengthDouble right) => !(left == right);
@@ -34,7 +34,7 @@ namespace NGenericDimensions
     {
         internal readonly double ValueAsDouble;
         internal LengthDouble(double valueAsDouble) => ValueAsDouble = valueAsDouble;
-        public override bool Equals(object obj) => obj != null && obj is LengthDouble<TUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
+        public override bool Equals(object? obj) => obj != null && obj is LengthDouble<TUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
         public static bool operator ==(LengthDouble<TUnitOfMeasure> left, LengthDouble<TUnitOfMeasure> right) => left.Equals(right);
         public static bool operator !=(LengthDouble<TUnitOfMeasure> left, LengthDouble<TUnitOfMeasure> right) => !(left == right);
@@ -229,11 +229,11 @@ namespace NGenericDimensions
         #region ToString
         public override string ToString() => UnitOfMeasure.ToString(LengthValue, null, null);
 
-        public string ToString(string format, IFormatProvider formatProvider) => UnitOfMeasure.ToString(LengthValue, format, formatProvider);
+        public string ToString(string? format, IFormatProvider? formatProvider) => UnitOfMeasure.ToString(LengthValue, format, formatProvider);
         #endregion
 
         #region Equals
-        public override bool Equals(object obj) => obj != null && obj is Length<TUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(LengthValue, o.LengthValue);
+        public override bool Equals(object? obj) => obj != null && obj is Length<TUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(LengthValue, o.LengthValue);
 
         bool IEquatable<Length<TUnitOfMeasure, TDataType>>.Equals(Length<TUnitOfMeasure, TDataType> other) => EqualityComparer<TDataType>.Default.Equals(LengthValue, other.LengthValue);
         #endregion

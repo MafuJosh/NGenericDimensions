@@ -21,7 +21,7 @@ namespace NGenericDimensions
             UnitOfMeasure = unitOfMeasure;
         }
 
-        public override bool Equals(object obj) => obj != null && obj is AreaDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.UnitOfMeasure.Equals(UnitOfMeasure);
+        public override bool Equals(object? obj) => obj != null && obj is AreaDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.UnitOfMeasure.Equals(UnitOfMeasure);
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
         public static bool operator ==(AreaDouble left, AreaDouble right) => left.Equals(right);
         public static bool operator !=(AreaDouble left, AreaDouble right) => !(left == right);
@@ -32,7 +32,7 @@ namespace NGenericDimensions
     {
         internal readonly double ValueAsDouble;
         internal AreaDouble(double valueAsDouble) => ValueAsDouble = valueAsDouble;
-        public override bool Equals(object obj) => obj != null && obj is AreaDouble<TUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
+        public override bool Equals(object? obj) => obj != null && obj is AreaDouble<TUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
         public static bool operator ==(AreaDouble<TUnitOfMeasure> left, AreaDouble<TUnitOfMeasure> right) => left.Equals(right);
         public static bool operator !=(AreaDouble<TUnitOfMeasure> left, AreaDouble<TUnitOfMeasure> right) => !(left == right);
@@ -154,7 +154,7 @@ namespace NGenericDimensions
         #region ToString
         public override string ToString() => ToString(null, null);
 
-        public string ToString(string format, IFormatProvider formatProvider)
+        public string ToString(string? format, IFormatProvider? formatProvider)
         {
             if (format == null)
             { }
@@ -178,7 +178,7 @@ namespace NGenericDimensions
         #endregion
 
         #region Equals
-        public override bool Equals(object obj) => obj != null && obj is Area<TUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(AreaValue, o.AreaValue);
+        public override bool Equals(object? obj) => obj != null && obj is Area<TUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(AreaValue, o.AreaValue);
 
         bool IEquatable<Area<TUnitOfMeasure, TDataType>>.Equals(Area<TUnitOfMeasure, TDataType> other) => EqualityComparer<TDataType>.Default.Equals(AreaValue, other.AreaValue);
         #endregion

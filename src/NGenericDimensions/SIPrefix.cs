@@ -13,7 +13,7 @@ namespace NGenericDimensions.MetricPrefix
         /// <returns></returns>
         public override string ToString() => GetType().Name;
 
-        public string ToString(string format, IFormatProvider formatProvider)
+        public string ToString(string? format, IFormatProvider? formatProvider)
         {
             if (format == "NU")
             {
