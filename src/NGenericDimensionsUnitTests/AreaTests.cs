@@ -1,67 +1,110 @@
 ﻿using NGenericDimensions;
+using NGenericDimensions.Areas.MetricNonSI;
 using NGenericDimensions.Extensions;
 using NGenericDimensions.Extensions.Numbers;
 using NGenericDimensions.Lengths.MetricSI;
 using NGenericDimensions.Lengths.Uscs;
+using NGenericDimensions.MetricPrefix;
 using System;
+using System.Linq;
 using Xunit;
 
 namespace NGenericDimensionsUnitTests
 {
     public class AreaTests : TestsHelperBBase
     {
+        private static readonly Type[] actualUomsTypesOfArea
+            = GetUnitOfMeasuresTypes<NGenericDimensions.Areas.Length2DUnitOfMeasure>(true, true)
+            .Concat(GetUnitOfMeasuresTypes<NGenericDimensions.Lengths.Length1DUnitOfMeasure>(true, true))
+            .OrderBy(o => o.FullName).ToArray();
+
+        private static readonly Type[] actualUomsTypesOfAreaEvenWithoutIDefinedUnitOfMeasure
+            = GetUnitOfMeasuresTypes<NGenericDimensions.Areas.Length2DUnitOfMeasure>(false, true)
+            .Concat(GetUnitOfMeasuresTypes<NGenericDimensions.Lengths.Length1DUnitOfMeasure>(false, true))
+            .Where(o => o.Name != "Length2DUnitOfMeasure" 
+                     && o.Name != "Length1DUnitOfMeasure" 
+                     && o.Name != "UscsLengthUnitOfMeasure" 
+                     && o.Name != "SILengthUnitOfMeasure" 
+                     && o.Name != "MetricNonSIAreaUnitOfMeasure")
+            .OrderBy(o => o.FullName).ToArray();
+
+        private static readonly Type[] actualUomsTypesOfUscsLengthUnitOfMeasure
+            = GetUnitOfMeasuresTypes<UscsLengthUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
+
+        private static readonly Type[] actualUomsTypesOfSILengthUnitOfMeasure
+            = GetUnitOfMeasuresTypes<SILengthUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
+
+        private static readonly Type[] actualUomsTypesOfMetricNonSIAreaUnitOfMeasure
+            = GetUnitOfMeasuresTypes<NGenericDimensions.Areas.MetricNonSI.MetricNonSIAreaUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
+
+        [Fact]
+        public void AreaUOMsBaseClassesAndInterfaces()
+        {
+            var expectedUomsOfMetricNonSIAreaUnitOfMeasure = new[] {
+                typeof(Hectares)
+            }.OrderBy(o => o.FullName);
+
+            var expectedUomsOfUscsLengthUnitOfMeasure = new[] {
+                typeof(Inches),
+                typeof(Feet),
+                typeof(Yards),
+                typeof(Miles)
+            }.OrderBy(o => o.FullName);
+
+            var expectedUomsOfSILengthUnitOfMeasure = new[] {
+                typeof(Kilometres),
+                typeof(Micrometres),
+                typeof(Millimetres),
+                typeof(Nanometres),
+                typeof(Metres<Deca>),
+                typeof(Metres<Hecto>),
+                typeof(Metres<Kilo>),
+                typeof(Metres<Mega>),
+                typeof(Metres<Giga>),
+                typeof(Metres<Tera>),
+                typeof(Metres<Peta>),
+                typeof(Metres<Exa>),
+                typeof(Metres<Zetta>),
+                typeof(Metres<Yotta>),
+                typeof(Metres<Deci>),
+                typeof(Metres<Centi>),
+                typeof(Metres<Milli>),
+                typeof(Metres<Micro>),
+                typeof(Metres<Nano>),
+                typeof(Metres<Pico>),
+                typeof(Metres<Femto>),
+                typeof(Metres<Atto>),
+                typeof(Metres<Zepto>),
+                typeof(Metres<Yocto>),
+                typeof(Metres)
+            }.OrderBy(o => o.FullName);
+
+            var expectedUomsOfArea
+                = expectedUomsOfMetricNonSIAreaUnitOfMeasure
+                .Concat(expectedUomsOfUscsLengthUnitOfMeasure)
+                .Concat(expectedUomsOfSILengthUnitOfMeasure)
+                .OrderBy(o => o.FullName);
+
+            Assert.Equal(expectedUomsOfArea, actualUomsTypesOfArea);
+            Assert.Equal(expectedUomsOfArea, actualUomsTypesOfAreaEvenWithoutIDefinedUnitOfMeasure);
+            Assert.Equal(expectedUomsOfUscsLengthUnitOfMeasure, actualUomsTypesOfUscsLengthUnitOfMeasure);
+            Assert.Equal(expectedUomsOfSILengthUnitOfMeasure, actualUomsTypesOfSILengthUnitOfMeasure);
+            Assert.Equal(expectedUomsOfMetricNonSIAreaUnitOfMeasure, actualUomsTypesOfMetricNonSIAreaUnitOfMeasure);
+        }
+
         [Fact]
         public void TestAreaConstructor()
         {
-            // test valid units of measure for area
-            _ = new NGenericDimensions.Area<NGenericDimensions.Areas.MetricNonSI.Hectares, double>(4.4);
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, double>(4.4);
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Metres, double>(4.4);
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Micrometres, double>(4.4);
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Millimetres, double>(4.4);
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Nanometres, double>(4.4);
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.Uscs.Feet, double>(4.4);
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.Uscs.Inches, double>(4.4);
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.Uscs.Miles, double>(4.4);
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.Uscs.Yards, double>(4.4);
+            var uomsToPass = GetUnitOfMeasuresTypeFullNames<NGenericDimensions.Areas.Length2DUnitOfMeasure>(true, true).Concat(GetUnitOfMeasuresTypeFullNames<NGenericDimensions.Lengths.Length1DUnitOfMeasure>(true, true)).ToArray();
+            var uomsToFail = GetUnitOfMeasuresTypeFullNames<NGenericDimensions.Areas.Length2DUnitOfMeasure>(true, false).Concat(GetUnitOfMeasuresTypeFullNames<NGenericDimensions.Lengths.Length1DUnitOfMeasure>(true, false)).Except(uomsToPass).ToArray();
 
-            // test invalid units of measure of area
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Area<NGenericDimensions.Durations.Days, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Area<NGenericDimensions.Durations.Hours, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Area<NGenericDimensions.Durations.Microseconds, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Area<NGenericDimensions.Durations.Milliseconds, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Area<NGenericDimensions.Durations.Minutes, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Area<NGenericDimensions.Durations.Seconds, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Area<NGenericDimensions.Durations.Ticks, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Area<NGenericDimensions.Masses.MetricSI.Grams, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Area<NGenericDimensions.Masses.MetricSI.Kilograms, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Area<NGenericDimensions.Volumes.MetricNonSI.Litres, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Area<NGenericDimensions.Lengths.Length1DUnitOfMeasure, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Area<NGenericDimensions.Areas.Length2DUnitOfMeasure, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Area<NGenericDimensions.Areas.MetricNonSI.MetricNonSIAreaUnitOfMeasure, double>(4.4);");
+            // test valid and invalid units of measure for length
+            Func<string, string> csharpCode = (t) => $@"_ = new NGenericDimensions.Area<{t}, double>(4.4);";
+            foreach (var uomToPass in uomsToPass) AssertCompilationPasses(csharpCode(uomToPass));
+            foreach (var uomToFail in uomsToFail) AssertCompilationFails("cannot be used as type parameter", csharpCode(uomToFail));
 
-            // test number data types
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Double>(System.Convert.ToDouble(4.44444));
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Double>(System.Convert.ToSingle(4.44444));
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Single>(System.Convert.ToSingle(4.44444));
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Decimal>(System.Convert.ToDecimal(4.44444));
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int64>(System.Convert.ToInt64(4));
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int32>(System.Convert.ToInt32(4));
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int16>(System.Convert.ToInt16(4));
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Byte>(System.Convert.ToByte(4));
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, System.SByte>(System.Convert.ToSByte(4));
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, System.UInt16>(System.Convert.ToUInt16(4));
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, System.UInt32>(System.Convert.ToUInt32(4));
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, System.UInt64>(System.Convert.ToUInt64(4));
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Char>(System.Convert.ToChar(4));");
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, System.DateTime>(new System.DateTime(1000)); // can't stop this from being allowed
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Boolean>(System.Convert.ToBoolean(4));");
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Numerics.BigInteger>(new System.Numerics.BigInteger(4.4));
-            // and prove it only allows compatible data types
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int32>(System.Convert.ToInt32(4));
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int32>(System.Convert.ToInt16(4));
-            _ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int32>(System.Convert.ToByte(4));
-            AssertCompilationFails("cannot convert from", @"_ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int32>(System.Convert.ToInt64(4));");
+            // test common constructor tests
+            TestConstructor(@"_ = new NGenericDimensions.Area<NGenericDimensions.Lengths.MetricSI.Kilometres, {0});");
 
             // make sure value gets stored in member variable
             var areaB = new Area<Kilometres, Int32>(3);

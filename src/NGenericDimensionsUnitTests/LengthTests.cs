@@ -2,66 +2,95 @@
 using NGenericDimensions.Durations;
 using NGenericDimensions.Extensions;
 using NGenericDimensions.Extensions.Numbers;
+using NGenericDimensions.Lengths.MetricSI;
 using NGenericDimensions.Lengths.Uscs;
 using NGenericDimensions.MetricPrefix;
 using System;
+using System.Linq;
 using Xunit;
 
 namespace NGenericDimensionsUnitTests
 {
     public class LengthTests : TestsHelperBBase
     {
+        private static readonly Type[] actualUomsTypesOfLength1DUnitOfMeasure
+            = GetUnitOfMeasuresTypes<NGenericDimensions.Lengths.Length1DUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
+
+        private static readonly Type[] actualUomsTypesOfLength1DUnitOfMeasureEvenWithoutIDefinedUnitOfMeasure
+            = GetUnitOfMeasuresTypes<NGenericDimensions.Lengths.Length1DUnitOfMeasure>(false, true)
+            .Where(o => o.Name != "Length1DUnitOfMeasure" 
+                     && o.Name != "UscsLengthUnitOfMeasure" 
+                     && o.Name != "SILengthUnitOfMeasure")
+            .OrderBy(o => o.FullName).ToArray();
+
+        private static readonly Type[] actualUomsTypesOfUscsLengthUnitOfMeasure
+            = GetUnitOfMeasuresTypes<UscsLengthUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
+        
+        private static readonly Type[] actualUomsTypesOfSILengthUnitOfMeasure
+            = GetUnitOfMeasuresTypes<SILengthUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
+
+        [Fact]
+        public void LengthUOMsBaseClassesAndInterfaces()
+        {
+            var expectedUomsOfUscsLengthUnitOfMeasure = new[] {
+                typeof(Inches),
+                typeof(Feet),
+                typeof(Yards),
+                typeof(Miles)
+            }.OrderBy(o => o.FullName);
+
+            var expectedUomsOfSILengthUnitOfMeasure = new[] {
+                typeof(Kilometres),
+                typeof(Micrometres),
+                typeof(Millimetres),
+                typeof(Nanometres),
+                typeof(Metres<Deca>),
+                typeof(Metres<Hecto>),
+                typeof(Metres<Kilo>),
+                typeof(Metres<Mega>),
+                typeof(Metres<Giga>),
+                typeof(Metres<Tera>),
+                typeof(Metres<Peta>),
+                typeof(Metres<Exa>),
+                typeof(Metres<Zetta>),
+                typeof(Metres<Yotta>),
+                typeof(Metres<Deci>),
+                typeof(Metres<Centi>),
+                typeof(Metres<Milli>),
+                typeof(Metres<Micro>),
+                typeof(Metres<Nano>),
+                typeof(Metres<Pico>),
+                typeof(Metres<Femto>),
+                typeof(Metres<Atto>),
+                typeof(Metres<Zepto>),
+                typeof(Metres<Yocto>),
+                typeof(Metres)
+            }.OrderBy(o => o.FullName);
+
+            var expectedUomsOfLength1DUnitOfMeasure 
+                = expectedUomsOfUscsLengthUnitOfMeasure
+                .Concat(expectedUomsOfSILengthUnitOfMeasure)
+                .OrderBy(o => o.FullName);
+
+            Assert.Equal(expectedUomsOfLength1DUnitOfMeasure, actualUomsTypesOfLength1DUnitOfMeasure);
+            Assert.Equal(expectedUomsOfLength1DUnitOfMeasure, actualUomsTypesOfLength1DUnitOfMeasureEvenWithoutIDefinedUnitOfMeasure);
+            Assert.Equal(expectedUomsOfUscsLengthUnitOfMeasure, actualUomsTypesOfUscsLengthUnitOfMeasure);
+            Assert.Equal(expectedUomsOfSILengthUnitOfMeasure, actualUomsTypesOfSILengthUnitOfMeasure);
+        }
 
         [Fact]
         public void TestLengthConstructor()
         {
-            // test valid units of measure for length
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, double>(4.4);
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Metres, double>(4.4);
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Micrometres, double>(4.4);
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Millimetres, double>(4.4);
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Nanometres, double>(4.4);
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.Uscs.Feet, double>(4.4);
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.Uscs.Inches, double>(4.4);
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.Uscs.Miles, double>(4.4);
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.Uscs.Yards, double>(4.4);
+            var uomsToPass = GetUnitOfMeasuresTypeFullNames<NGenericDimensions.Lengths.Length1DUnitOfMeasure>(true, true);
+            var uomsToFail = GetUnitOfMeasuresTypeFullNames<NGenericDimensions.Lengths.Length1DUnitOfMeasure>(true, false);
 
-            // test invalid units of measure of length
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Length<NGenericDimensions.Areas.MetricNonSI.Hectares, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Length<NGenericDimensions.Durations.Days, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Length<NGenericDimensions.Durations.Hours, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Length<NGenericDimensions.Durations.Microseconds, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Length<NGenericDimensions.Durations.Milliseconds, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Length<NGenericDimensions.Durations.Minutes, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Length<NGenericDimensions.Durations.Seconds, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Length<NGenericDimensions.Durations.Ticks, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Length<NGenericDimensions.Masses.MetricSI.Grams, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Length<NGenericDimensions.Masses.MetricSI.Kilograms, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Length<NGenericDimensions.Volumes.MetricNonSI.Litres, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Length<NGenericDimensions.Lengths.Length1DUnitOfMeasure, double>(4.4);");
+            // test valid and invalid units of measure for length
+            Func<string, string> csharpCode = (t) => $@"_ = new NGenericDimensions.Length<{t}, double>(4.4);";
+            foreach (var uomToPass in uomsToPass) AssertCompilationPasses(csharpCode(uomToPass));
+            foreach (var uomToFail in uomsToFail) AssertCompilationFails("cannot be used as type parameter", csharpCode(uomToFail));
 
-            // test number data types
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Double>(System.Convert.ToDouble(4.44444));
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Double>(System.Convert.ToSingle(4.44444));
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Single>(System.Convert.ToSingle(4.44444));
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Decimal>(System.Convert.ToDecimal(4.44444));
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int64>(System.Convert.ToInt64(4));
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int32>(System.Convert.ToInt32(4));
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int16>(System.Convert.ToInt16(4));
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Byte>(System.Convert.ToByte(4));
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.SByte>(System.Convert.ToSByte(4));
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.UInt16>(System.Convert.ToUInt16(4));
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.UInt32>(System.Convert.ToUInt32(4));
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.UInt64>(System.Convert.ToUInt64(4));
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Char>(System.Convert.ToChar(4));");
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.DateTime>(new System.DateTime(1000)); // can't stop this from being allowed
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Boolean>(System.Convert.ToBoolean(4));");
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Numerics.BigInteger>(new System.Numerics.BigInteger(4.4));
-            // and prove it only allows compatible data types
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int32>(System.Convert.ToInt32(4));
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int32>(System.Convert.ToInt16(4));
-            _ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int32>(System.Convert.ToByte(4));
-            AssertCompilationFails("cannot convert from", @"_ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int32>(System.Convert.ToInt64(4));");
+            // test common constructor tests
+            TestConstructor(@"_ = new NGenericDimensions.Length<NGenericDimensions.Lengths.MetricSI.Kilometres, {0});");
 
             // make sure value gets stored in member variable
             var lengthB = new Length<NGenericDimensions.Lengths.MetricSI.Kilometres, Int32>(3);

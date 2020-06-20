@@ -5,75 +5,76 @@ using NGenericDimensions.Extensions.Numbers;
 using NGenericDimensions.Lengths.Uscs;
 using NGenericDimensions.MetricPrefix;
 using System;
+using System.Linq;
 using Xunit;
 
 namespace NGenericDimensionsUnitTests
 {
     public class DurationTests : TestsHelperBBase
     {
+        private static readonly Type[] actualUomsTypesOfDurationUnitOfMeasure
+            = GetUnitOfMeasuresTypes<DurationUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
+
+        private static readonly Type[] actualUomsTypesOfDurationUnitOfMeasureEvenWithoutIDefinedUnitOfMeasure
+            = GetUnitOfMeasuresTypes<DurationUnitOfMeasure>(false, true)
+            .Where(o => o.Name != "DurationUnitOfMeasure"
+                     && o.Name != "StandardDurationUnitOfMeasure")
+            .OrderBy(o => o.FullName).ToArray();
+
+        private static readonly Type[] actualUomsTypesOfStandardDurationUnitOfMeasure
+            = GetUnitOfMeasuresTypes<StandardDurationUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
+
+
+        [Fact]
+        public void DurationUOMsBaseClassesAndInterfaces()
+        {
+            var expectedUomsOfStandardDurationUnitOfMeasure = new[] {
+                typeof(Days),
+                typeof(Hours),
+                typeof(Microseconds),
+                typeof(Milliseconds),
+                typeof(Minutes),
+                typeof(Ticks),
+                typeof(Seconds<Deca>),
+                typeof(Seconds<Hecto>),
+                typeof(Seconds<Kilo>),
+                typeof(Seconds<Mega>),
+                typeof(Seconds<Giga>),
+                typeof(Seconds<Tera>),
+                typeof(Seconds<Peta>),
+                typeof(Seconds<Exa>),
+                typeof(Seconds<Zetta>),
+                typeof(Seconds<Yotta>),
+                typeof(Seconds<Deci>),
+                typeof(Seconds<Centi>),
+                typeof(Seconds<Milli>),
+                typeof(Seconds<Micro>),
+                typeof(Seconds<Nano>),
+                typeof(Seconds<Pico>),
+                typeof(Seconds<Femto>),
+                typeof(Seconds<Atto>),
+                typeof(Seconds<Zepto>),
+                typeof(Seconds<Yocto>),
+                typeof(Seconds)
+            }.OrderBy(o => o.FullName);
+
+            Assert.Equal(expectedUomsOfStandardDurationUnitOfMeasure, actualUomsTypesOfDurationUnitOfMeasure);
+            Assert.Equal(expectedUomsOfStandardDurationUnitOfMeasure, actualUomsTypesOfDurationUnitOfMeasureEvenWithoutIDefinedUnitOfMeasure);
+        }
 
         [Fact]
         public void TestDurationConstructor()
         {
-            // test valid units of measure for duration
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Days, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Minutes, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Seconds, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Milliseconds, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Microseconds, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Ticks, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Seconds<Deca>, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Seconds<Hecto>, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Seconds<Kilo>, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Seconds<Mega>, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Seconds<Giga>, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Seconds<Tera>, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Seconds<Peta>, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Seconds<Exa>, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Seconds<Zetta>, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Seconds<Yotta>, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Seconds<Deci>, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Seconds<Centi>, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Seconds<Milli>, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Seconds<Micro>, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Seconds<Nano>, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Seconds<Pico>, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Seconds<Femto>, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Seconds<Atto>, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Seconds<Zepto>, double>(4.4);
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Seconds<Yocto>, double>(4.4);
+            var uomsToPass = GetUnitOfMeasuresTypeFullNames<DurationUnitOfMeasure>(true, true);
+            var uomsToFail = GetUnitOfMeasuresTypeFullNames<DurationUnitOfMeasure>(true, false);
 
-            // test invalid units of measure of duration
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Duration<NGenericDimensions.Areas.MetricNonSI.Hectares, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Duration<NGenericDimensions.Lengths.MetricSI.Millimetres, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Duration<NGenericDimensions.Masses.MetricSI.Grams, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Duration<NGenericDimensions.Masses.MetricSI.Kilograms, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Duration<NGenericDimensions.Volumes.MetricNonSI.Litres, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Duration<NGenericDimensions.Durations.DurationUnitOfMeasure, double>(4.4);");
+            // test valid and invalid units of measure for length
+            Func<string, string> csharpCode = (t) => $@"_ = new NGenericDimensions.Duration<{t}, double>(4.4);";
+            foreach (var uomToPass in uomsToPass) AssertCompilationPasses(csharpCode(uomToPass));
+            foreach (var uomToFail in uomsToFail) AssertCompilationFails("cannot be used as type parameter", csharpCode(uomToFail));
 
-            // test number data types
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, System.Double>(System.Convert.ToDouble(4.44444));
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, System.Double>(System.Convert.ToSingle(4.44444));
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, System.Single>(System.Convert.ToSingle(4.44444));
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, System.Decimal>(System.Convert.ToDecimal(4.44444));
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, System.Int64>(System.Convert.ToInt64(4));
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, System.Int32>(System.Convert.ToInt32(4));
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, System.Int16>(System.Convert.ToInt16(4));
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, System.Byte>(System.Convert.ToByte(4));
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, System.SByte>(System.Convert.ToSByte(4));
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, System.UInt16>(System.Convert.ToUInt16(4));
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, System.UInt32>(System.Convert.ToUInt32(4));
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, System.UInt64>(System.Convert.ToUInt64(4));
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, System.Char>(System.Convert.ToChar(4));");
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, System.DateTime>(new System.DateTime(1000)); // can't stop this from being allowed
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, System.Boolean>(System.Convert.ToBoolean(4));");
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, System.Numerics.BigInteger>(new System.Numerics.BigInteger(4.4));
-            // and prove it only allows compatible data types
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, System.Int32>(System.Convert.ToInt32(4));
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, System.Int32>(System.Convert.ToInt16(4));
-            _ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, System.Int32>(System.Convert.ToByte(4));
-            AssertCompilationFails("cannot convert from", @"_ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, System.Int32>(System.Convert.ToInt64(4));");
+            // test common constructor tests
+            TestConstructor(@"_ = new NGenericDimensions.Duration<NGenericDimensions.Durations.Hours, {0});");
 
             // make sure constructor can take a timespan
             _ = new Duration<Hours, Int32>(TimeSpan.FromDays(2));

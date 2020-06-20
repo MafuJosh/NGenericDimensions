@@ -2,56 +2,82 @@
 using NGenericDimensions.Extensions;
 using NGenericDimensions.Extensions.Numbers;
 using NGenericDimensions.Masses.MetricSI;
+using NGenericDimensions.MetricPrefix;
 using System;
+using System.Linq;
 using Xunit;
 
 namespace NGenericDimensionsUnitTests
 {
     public class MassTests : TestsHelperBBase
     {
+        private static readonly Type[] actualUomsTypesOfMassUnitOfMeasure
+            = GetUnitOfMeasuresTypes<NGenericDimensions.Masses.MassUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
+
+        private static readonly Type[] actualUomsTypesOfMassUnitOfMeasureEvenWithoutIDefinedUnitOfMeasure
+            = GetUnitOfMeasuresTypes<NGenericDimensions.Masses.MassUnitOfMeasure>(false, true)
+            .Where(o => o.Name != "MassUnitOfMeasure" 
+                     && o.Name != "SIMassUnitOfMeasure")
+            .OrderBy(o => o.FullName).ToArray();
+
+        private static readonly Type[] actualUomsTypesOfSIMassUnitOfMeasure
+            = GetUnitOfMeasuresTypes<SIMassUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
+
+        [Fact]
+        public void MassUOMsBaseClassesAndInterfaces()
+        {
+            var expectedUomsOfUscsMassUnitOfMeasure = new Type[] {
+            }.OrderBy(o => o.FullName);
+
+            var expectedUomsOfSIMassUnitOfMeasure = new[] {
+                typeof(Kilograms),
+                typeof(Grams<Deca>),
+                typeof(Grams<Hecto>),
+                typeof(Grams<Kilo>),
+                typeof(Grams<Mega>),
+                typeof(Grams<Giga>),
+                typeof(Grams<Tera>),
+                typeof(Grams<Peta>),
+                typeof(Grams<Exa>),
+                typeof(Grams<Zetta>),
+                typeof(Grams<Yotta>),
+                typeof(Grams<Deci>),
+                typeof(Grams<Centi>),
+                typeof(Grams<Milli>),
+                typeof(Grams<Micro>),
+                typeof(Grams<Nano>),
+                typeof(Grams<Pico>),
+                typeof(Grams<Femto>),
+                typeof(Grams<Atto>),
+                typeof(Grams<Zepto>),
+                typeof(Grams<Yocto>),
+                typeof(Grams)
+            }.OrderBy(o => o.FullName);
+
+            var expectedUomsOfMassUnitOfMeasure
+                = expectedUomsOfUscsMassUnitOfMeasure
+                .Concat(expectedUomsOfSIMassUnitOfMeasure)
+                .OrderBy(o => o.FullName);
+
+            Assert.Equal(expectedUomsOfMassUnitOfMeasure, actualUomsTypesOfMassUnitOfMeasure);
+            Assert.Equal(expectedUomsOfMassUnitOfMeasure, actualUomsTypesOfMassUnitOfMeasureEvenWithoutIDefinedUnitOfMeasure);
+            Assert.Equal(expectedUomsOfUscsMassUnitOfMeasure, new Type[] { });
+            Assert.Equal(expectedUomsOfSIMassUnitOfMeasure, actualUomsTypesOfSIMassUnitOfMeasure);
+        }
+
         [Fact]
         public void TestMassConstructor()
         {
-            // test valid units of measure for mass
-            _ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, double>(4.4);
-            _ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Grams, double>(4.4);
+            var uomsToPass = GetUnitOfMeasuresTypeFullNames<NGenericDimensions.Masses.MassUnitOfMeasure>(true, true);
+            var uomsToFail = GetUnitOfMeasuresTypeFullNames<NGenericDimensions.Masses.MassUnitOfMeasure>(true, false);
 
-            // test invalid units of measure of mass
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Mass<NGenericDimensions.Areas.MetricNonSI.Hectares, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Mass<NGenericDimensions.Durations.Days, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Mass<NGenericDimensions.Durations.Hours, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Mass<NGenericDimensions.Durations.Microseconds, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Mass<NGenericDimensions.Durations.Milliseconds, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Mass<NGenericDimensions.Durations.Minutes, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Mass<NGenericDimensions.Durations.Seconds, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Mass<NGenericDimensions.Durations.Ticks, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Mass<NGenericDimensions.Lengths.MetricSI.Metres, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Mass<NGenericDimensions.Lengths.Uscs.Feet, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Mass<NGenericDimensions.Volumes.MetricNonSI.Litres, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Mass<NGenericDimensions.Lengths.Length1DUnitOfMeasure, double>(4.4);");
+            // test valid and invalid units of measure for length
+            Func<string, string> csharpCode = (t) => $@"_ = new NGenericDimensions.Mass<{t}, double>(4.4);";
+            foreach (var uomToPass in uomsToPass) AssertCompilationPasses(csharpCode(uomToPass));
+            foreach (var uomToFail in uomsToFail) AssertCompilationFails("cannot be used as type parameter", csharpCode(uomToFail));
 
-            // test number data types
-            _ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, System.Double>(System.Convert.ToDouble(4.44444));
-            _ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, System.Double>(System.Convert.ToSingle(4.44444));
-            _ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, System.Single>(System.Convert.ToSingle(4.44444));
-            _ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, System.Decimal>(System.Convert.ToDecimal(4.44444));
-            _ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, System.Int64>(System.Convert.ToInt64(4));
-            _ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, System.Int32>(System.Convert.ToInt32(4));
-            _ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, System.Int16>(System.Convert.ToInt16(4));
-            _ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, System.Byte>(System.Convert.ToByte(4));
-            _ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, System.SByte>(System.Convert.ToSByte(4));
-            _ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, System.UInt16>(System.Convert.ToUInt16(4));
-            _ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, System.UInt32>(System.Convert.ToUInt32(4));
-            _ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, System.UInt64>(System.Convert.ToUInt64(4));
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, System.Char>(System.Convert.ToChar(4));");
-            _ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, System.DateTime>(new System.DateTime(1000)); // can't stop this from being allowed
-            AssertCompilationFails("cannot be used as type parameter", @"_ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, System.Boolean>(System.Convert.ToBoolean(4));");
-            _ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, System.Numerics.BigInteger>(new System.Numerics.BigInteger(4.4));
-            // and prove it only allows compatible data types
-            _ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, System.Int32>(System.Convert.ToInt32(4));
-            _ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, System.Int32>(System.Convert.ToInt16(4));
-            _ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, System.Int32>(System.Convert.ToByte(4));
-            AssertCompilationFails("cannot convert from", @"_ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, System.Int32>(System.Convert.ToInt64(4));");
+            // test common constructor tests
+            TestConstructor(@"_ = new NGenericDimensions.Mass<NGenericDimensions.Masses.MetricSI.Kilograms, {0});");
 
             // make sure value gets stored in member variable
             var massB = new Mass<Kilograms, Int32>(3);

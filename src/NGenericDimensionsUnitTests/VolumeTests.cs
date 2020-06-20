@@ -3,65 +3,128 @@ using NGenericDimensions.Extensions;
 using NGenericDimensions.Extensions.Numbers;
 using NGenericDimensions.Lengths.MetricSI;
 using NGenericDimensions.Lengths.Uscs;
+using NGenericDimensions.MetricPrefix;
+using NGenericDimensions.Volumes.MetricNonSI;
 using System;
+using System.Linq;
 using Xunit;
 
 namespace NGenericDimensionsUnitTests
 {
     public class VolumeTests : TestsHelperBBase
     {
+        private static readonly Type[] actualUomsTypesOfVolume
+            = GetUnitOfMeasuresTypes<NGenericDimensions.Volumes.Length3DUnitOfMeasure>(true, true)
+            .Concat(GetUnitOfMeasuresTypes<NGenericDimensions.Lengths.Length1DUnitOfMeasure>(true, true))
+            .OrderBy(o => o.FullName).ToArray();
+
+        private static readonly Type[] actualUomsTypesOfVolumeEvenWithoutIDefinedUnitOfMeasure
+            = GetUnitOfMeasuresTypes<NGenericDimensions.Volumes.Length3DUnitOfMeasure>(false, true)
+            .Concat(GetUnitOfMeasuresTypes<NGenericDimensions.Lengths.Length1DUnitOfMeasure>(false, true))
+            .Where(o => o.Name != "Length3DUnitOfMeasure" 
+                     && o.Name != "Length1DUnitOfMeasure"
+                     && o.Name != "MetricNonSIVolumeUnitOfMeasure" 
+                     && o.Name != "UscsLengthUnitOfMeasure" 
+                     && o.Name != "SILengthUnitOfMeasure")
+            .OrderBy(o => o.FullName).ToArray();
+
+        private static readonly Type[] actualUomsTypesOfUscsLengthUnitOfMeasure
+            = GetUnitOfMeasuresTypes<UscsLengthUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
+
+        private static readonly Type[] actualUomsTypesOfSILengthUnitOfMeasure
+            = GetUnitOfMeasuresTypes<SILengthUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
+
+        private static readonly Type[] actualUomsTypesOfMetricNonSIVolumeUnitOfMeasure
+            = GetUnitOfMeasuresTypes<NGenericDimensions.Volumes.MetricNonSI.MetricNonSIVolumeUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
+
+        [Fact]
+        public void VolumeUOMsBaseClassesAndInterfaces()
+        {
+            var expectedUomsOfMetricNonSIVolumeUnitOfMeasure = new[] {
+                typeof(Litres<Deca>),
+                typeof(Litres<Hecto>),
+                typeof(Litres<Kilo>),
+                typeof(Litres<Mega>),
+                typeof(Litres<Giga>),
+                typeof(Litres<Tera>),
+                typeof(Litres<Peta>),
+                typeof(Litres<Exa>),
+                typeof(Litres<Zetta>),
+                typeof(Litres<Yotta>),
+                typeof(Litres<Deci>),
+                typeof(Litres<Centi>),
+                typeof(Litres<Milli>),
+                typeof(Litres<Micro>),
+                typeof(Litres<Nano>),
+                typeof(Litres<Pico>),
+                typeof(Litres<Femto>),
+                typeof(Litres<Atto>),
+                typeof(Litres<Zepto>),
+                typeof(Litres<Yocto>),
+                typeof(Litres)
+            }.OrderBy(o => o.FullName);
+
+            var expectedUomsOfUscsLengthUnitOfMeasure = new[] {
+                typeof(Inches),
+                typeof(Feet),
+                typeof(Yards),
+                typeof(Miles)
+            }.OrderBy(o => o.FullName);
+
+            var expectedUomsOfSILengthUnitOfMeasure = new[] {
+                typeof(Kilometres),
+                typeof(Micrometres),
+                typeof(Millimetres),
+                typeof(Nanometres),
+                typeof(Metres<Deca>),
+                typeof(Metres<Hecto>),
+                typeof(Metres<Kilo>),
+                typeof(Metres<Mega>),
+                typeof(Metres<Giga>),
+                typeof(Metres<Tera>),
+                typeof(Metres<Peta>),
+                typeof(Metres<Exa>),
+                typeof(Metres<Zetta>),
+                typeof(Metres<Yotta>),
+                typeof(Metres<Deci>),
+                typeof(Metres<Centi>),
+                typeof(Metres<Milli>),
+                typeof(Metres<Micro>),
+                typeof(Metres<Nano>),
+                typeof(Metres<Pico>),
+                typeof(Metres<Femto>),
+                typeof(Metres<Atto>),
+                typeof(Metres<Zepto>),
+                typeof(Metres<Yocto>),
+                typeof(Metres)
+            }.OrderBy(o => o.FullName);
+
+            var expectedUomsOfVolume
+                = expectedUomsOfUscsLengthUnitOfMeasure
+                .Concat(expectedUomsOfSILengthUnitOfMeasure)
+                .Concat(expectedUomsOfMetricNonSIVolumeUnitOfMeasure)
+                .OrderBy(o => o.FullName);
+
+            Assert.Equal(expectedUomsOfVolume, actualUomsTypesOfVolume);
+            Assert.Equal(expectedUomsOfVolume, actualUomsTypesOfVolumeEvenWithoutIDefinedUnitOfMeasure);
+            Assert.Equal(expectedUomsOfUscsLengthUnitOfMeasure, actualUomsTypesOfUscsLengthUnitOfMeasure);
+            Assert.Equal(expectedUomsOfSILengthUnitOfMeasure, actualUomsTypesOfSILengthUnitOfMeasure);
+            Assert.Equal(expectedUomsOfMetricNonSIVolumeUnitOfMeasure, actualUomsTypesOfMetricNonSIVolumeUnitOfMeasure);
+        }
+
         [Fact]
         public void TestVolumeConstructor()
         {
-            // test valid units of measure for volume
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Volumes.MetricNonSI.Litres, double>(4.4);
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, double>(4.4);
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Metres, double>(4.4);
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Micrometres, double>(4.4);
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Millimetres, double>(4.4);
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Nanometres, double>(4.4);
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.Uscs.Feet, double>(4.4);
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.Uscs.Inches, double>(4.4);
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.Uscs.Miles, double>(4.4);
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.Uscs.Yards, double>(4.4);
+            var uomsToPass = GetUnitOfMeasuresTypeFullNames<NGenericDimensions.Volumes.Length3DUnitOfMeasure>(true, true).Concat(GetUnitOfMeasuresTypeFullNames<NGenericDimensions.Lengths.Length1DUnitOfMeasure>(true, true)).ToArray();
+            var uomsToFail = GetUnitOfMeasuresTypeFullNames<NGenericDimensions.Volumes.Length3DUnitOfMeasure>(true, false).Concat(GetUnitOfMeasuresTypeFullNames<NGenericDimensions.Lengths.Length1DUnitOfMeasure>(true, false)).Except(uomsToPass).ToArray();
 
-            // test invalid units of measure of volume
-            AssertCompilationFails("cannot be used as type parameter", @"var volumeA = new NGenericDimensions.Volume<NGenericDimensions.Durations.Days, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"var volumeA = new NGenericDimensions.Volume<NGenericDimensions.Durations.Hours, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"var volumeA = new NGenericDimensions.Volume<NGenericDimensions.Durations.Microseconds, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"var volumeA = new NGenericDimensions.Volume<NGenericDimensions.Durations.Milliseconds, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"var volumeA = new NGenericDimensions.Volume<NGenericDimensions.Durations.Minutes, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"var volumeA = new NGenericDimensions.Volume<NGenericDimensions.Durations.Seconds, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"var volumeA = new NGenericDimensions.Volume<NGenericDimensions.Durations.Ticks, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"var volumeA = new NGenericDimensions.Volume<NGenericDimensions.Masses.MetricSI.Grams, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"var volumeA = new NGenericDimensions.Volume<NGenericDimensions.Masses.MetricSI.Kilograms, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"var volumeA = new NGenericDimensions.Volume<NGenericDimensions.Areas.MetricNonSI.Hectares, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"var volumeA = new NGenericDimensions.Volume<NGenericDimensions.Lengths.Length1DUnitOfMeasure, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"var volumeA = new NGenericDimensions.Volume<NGenericDimensions.Volumes.Length3DUnitOfMeasure, double>(4.4);");
-            AssertCompilationFails("cannot be used as type parameter", @"var volumeA = new NGenericDimensions.Volume<NGenericDimensions.Volumes.MetricNonSI.MetricNonSIVolumeUnitOfMeasure, double>(4.4);");
+            // test valid and invalid units of measure for length
+            Func<string, string> csharpCode = (t) => $@"_ = new NGenericDimensions.Volume<{t}, double>(4.4);";
+            foreach (var uomToPass in uomsToPass) AssertCompilationPasses(csharpCode(uomToPass));
+            foreach (var uomToFail in uomsToFail) AssertCompilationFails("cannot be used as type parameter", csharpCode(uomToFail));
 
-            // test number data types
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Double>(System.Convert.ToDouble(4.44444));
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Double>(System.Convert.ToSingle(4.44444));
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Single>(System.Convert.ToSingle(4.44444));
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Decimal>(System.Convert.ToDecimal(4.44444));
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int64>(System.Convert.ToInt64(4));
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int32>(System.Convert.ToInt32(4));
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int16>(System.Convert.ToInt16(4));
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Byte>(System.Convert.ToByte(4));
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, System.SByte>(System.Convert.ToSByte(4));
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, System.UInt16>(System.Convert.ToUInt16(4));
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, System.UInt32>(System.Convert.ToUInt32(4));
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, System.UInt64>(System.Convert.ToUInt64(4));
-            AssertCompilationFails("cannot be used as type parameter", @"var volumeA = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Char>(System.Convert.ToChar(4));");
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, System.DateTime>(new System.DateTime(1000)); // can't stop this from being allowed
-            AssertCompilationFails("cannot be used as type parameter", @"var volumeA = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Boolean>(System.Convert.ToBoolean(4));");
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Numerics.BigInteger>(new System.Numerics.BigInteger(4.4));
-            // and prove it only allows compatible data types
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int32>(System.Convert.ToInt32(4));
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int32>(System.Convert.ToInt16(4));
-            _ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int32>(System.Convert.ToByte(4));
-            AssertCompilationFails("cannot convert from", @"var volumeA = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, System.Int32>(System.Convert.ToInt64(4));");
+            // test common constructor tests
+            TestConstructor(@"_ = new NGenericDimensions.Volume<NGenericDimensions.Lengths.MetricSI.Kilometres, {0});");
 
             // make sure value gets stored in member variable
             var volumeB = new Volume<Kilometres, Int32>(3);
