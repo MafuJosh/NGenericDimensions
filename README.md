@@ -5,20 +5,7 @@ NGenericDimensions™ is an experiment at creating a .NET library for attempting
 
 ## Examples
 
-VB.NET 2010
-```vbnet
-Dim myspeed = 10.miles.per.hour
-Dim yourspeed = 20.kilometres / 2.minutes
-Dim mylength1 As New Length(Of Metres, Double)(100.0)
-Dim mylength2 As New Length(Of Metres, Double)(200.0)
-Dim mylength3 As Length(Of Metres, Double) = 300.0
-Dim mylenght4 = mylength1 + mylength2
-Dim myarea = mylength1 * mylength2
-Dim myarea2 As Area(Of Metres, Double) = myarea
-Dim myduration As New Duration(Of Durations.Minutes, Integer)(100)
-```
-
-C#.NET 2010
+C# (.NET 5)
 ```csharp
 var myspeed = (10).miles().per().hour();
 var yourspeed = 20.kilometres() / 2.minutes();
@@ -29,6 +16,19 @@ var mylenght4 = mylength1 + mylength2;
 var myarea = mylength1 * mylength2;
 Area<Metres, double> myarea2 = myarea;
 var myduration = new Duration<Minutes, int>(100);
+```
+
+VB (.NET 5)
+```vbnet
+Dim myspeed = 10.miles.per.hour
+Dim yourspeed = 20.kilometres / 2.minutes
+Dim mylength1 As New Length(Of Metres, Double)(100.0)
+Dim mylength2 As New Length(Of Metres, Double)(200.0)
+Dim mylength3 As Length(Of Metres, Double) = 300.0
+Dim mylenght4 = mylength1 + mylength2
+Dim myarea = mylength1 * mylength2
+Dim myarea2 As Area(Of Metres, Double) = myarea
+Dim myduration As New Duration(Of Durations.Minutes, Integer)(100)
 ```
 
 ## Purpose
