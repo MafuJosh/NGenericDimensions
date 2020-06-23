@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NGenericDimensions.Math;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -186,6 +187,34 @@ namespace NGenericDimensions
 
         #region GetHashCode
         public override int GetHashCode() => HashCode.Combine(DurationValue);
+        #endregion
+
+        #region IConvertible
+        TypeCode IConvertible.GetTypeCode() => GenericOperatorMath<TDataType>.GetTypeCode();
+        object IConvertible.ToType(Type conversionType, IFormatProvider? provider)
+        {
+            if (conversionType == typeof(TimeSpan))
+            {
+                return (TimeSpan)this;
+            }
+            else if (typeof(IDuration).IsAssignableFrom(conversionType))
+            {
+                var convertedInstance = Activator.CreateInstance(conversionType, (DurationDouble)this);
+                if (convertedInstance != null) return convertedInstance;
+            }
+            throw new NotImplementedException();
+        }
+        byte IConvertible.ToByte(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToByte(DurationValue);
+        decimal IConvertible.ToDecimal(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToDecimal(DurationValue);
+        double IConvertible.ToDouble(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToDouble(DurationValue);
+        short IConvertible.ToInt16(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToInt16(DurationValue);
+        int IConvertible.ToInt32(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToInt32(DurationValue);
+        long IConvertible.ToInt64(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToInt64(DurationValue);
+        sbyte IConvertible.ToSByte(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToSByte(DurationValue);
+        float IConvertible.ToSingle(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToSingle(DurationValue);
+        ushort IConvertible.ToUInt16(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToUInt16(DurationValue);
+        uint IConvertible.ToUInt32(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToUInt32(DurationValue);
+        ulong IConvertible.ToUInt64(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToUInt64(DurationValue);
         #endregion
     }
 }

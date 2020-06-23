@@ -2,15 +2,21 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace NGenericDimensions
 {
     /// <summary>
     /// IDimension is the base interface of all dimension data types. It can be used to identify if a datatype is a dimensional datatype and retrieve its value.
     /// </summary>
-    public interface IDimension : IFormattable
+    public interface IDimension : IFormattable, IConvertible
     {
         double Value { get; }
+
+        bool IConvertible.ToBoolean(IFormatProvider? provider) => throw new InvalidCastException("The conversion to a Boolean is not supported.");
+        char IConvertible.ToChar(IFormatProvider? provider) => throw new InvalidCastException("The conversion to a Char is not supported.");
+        DateTime IConvertible.ToDateTime(IFormatProvider? provider) => throw new InvalidCastException("The conversion to a DateTime is not supported.");
+        string IConvertible.ToString(IFormatProvider? provider) => ToString(null, provider);
     }
 
     [EditorBrowsable(EditorBrowsableState.Never)]

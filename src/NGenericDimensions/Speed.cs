@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NGenericDimensions.Math;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -237,6 +238,30 @@ namespace NGenericDimensions
 
         #region GetHashCode
         public override int GetHashCode() => HashCode.Combine(SpeedValue);
+        #endregion
+
+        #region IConvertible
+        TypeCode IConvertible.GetTypeCode() => GenericOperatorMath<TDataType>.GetTypeCode();
+        object IConvertible.ToType(Type conversionType, IFormatProvider? provider)
+        {
+            if (typeof(ISpeed).IsAssignableFrom(conversionType))
+            {
+                var convertedInstance = Activator.CreateInstance(conversionType, (SpeedDouble)this);
+                if (convertedInstance != null) return convertedInstance;
+            }
+            throw new NotImplementedException();
+        }
+        byte IConvertible.ToByte(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToByte(SpeedValue);
+        decimal IConvertible.ToDecimal(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToDecimal(SpeedValue);
+        double IConvertible.ToDouble(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToDouble(SpeedValue);
+        short IConvertible.ToInt16(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToInt16(SpeedValue);
+        int IConvertible.ToInt32(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToInt32(SpeedValue);
+        long IConvertible.ToInt64(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToInt64(SpeedValue);
+        sbyte IConvertible.ToSByte(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToSByte(SpeedValue);
+        float IConvertible.ToSingle(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToSingle(SpeedValue);
+        ushort IConvertible.ToUInt16(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToUInt16(SpeedValue);
+        uint IConvertible.ToUInt32(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToUInt32(SpeedValue);
+        ulong IConvertible.ToUInt64(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToUInt64(SpeedValue);
         #endregion
     }
 }

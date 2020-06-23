@@ -1,4 +1,5 @@
 ﻿using NGenericDimensions.Lengths;
+using NGenericDimensions.Math;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -189,6 +190,30 @@ namespace NGenericDimensions
 
         #region GetHashCode
         public override int GetHashCode() => HashCode.Combine(AreaValue);
+        #endregion
+
+        #region IConvertible
+        TypeCode IConvertible.GetTypeCode() => GenericOperatorMath<TDataType>.GetTypeCode();
+        object IConvertible.ToType(Type conversionType, IFormatProvider? provider)
+        {
+            if (typeof(IArea).IsAssignableFrom(conversionType))
+            {
+                var convertedInstance = Activator.CreateInstance(conversionType, (AreaDouble)this);
+                if (convertedInstance != null) return convertedInstance;
+            }
+            throw new NotImplementedException();
+        }
+        byte IConvertible.ToByte(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToByte(AreaValue);
+        decimal IConvertible.ToDecimal(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToDecimal(AreaValue);
+        double IConvertible.ToDouble(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToDouble(AreaValue);
+        short IConvertible.ToInt16(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToInt16(AreaValue);
+        int IConvertible.ToInt32(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToInt32(AreaValue);
+        long IConvertible.ToInt64(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToInt64(AreaValue);
+        sbyte IConvertible.ToSByte(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToSByte(AreaValue);
+        float IConvertible.ToSingle(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToSingle(AreaValue);
+        ushort IConvertible.ToUInt16(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToUInt16(AreaValue);
+        uint IConvertible.ToUInt32(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToUInt32(AreaValue);
+        ulong IConvertible.ToUInt64(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToUInt64(AreaValue);
         #endregion
     }
 }

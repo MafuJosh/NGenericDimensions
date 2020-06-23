@@ -1,4 +1,5 @@
 ﻿using NGenericDimensions.Lengths;
+using NGenericDimensions.Math;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -189,6 +190,30 @@ namespace NGenericDimensions
 
         #region GetHashCode
         public override int GetHashCode() => HashCode.Combine(VolumeValue);
+        #endregion
+
+        #region IConvertible
+        TypeCode IConvertible.GetTypeCode() => GenericOperatorMath<TDataType>.GetTypeCode();
+        object IConvertible.ToType(Type conversionType, IFormatProvider? provider)
+        {
+            if (typeof(IVolume).IsAssignableFrom(conversionType))
+            {
+                var convertedInstance = Activator.CreateInstance(conversionType, (VolumeDouble)this);
+                if (convertedInstance != null) return convertedInstance;
+            }
+            throw new NotImplementedException();
+        }
+        byte IConvertible.ToByte(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToByte(VolumeValue);
+        decimal IConvertible.ToDecimal(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToDecimal(VolumeValue);
+        double IConvertible.ToDouble(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToDouble(VolumeValue);
+        short IConvertible.ToInt16(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToInt16(VolumeValue);
+        int IConvertible.ToInt32(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToInt32(VolumeValue);
+        long IConvertible.ToInt64(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToInt64(VolumeValue);
+        sbyte IConvertible.ToSByte(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToSByte(VolumeValue);
+        float IConvertible.ToSingle(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToSingle(VolumeValue);
+        ushort IConvertible.ToUInt16(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToUInt16(VolumeValue);
+        uint IConvertible.ToUInt32(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToUInt32(VolumeValue);
+        ulong IConvertible.ToUInt64(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToUInt64(VolumeValue);
         #endregion
     }
 }
