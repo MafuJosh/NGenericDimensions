@@ -30,10 +30,7 @@ namespace NGenericDimensions.Extensions
         public static T CubeKilometresValue<T>(this Volume<Lengths.MetricSI.Kilometres, T> volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => volume.VolumeValue;
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static T? CubeKilometresValue<T>(this Volume<Lengths.MetricSI.Kilometres, T>? volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T>
-        {
-            return volume?.VolumeValue;
-        }
+        public static T? CubeKilometresValue<T>(this Volume<Lengths.MetricSI.Kilometres, T>? volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => volume?.VolumeValue;
     }
 }
 
