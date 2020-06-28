@@ -3,13 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NGenericDimensions", "NGenericDimensions\NGenericDimensions.csproj", "{05036B07-F053-44EF-8367-F27208891E94}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NGenericDimensions", "Core\NGenericDimensions.csproj", "{05036B07-F053-44EF-8367-F27208891E94}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NGenericDimensionsUnitTests", "NGenericDimensionsUnitTests\NGenericDimensionsUnitTests.csproj", "{CDA04ED0-5FCA-4053-A09D-0EC9329B92CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NGenericDimensionsUnitTests", "UnitTests\NGenericDimensionsUnitTests.csproj", "{CDA04ED0-5FCA-4053-A09D-0EC9329B92CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NGenericDimensions.Demo.CS", "NGenericDimensions.Demo.CS\NGenericDimensions.Demo.CS.csproj", "{ABD1B9C7-F6A1-4A9B-95B8-83C3C775A2E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NGenericDimensions.Demo.CS", "Demo.CS\NGenericDimensions.Demo.CS.csproj", "{ABD1B9C7-F6A1-4A9B-95B8-83C3C775A2E6}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "NGenericDimensions.Demo.VB", "NGenericDimensions.Demo.VB\NGenericDimensions.Demo.VB.vbproj", "{17A1BEF9-F609-4BCF-833C-2F4CD384D54E}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "NGenericDimensions.Demo.VB", "Demo.VB\NGenericDimensions.Demo.VB.vbproj", "{17A1BEF9-F609-4BCF-833C-2F4CD384D54E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NGenericDimensions.CodeGenerator.Templates", "CodeGenerator.Templates\NGenericDimensions.CodeGenerator.Templates.csproj", "{2A68789F-F880-4A39-B422-D3E4926C6E62}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NGenericDimensions.CodeGenerator.Data", "CodeGenerator.Data\NGenericDimensions.CodeGenerator.Data.csproj", "{A1B1F04E-AECE-4B1E-8A18-21F3AC954B62}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +37,14 @@ Global
 		{17A1BEF9-F609-4BCF-833C-2F4CD384D54E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17A1BEF9-F609-4BCF-833C-2F4CD384D54E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17A1BEF9-F609-4BCF-833C-2F4CD384D54E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A68789F-F880-4A39-B422-D3E4926C6E62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A68789F-F880-4A39-B422-D3E4926C6E62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A68789F-F880-4A39-B422-D3E4926C6E62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A68789F-F880-4A39-B422-D3E4926C6E62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B1F04E-AECE-4B1E-8A18-21F3AC954B62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B1F04E-AECE-4B1E-8A18-21F3AC954B62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B1F04E-AECE-4B1E-8A18-21F3AC954B62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B1F04E-AECE-4B1E-8A18-21F3AC954B62}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

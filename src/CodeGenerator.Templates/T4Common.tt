@@ -1,0 +1,180 @@
+﻿<#+
+    internal class DerivedFromDimension
+    {
+        public Dimension Dimension { get; set; }
+        public int Mode { get; set; }        
+    }
+
+    internal class Dimension
+    {
+        public string NameUppercase { get; set; }
+        public string NamePluralUppercase { get; set; }
+        public string NameLowercase { get; set; }
+        public string NamePluralLowercase { get; set; }
+        public Unit[] Units { get; set; }
+        public DerivedFromDimension[] DerivedFromDimensions { get; set; }
+    }
+
+    internal class Unit
+    {
+        public string NameUppercase { get; set; }
+        public string NamePluralUppercase { get; set; }
+        public string NameLowercase { get; set; }
+        public string NamePluralLowercase { get; set; }
+        public Dimension Dimension { get; set; }
+        public string SubFolder { get; set; }
+        public string UnitSymbol { get; set; }
+        public string Namespace { get; set; }
+        public string FullClassName { get; set; }
+        public string SIPrefix { get; set; }
+        public bool InheritsSIPrefix { get; set; }
+        public string MetricBaseClassName { get; set; }
+    }
+
+    internal class DimensionUnitOfMeasureBase
+    {
+        public Dimension Dimension { get; set; }
+        public string SubFolder { get; set; }
+    }
+
+    private Dimension[] dimensions = null;
+    private Unit[] units = null;
+    private DimensionUnitOfMeasureBase[] dimensionUnitOfMeasureBases = null;
+
+    internal Dimension[] Dimensions
+    {
+        get
+        {
+            Init();
+            return dimensions;
+        }
+    }
+
+    internal Unit[] Units
+    {
+        get
+        {
+            Init();
+            return units;
+        }
+    }
+
+    internal DimensionUnitOfMeasureBase[] DimensionUnitOfMeasureBases
+    {
+        get
+        {
+            Init();
+            return dimensionUnitOfMeasureBases;
+        }
+    }
+
+    private void Init()
+    {
+        if (dimensions != null)
+            return;
+        
+        var dimensionHeader_NameUppercase             = "Dimension";
+        var dimensionHeader_NamePluralUppercase       = "DimensionPlural";
+        var dimensionHeader_DerivedFromDimension1     = "Dimension1";
+        var dimensionHeader_DerivedFromDimension1Mode = "Dimension1Mode";
+        var dimensionHeader_DerivedFromDimension2     = "Dimension2";
+        var dimensionHeader_DerivedFromDimension2Mode = "Dimension2Mode";
+        var unitHeader_NameUppercase                  = "Name";
+        var unitHeader_NamePluralUppercase            = "NamePlural";
+        var unitHeader_Dimension                      = "Dimension";
+        var unitHeader_SubFolder                      = "SubFolder";
+        var unitHeader_UnitSymbol                     = "UnitSymbol";
+
+        var dimensionsFileLines = 
+            File
+            .ReadAllLines(Path.Combine(Path.GetDirectoryName(Host.TemplateFile), "T4Dimensions.csv"))
+            .ToArray();
+
+        var dimensionHeaderNames =
+            dimensionsFileLines
+            .First().Split(',')
+            .Select(name => name.Trim())
+            .ToArray();
+
+        var dimensionRowsOfKeyedValues = (
+            from line in dimensionsFileLines.Skip(1)
+            let values = line.Split(',')
+            select Enumerable.Range(0, dimensionHeaderNames.Length).ToDictionary(i => dimensionHeaderNames[i], i => values[i].Trim())
+            ).ToArray();
+
+        dimensions = dimensionRowsOfKeyedValues
+            .Select(dict => new Dimension() { 
+                NameUppercase       = dict[dimensionHeader_NameUppercase],
+                NamePluralUppercase = dict[dimensionHeader_NamePluralUppercase],
+                NameLowercase       = char.ToLower(dict[dimensionHeader_NameUppercase][0]) + dict[dimensionHeader_NameUppercase].Substring(1),
+                NamePluralLowercase = char.ToLower(dict[dimensionHeader_NamePluralUppercase][0]) + dict[dimensionHeader_NamePluralUppercase].Substring(1)
+            })
+            .ToArray();
+
+        for (int i = 0; i < dimensions.Length; i++)
+        {
+            dimensions[i].DerivedFromDimensions =
+                (new [] {
+                    Tuple.Create(dimensionRowsOfKeyedValues[i][dimensionHeader_DerivedFromDimension1], dimensionRowsOfKeyedValues[i][dimensionHeader_DerivedFromDimension1Mode]),
+                    Tuple.Create(dimensionRowsOfKeyedValues[i][dimensionHeader_DerivedFromDimension2], dimensionRowsOfKeyedValues[i][dimensionHeader_DerivedFromDimension2Mode])
+                })
+                .Where(t => !String.IsNullOrEmpty(t.Item1))
+                .Where(t => t.Item1 != dimensions[i].NameUppercase)
+                .Select(t => new DerivedFromDimension() {
+                    Dimension = dimensions.First(d => d.NameUppercase == t.Item1),
+                    Mode = int.Parse(t.Item2)
+                }).ToArray();
+        }
+        
+        var unitsFileLines =
+            File
+            .ReadAllLines(Path.Combine(Path.GetDirectoryName(Host.TemplateFile), "T4Units.csv"))
+            .ToArray();
+
+        var unitHeaderNames =
+            unitsFileLines
+            .First().Split(',')
+            .Select(name => name.Trim())
+            .ToArray();
+
+        var unitRowsOfKeyedValues = (
+            from line in unitsFileLines.Skip(1)
+            let values = line.Split(',')
+            select Enumerable.Range(0, unitHeaderNames.Length).ToDictionary(i => unitHeaderNames[i], i => values[i].Trim())
+            ).ToArray();
+
+        units = unitRowsOfKeyedValues
+            .Select(dict => new Unit() { 
+                NameUppercase       = dict[unitHeader_NameUppercase],
+                NamePluralUppercase = dict[unitHeader_NamePluralUppercase],
+                NameLowercase       = char.ToLower(dict[unitHeader_NameUppercase][0]) + dict[unitHeader_NameUppercase].Substring(1),
+                NamePluralLowercase = char.ToLower(dict[unitHeader_NamePluralUppercase][0]) + dict[unitHeader_NamePluralUppercase].Substring(1),
+                Dimension           = dimensions.First(d => d.NameUppercase == dict[unitHeader_Dimension]),
+                SubFolder           = dict[unitHeader_SubFolder],
+                UnitSymbol          = (dict[unitHeader_UnitSymbol]=="" ? null : dict[unitHeader_UnitSymbol]),
+                InheritsSIPrefix    = dict[unitHeader_NamePluralUppercase].EndsWith("metres") || dict[unitHeader_NamePluralUppercase].EndsWith("grams")
+            })
+            .ToArray();
+        
+        var tempDimensionUnitOfMeasureBases = new List<DimensionUnitOfMeasureBase>();
+
+        foreach (var dimension in Dimensions.Where(d => d.Units.Any()))
+        {
+            dimension.Units = units.Where(u => u.Dimension.NameUppercase == dimension.NameUppercase).ToArray();
+            tempDimensionUnitOfMeasureBases.Add(new DimensionUnitOfMeasureBase() {
+                Dimension = dimension
+            });
+        }
+
+        foreach (var unit in Units)
+        {
+            unit.Namespace = $@"{unit.Dimension.NamePluralUppercase}.{unit.SubFolder}";
+            unit.FullClassName = $@"{unit.Namespace}.{unit.NamePluralUppercase}";
+            if (unit.InheritsSIPrefix)
+                unit.SIPrefix = unit.NamePluralUppercase.Replace("metres","").Replace("grams","");
+            unit.MetricBaseClassName = (unit.InheritsSIPrefix ? $@"{char.ToUpper(unit.NamePluralUppercase.Replace(unit.SIPrefix,"")[0])}{unit.NamePluralUppercase.Replace(unit.SIPrefix,"").Substring(1)}<{unit.SIPrefix}>" : null);
+        }
+
+        dimensionUnitOfMeasureBases = tempDimensionUnitOfMeasureBases.ToArray();
+    }
+#>

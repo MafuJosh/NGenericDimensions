@@ -1,0 +1,98 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" visibility="internal" encoding="utf-8" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#@ Include file="T4Common.tt" #>
+<#  foreach (var unit in Units) { #>
+/*
+<#  if (unit.InheritsSIPrefix) { #>
+using NGenericDimensions.MetricPrefix;
+<#  } #>
+using System;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+
+namespace NGenericDimensions.<#=unit.Namespace#>
+{
+<#  if (unit.InheritsSIPrefix) { #>
+    public class <#=unit.NamePluralUppercase#> : <#=unit.MetricBaseClassName#>
+<#  } else { #>
+    public class <#=unit.NamePluralUppercase#> : <#=unit.SubFolder#><#=unit.Dimension.NameUppercase#>UnitOfMeasure, IDefinedUnitOfMeasure
+<#  } #>
+    {
+<#  if (unit.UnitSymbol != null) { #>
+        public override string UnitSymbol => "<#=unit.UnitSymbol#>";
+<#  } #>
+    }
+}
+
+namespace NGenericDimensions.Extensions
+{
+    public static class <#=unit.NamePluralUppercase#>ExtensionMethods
+    {
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static T <#=unit.NamePluralUppercase#>Value<T>(this <#=unit.Dimension.NameUppercase#><<#=unit.NamePluralUppercase#>, T> <#=unit.Dimension.NameLowercase#>) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => <#=unit.Dimension.NameLowercase#>.<#=unit.Dimension.NameUppercase#>Value;
+
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static T? <#=unit.NamePluralUppercase#>Value<T>(this <#=unit.Dimension.NameUppercase#><<#=unit.NamePluralUppercase#>, T>? <#=unit.Dimension.NameLowercase#>) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => <#=unit.Dimension.NameLowercase#>?.<#=unit.Dimension.NameUppercase#>Value;
+
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static T Square<#=unit.NamePluralUppercase#>Value<T>(this Area<<#=unit.NamePluralUppercase#>, T> area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => area.AreaValue;
+
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static T? Square<#=unit.NamePluralUppercase#>Value<T>(this Area<<#=unit.NamePluralUppercase#>, T>? area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => area?.AreaValue;
+
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static T Cube<#=unit.NamePluralUppercase#>Value<T>(this Volume<<#=unit.NamePluralUppercase#>, T> volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => volume.VolumeValue;
+
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static T? Cube<#=unit.NamePluralUppercase#>Value<T>(this Volume<<#=unit.NamePluralUppercase#>, T>? volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => volume?.VolumeValue;
+    }
+}
+
+namespace NGenericDimensions.Extensions.Numbers
+{
+    [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "In this case we want it to be lowercase, to appear different than other functions.")]
+    public static class <#=unit.NamePluralUppercase#>NumberExtensionMethods
+    {
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static <#=unit.Dimension.NameUppercase#><<#=unit.FullClassName#>, T> <#=unit.NamePluralLowercase#><T>(this T <#=unit.Dimension.NameLowercase#>) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => length;
+
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static Area<<#=unit.FullClassName#>, T> <#=unit.NamePluralLowercase#><T>(this DimensionSquareExtension<T> area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => area.SquaredValue;
+
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static Volume<<#=unit.FullClassName#>, T> <#=unit.NamePluralLowercase#><T>(this DimensionCubeExtension<T> volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => volume.CubedValue;
+    }
+}
+*/
+<#
+        SaveOutputToSubFolder(unit.Dimension.NamePluralUppercase, unit.SubFolder, unit.NamePluralUppercase + ".cs");
+	}
+#>
+<#+
+private void SaveOutput(string outputFileName) {
+  string templateDirectory = Path.GetDirectoryName(Host.TemplateFile);
+  string outputFilePath = Path.Combine(templateDirectory, outputFileName);
+  File.WriteAllText(outputFilePath, this.GenerationEnvironment.ToString()); 
+  this.GenerationEnvironment.Clear();
+}
+private void SaveOutputToSubFolder(string folderName, string subFolderName, string outputFileName) {
+  string templateDirectory = Path.GetDirectoryName(Host.TemplateFile);
+  string newDirectoryName = Path.Combine(templateDirectory,folderName);
+  if(!Directory.Exists(newDirectoryName))
+    Directory.CreateDirectory(newDirectoryName);
+  if(subFolderName != null)
+  {
+    newDirectoryName = Path.Combine(newDirectoryName,subFolderName);
+    if(!Directory.Exists(newDirectoryName))
+      Directory.CreateDirectory(newDirectoryName);
+  }
+  string outputFilePath = Path.Combine(newDirectoryName, outputFileName);
+  File.WriteAllText(outputFilePath, this.GenerationEnvironment.ToString()); 
+  this.GenerationEnvironment.Clear();
+}
+#>
