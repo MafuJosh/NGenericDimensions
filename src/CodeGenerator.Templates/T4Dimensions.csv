@@ -1,7 +1,0 @@
-Dimension,DimensionPlural,Dimension1,Dimension1Mode,Dimension2,Dimension2Mode
-Length,Lengths,Length,1,,
-Mass,Masses,Mass,1,,
-Duration,Durations,Duration,1,,
-Volume,Volumes,Length,3,,
-Speed,Speeds,Length,1,Duration,-1
-Area,Areas,Length,2,,
