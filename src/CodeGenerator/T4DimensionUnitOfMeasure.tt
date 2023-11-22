@@ -1,0 +1,53 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#  if (dimensionUnitOfMeasureBase.Is2DInterface || dimensionUnitOfMeasureBase.Is3DInterface) { #>
+using NGenericDimensions.<#=dimensionUnitOfMeasureBase.Dimension.DerivedFromDimensions[0].Dimension.NamePluralUppercase#>;
+
+<#  } #>
+<#  if (dimensionUnitOfMeasureBase.SubFolder == null) { #>
+namespace NGenericDimensions.<#=dimensionUnitOfMeasureBase.Dimension.NamePluralUppercase#>
+<#  } else { #>
+namespace NGenericDimensions.<#=dimensionUnitOfMeasureBase.Dimension.NamePluralUppercase#>.<#=dimensionUnitOfMeasureBase.SubFolder#>
+<#  } #>
+{
+<#  if (dimensionUnitOfMeasureBase.UnitGroupName != null) { #>
+    public abstract class <#=dimensionUnitOfMeasureBase.InterfaceName#> : <#=dimensionUnitOfMeasureBase.BaseInterface.InterfaceName#>
+<#  } else if (dimensionUnitOfMeasureBase.Is1DInterface) { #>
+    public abstract class <#=dimensionUnitOfMeasureBase.InterfaceName#> : <#=dimensionUnitOfMeasureBase.Dimension.NameUppercase#>UnitOfMeasure, IExponent1Or2, IExponent1Or3
+<#  } else if (dimensionUnitOfMeasureBase.Is2DInterface) { #>
+    public abstract class <#=dimensionUnitOfMeasureBase.InterfaceName#> : <#=dimensionUnitOfMeasureBase.Dimension.DerivedFromDimensions[0].Dimension.NameUppercase#>UnitOfMeasure, IExponent1Or2
+<#  } else if (dimensionUnitOfMeasureBase.Is3DInterface) { #>
+    public abstract class <#=dimensionUnitOfMeasureBase.InterfaceName#> : <#=dimensionUnitOfMeasureBase.Dimension.DerivedFromDimensions[0].Dimension.NameUppercase#>UnitOfMeasure, IExponent1Or3
+<#  } else { #>
+    public abstract class <#=dimensionUnitOfMeasureBase.InterfaceName#> : UnitOfMeasure
+<#  } #>
+    {
+<#  if (dimensionUnitOfMeasureBase.NonFamilyMultiplier != null && dimensionUnitOfMeasureBase.NonFamilyMultiplier != "1") { #>
+        protected override double GetMultiplier(bool stayWithinFamily) => stayWithinFamily ? 1 : <#=dimensionUnitOfMeasureBase.NonFamilyMultiplier#>;
+        
+<#  } #>
+<#  if (dimensionUnitOfMeasureBase.UnitGroupName != null) { #>
+        protected override bool IsSameFamily(System.Type typeOfUnitOfMeasure) => typeof(<#=dimensionUnitOfMeasureBase.InterfaceName#>).IsAssignableFrom(typeOfUnitOfMeasure);
+        
+<#  } #>
+<#  if ((dimensionUnitOfMeasureBase.Is1DInterface || dimensionUnitOfMeasureBase.UnitGroupName != null) && dimensionUnitOfMeasureBase.Symbol2D != null) { #>
+        protected internal <#=(dimensionUnitOfMeasureBase.Is1DInterface)?"virtual":"override"#> string AreaUnitSymbol => $@"<#=dimensionUnitOfMeasureBase.Symbol2D#>";
+        
+<#  } #>
+<#  if ((dimensionUnitOfMeasureBase.Is1DInterface || dimensionUnitOfMeasureBase.UnitGroupName != null) && dimensionUnitOfMeasureBase.Symbol3D != null) { #>
+        protected internal <#=(dimensionUnitOfMeasureBase.Is1DInterface)?"virtual":"override"#> string VolumeUnitSymbol => $@"<#=dimensionUnitOfMeasureBase.Symbol3D#>";
+        
+<#  } #>
+<#  if (dimensionUnitOfMeasureBase.Is2DInterface) { #>
+        protected override int Exponent => 2;
+        
+<#  } #>
+<#  if (dimensionUnitOfMeasureBase.Is3DInterface) { #>
+        protected override int Exponent => 3;
+        
+<#  } #>
+    }
+}

@@ -1,0 +1,40 @@
+# Processed by the Engine.cs constructor.
+# Name:
+# NamePlural:
+# Dimension: from T4Dimensions.csv
+# SubFolder: subfolder of generated unit class
+#   Uscs: US Customary
+#   MetricSI: SI
+#   MetricNonSI: Nonstandard SI
+#   Standard: General Standard
+# UnitSymbol:
+#   Litre can be L or l, using L to avoid confusion with 1
+# FamilyBaseUnit:
+# FamilyMultiplier:
+# SIBaseUnit:
+# SIMultiplier:
+# GenericMetricPrefix:
+# SquaredSymbol:
+# CubedSymbol:
+Name       ,NamePlural  ,Dimension,SubFolder  ,UnitSymbol,FamilyBaseUnit,FamilyMultiplier,SIBaseUnit,SIMultiplier,GenericMetricPrefix,SquaredSymbol   ,CubedSymbol     
+Foot       ,Feet        ,Length   ,Uscs       ,ft.       ,Foot          ,*1              ,Metre     ,*0.3048     ,                   ,sq. {UnitSymbol},cu. {UnitSymbol}
+Inch       ,Inches      ,Length   ,Uscs       ,in.       ,Foot          ,/12             ,Metre     ,            ,                   ,sq. {UnitSymbol},cu. {UnitSymbol}
+Mile       ,Miles       ,Length   ,Uscs       ,mi.       ,Foot          ,*5280           ,Metre     ,            ,                   ,sq. {UnitSymbol},cu. {UnitSymbol}
+Yard       ,Yards       ,Length   ,Uscs       ,yd.       ,Foot          ,*3              ,Metre     ,            ,                   ,sq. {UnitSymbol},cu. {UnitSymbol}
+Kilometre  ,Kilometres  ,Length   ,MetricSI   ,          ,Metre         ,*1000           ,Metre     ,            ,                   ,{UnitSymbol}²   ,{UnitSymbol}³   
+Micrometre ,Micrometres ,Length   ,MetricSI   ,          ,Metre         ,*0.000001       ,Metre     ,            ,                   ,{UnitSymbol}²   ,{UnitSymbol}³   
+Millimetre ,Millimetres ,Length   ,MetricSI   ,          ,Metre         ,*0.001          ,Metre     ,            ,                   ,{UnitSymbol}²   ,{UnitSymbol}³   
+Nanometre  ,Nanometres  ,Length   ,MetricSI   ,          ,Metre         ,*0.000000001    ,Metre     ,            ,                   ,{UnitSymbol}²   ,{UnitSymbol}³   
+Metre      ,Metres      ,Length   ,MetricSI   ,m         ,Metre         ,*1              ,Metre     ,            ,1                  ,{UnitSymbol}²   ,{UnitSymbol}³   
+Gram       ,Grams       ,Mass     ,MetricSI   ,g         ,Gram          ,*1              ,Gram      ,            ,1                  ,                ,                
+Kilogram   ,Kilograms   ,Mass     ,MetricSI   ,          ,Gram          ,*1000           ,Gram      ,            ,                   ,                ,                
+Litre      ,Litres      ,Volume   ,MetricNonSI,L         ,Litre         ,*1              ,Metre     ,*0.001      ,1                  ,                ,                
+Hectare    ,Hectares    ,Area     ,MetricNonSI,ha        ,Hectare       ,*1              ,Metre     ,*10000      ,                   ,                ,                
+Day        ,Days        ,Duration ,[Standard] ,d         ,Tick          ,*864000000000   ,Tick      ,            ,                   ,                ,                
+Hour       ,Hours       ,Duration ,[Standard] ,hr        ,Tick          ,*36000000000    ,Tick      ,            ,                   ,                ,                
+Microsecond,Microseconds,Duration ,[Standard] ,          ,Tick          ,*10             ,Tick      ,            ,                   ,                ,                
+Millisecond,Milliseconds,Duration ,[Standard] ,          ,Tick          ,*10000          ,Tick      ,            ,                   ,                ,                
+Minute     ,Minutes     ,Duration ,[Standard] ,min       ,Tick          ,*600000000      ,Tick      ,            ,                   ,                ,                
+Second     ,Seconds     ,Duration ,[Standard] ,s         ,Tick          ,*10000000       ,Tick      ,            ,1                  ,                ,                
+Tick       ,Ticks       ,Duration ,[Standard] ,ticks     ,Tick          ,*1              ,Tick      ,            ,                   ,                ,                
+MilePerHour,MilesPerHour,Speed    ,           ,mph       ,              ,                ,          ,            ,                   ,                ,

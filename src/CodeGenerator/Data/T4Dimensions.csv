@@ -1,0 +1,19 @@
+# Processed by the Engine.cs constructor.
+# Dimension: Name of the dimension, when used to describe a singular amount.
+# DimensionPlural: Name of the dimension, when used to describe a plural amount.
+# Mass, Length, Duration:
+#   Each of the 3 dimensions of mass, length, and duration, can have a int under it, or empty space.
+#   1  = the dimension
+#   2  = the dimension squared
+#   3  = the dimension cubed
+#   -1 = 1 divided by the dimension
+#   -2 = 1 divided by the dimension squared
+#   -3 = 1 divided by the dimension cubed
+#   (blank) = the dimension is not used in this dimension
+Dimension,DimensionPlural,Mass,Length,Duration
+Length   ,Lengths        ,    ,1     ,
+Mass     ,Masses         ,1   ,      ,
+Duration ,Durations      ,    ,      ,1
+Volume   ,Volumes        ,    ,3     ,
+Speed    ,Speeds         ,    ,1     ,-1
+Area     ,Areas          ,    ,2     ,

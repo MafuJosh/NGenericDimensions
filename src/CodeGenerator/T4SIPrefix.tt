@@ -1,0 +1,45 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+using System;
+
+namespace NGenericDimensions.MetricPrefix
+{
+    public abstract class MetricPrefixBase : IFormattable
+    {
+        protected internal decimal Multiplier { get; set; }
+        public abstract string UnitSymbol { get; }
+
+        /// <summary>
+        /// Returns the simple name of the derived class.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString() => GetType().Name;
+
+        public string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            if (format == "NU")
+            {
+                return "";
+            }
+            else if (format == "SU")
+            {
+                return UnitSymbol;
+            }
+            return ToString();
+        }
+    }
+<# foreach (var prefix in siPrefixes) { #>
+
+    public class <#=prefix.Prefix#> : MetricPrefixBase
+    {
+        public <#=prefix.Prefix#>() => Multiplier = <#=prefix.Multiplier#>m;
+        public override string UnitSymbol => "<#=prefix.UnitSymbol#>";
+<# if (prefix.Prefix == "NoPrefix") { #>
+        public override string ToString() => "";
+<# } #>
+    }
+<# } #>
+}
