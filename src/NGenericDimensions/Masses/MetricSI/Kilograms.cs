@@ -1,5 +1,4 @@
-﻿using NGenericDimensions.Masses.MetricSI;
-using NGenericDimensions.MetricPrefix;
+﻿using NGenericDimensions.MetricPrefix;
 using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -16,10 +15,11 @@ namespace NGenericDimensions.Extensions
     public static class KilogramsExtensionMethods
     {
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static T KilogramsValue<T>(this Mass<Kilograms, T> mass) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => mass.MassValue;
-
+        public static T KilogramsValue<T>(this Mass<Masses.MetricSI.Kilograms, T> mass) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => mass.MassValue;
+        
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static T? KilogramsValue<T>(this Mass<Kilograms, T>? mass) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => mass?.MassValue;
+        public static T? KilogramsValue<T>(this Mass<Masses.MetricSI.Kilograms, T>? mass) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => mass?.MassValue;
+        
     }
 }
 
@@ -29,6 +29,7 @@ namespace NGenericDimensions.Extensions.Numbers
     public static class KilogramsNumberExtensionMethods
     {
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static Mass<Kilograms, T> kilograms<T>(this T mass) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => mass;
+        public static Mass<Masses.MetricSI.Kilograms, T> kilograms<T>(this T mass) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => mass;
+        
     }
 }

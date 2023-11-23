@@ -103,9 +103,9 @@ namespace NGenericDimensions
             }
             else
             {
-                dynamic stayWithinFamily = IsSameFamily(typeof(T));
-                double myMultiplier = ApplyExponentToMultiplier(GetMultiplier(stayWithinFamily), Exponent, exponent);
-                double otherMultiplier = ApplyExponentToMultiplier(UnitOfMeasureGlobals<T>.GlobalInstance.GetMultiplier(stayWithinFamily), UnitOfMeasureGlobals<T>.GlobalInstance.Exponent, exponent);
+                var stayWithinFamily = IsSameFamily(typeof(T));
+                var myMultiplier = ApplyExponentToMultiplier(GetMultiplier(stayWithinFamily), Exponent, exponent);
+                var otherMultiplier = ApplyExponentToMultiplier(UnitOfMeasureGlobals<T>.GlobalInstance.GetMultiplier(stayWithinFamily), UnitOfMeasureGlobals<T>.GlobalInstance.Exponent, exponent);
                 return myMultiplier / otherMultiplier;
             }
         }

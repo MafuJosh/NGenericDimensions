@@ -1,4 +1,7 @@
-﻿using NGenericDimensions.Math;
+﻿using NGenericDimensions.Lengths;
+using NGenericDimensions.Durations;
+using NGenericDimensions.Math;
+using NGenericDimensions.MetricPrefix;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,17 +11,17 @@ namespace NGenericDimensions
 {
     public interface ISpeed : IDimension
     {
-        Lengths.Length1DUnitOfMeasure LengthUnitOfMeasure { get; }
-        Durations.DurationUnitOfMeasure DurationUnitOfMeasure { get; }
+        Length1DUnitOfMeasure LengthUnitOfMeasure { get; }
+        DurationUnitOfMeasure DurationUnitOfMeasure { get; }
     }
 
     public readonly struct SpeedDouble : IEquatable<SpeedDouble>
     {
         internal readonly double ValueAsDouble;
-        internal readonly Lengths.Length1DUnitOfMeasure LengthUnitOfMeasure;
-        internal readonly Durations.DurationUnitOfMeasure DurationUnitOfMeasure;
+        internal readonly Length1DUnitOfMeasure LengthUnitOfMeasure;
+        internal readonly DurationUnitOfMeasure DurationUnitOfMeasure;
 
-        internal SpeedDouble(double valueAsDouble, Lengths.Length1DUnitOfMeasure lengthUnitOfMeasure, Durations.DurationUnitOfMeasure durationUnitOfMeasure)
+        internal SpeedDouble(double valueAsDouble, Length1DUnitOfMeasure lengthUnitOfMeasure, DurationUnitOfMeasure durationUnitOfMeasure)
         {
             ValueAsDouble = valueAsDouble;
             LengthUnitOfMeasure = lengthUnitOfMeasure;
@@ -27,14 +30,14 @@ namespace NGenericDimensions
 
         public override bool Equals(object? obj) => obj != null && obj is SpeedDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.LengthUnitOfMeasure.Equals(LengthUnitOfMeasure) && o.DurationUnitOfMeasure.Equals(DurationUnitOfMeasure);
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
-        bool IEquatable<SpeedDouble>.Equals(SpeedDouble other) => EqualityComparer<double>.Default.Equals(ValueAsDouble, other.ValueAsDouble) && EqualityComparer<Lengths.Length1DUnitOfMeasure>.Default.Equals(LengthUnitOfMeasure, other.LengthUnitOfMeasure) && EqualityComparer<Durations.DurationUnitOfMeasure>.Default.Equals(DurationUnitOfMeasure, other.DurationUnitOfMeasure);
+        bool IEquatable<SpeedDouble>.Equals(SpeedDouble other) => EqualityComparer<double>.Default.Equals(ValueAsDouble, other.ValueAsDouble) && EqualityComparer<Length1DUnitOfMeasure>.Default.Equals(LengthUnitOfMeasure, other.LengthUnitOfMeasure) && EqualityComparer<DurationUnitOfMeasure>.Default.Equals(DurationUnitOfMeasure, other.DurationUnitOfMeasure);
         public static bool operator ==(SpeedDouble left, SpeedDouble right) => left.Equals(right);
-        public static bool operator !=(SpeedDouble left, SpeedDouble right) => !(left == right);
+        public static bool operator !=(SpeedDouble left, SpeedDouble right) => !left.Equals(right);
     }
 
     public readonly struct SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure> : IEquatable<SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure>>
-        where TLengthUnitOfMeasure : Lengths.Length1DUnitOfMeasure, IDefinedUnitOfMeasure
-        where TDurationUnitOfMeasure : Durations.DurationUnitOfMeasure, IDefinedUnitOfMeasure
+        where TLengthUnitOfMeasure : Length1DUnitOfMeasure, IDefinedUnitOfMeasure
+        where TDurationUnitOfMeasure : DurationUnitOfMeasure, IDefinedUnitOfMeasure
     {
         internal readonly double ValueAsDouble;
         internal SpeedDouble(double valueAsDouble) => ValueAsDouble = valueAsDouble;
@@ -42,59 +45,77 @@ namespace NGenericDimensions
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
         bool IEquatable<SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure>>.Equals(SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure> other) => EqualityComparer<double>.Default.Equals(ValueAsDouble, other.ValueAsDouble);
         public static bool operator ==(SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure> left, SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure> right) => left.Equals(right);
-        public static bool operator !=(SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure> left, SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure> right) => !(left == right);
+        public static bool operator !=(SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure> left, SpeedDouble<TLengthUnitOfMeasure, TDurationUnitOfMeasure> right) => !left.Equals(right);
+
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public TLengthUnitOfMeasure LengthUnitOfMeasure => UnitOfMeasureGlobals<TLengthUnitOfMeasure>.GlobalInstance;
+
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public TDurationUnitOfMeasure DurationUnitOfMeasure => UnitOfMeasureGlobals<TDurationUnitOfMeasure>.GlobalInstance;
     }
 
     [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "This is not needed yet.")]
     public readonly struct Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> : ISpeed, IEquatable<Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>>
-        where TLengthUnitOfMeasure : Lengths.Length1DUnitOfMeasure, IDefinedUnitOfMeasure
-        where TDurationUnitOfMeasure : Durations.DurationUnitOfMeasure, IDefinedUnitOfMeasure
+        where TLengthUnitOfMeasure : Length1DUnitOfMeasure, IDefinedUnitOfMeasure
+        where TDurationUnitOfMeasure : DurationUnitOfMeasure, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
     {
         #region Constructors
         public Speed(TDataType speed) => SpeedValue = speed;
 
         public Speed(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed) => SpeedValue = speed.SpeedValue;
-
-        public Speed(SpeedDouble speedToConvertFrom) => SpeedValue = (TDataType)Convert.ChangeType(speedToConvertFrom.ValueAsDouble * speedToConvertFrom.LengthUnitOfMeasure.GetCompleteMultiplier<TLengthUnitOfMeasure>(1) / speedToConvertFrom.DurationUnitOfMeasure.GetCompleteMultiplier<TDurationUnitOfMeasure>(1), typeof(TDataType), null);
-
-        public Speed(LengthDouble<TLengthUnitOfMeasure> length, DurationDouble<TDurationUnitOfMeasure> duration) => SpeedValue = (TDataType)Convert.ChangeType((new Length<TLengthUnitOfMeasure, double>(length.ValueAsDouble)).LengthValue / (new Duration<TDurationUnitOfMeasure, double>(duration.ValueAsDouble)).DurationValue, typeof(TDataType), null);
-
-        public Speed(LengthDouble<TLengthUnitOfMeasure> length, TimeSpan duration) => SpeedValue = (TDataType)(Convert.ChangeType((new Length<TLengthUnitOfMeasure, double>(length.ValueAsDouble)).LengthValue / (new Duration<TDurationUnitOfMeasure, double>(duration)).DurationValue, typeof(TDataType), null));
+        
+        public Speed(SpeedDouble speedToConvertFrom)
+            => SpeedValue = GenericOperatorMath<TDataType>.ConvertFromDouble(
+            speedToConvertFrom.ValueAsDouble
+            * speedToConvertFrom.LengthUnitOfMeasure.GetCompleteMultiplier<TLengthUnitOfMeasure>(1)
+            / speedToConvertFrom.DurationUnitOfMeasure.GetCompleteMultiplier<TDurationUnitOfMeasure>(1)
+            );
+        
+        public Speed(LengthDouble<TLengthUnitOfMeasure> length, DurationDouble<TDurationUnitOfMeasure> duration)
+        	=> SpeedValue = GenericOperatorMath<TDataType>.ConvertFromDouble(
+        	(length.ValueAsDouble * length.LengthUnitOfMeasure.GetCompleteMultiplier<TLengthUnitOfMeasure>(1))
+        	/ (duration.ValueAsDouble * duration.DurationUnitOfMeasure.GetCompleteMultiplier<TDurationUnitOfMeasure>(1))
+        );
+        
+        public Speed(LengthDouble<TLengthUnitOfMeasure> length, TimeSpan duration)
+            => SpeedValue = GenericOperatorMath<TDataType>.ConvertFromDouble(
+            (length.ValueAsDouble * length.LengthUnitOfMeasure.GetCompleteMultiplier<TLengthUnitOfMeasure>(1))
+            / (new Duration<TDurationUnitOfMeasure, double>(duration)).DurationValue
+        );
+        
         #endregion
 
         #region Value
-
-        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        [EditorBrowsable(EditorBrowsableState.Always)]
         public TDataType SpeedValue { get; }
-
-        private double ValueAsDouble => Convert.ToDouble(SpeedValue, null);
+        
+        private double ValueAsDouble => GenericOperatorMath<TDataType>.ConvertToDouble(SpeedValue);
         double IDimension.Value => ValueAsDouble;
         #endregion
 
         #region UnitOfMeasure
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public TLengthUnitOfMeasure LengthUnitOfMeasure => UnitOfMeasureGlobals<TLengthUnitOfMeasure>.GlobalInstance;
-
-        private Lengths.Length1DUnitOfMeasure LengthUnitOfMeasure1 => LengthUnitOfMeasure;
-        Lengths.Length1DUnitOfMeasure ISpeed.LengthUnitOfMeasure => LengthUnitOfMeasure1;
-
+        
+        Length1DUnitOfMeasure ISpeed.LengthUnitOfMeasure => LengthUnitOfMeasure;
+        
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public TDurationUnitOfMeasure DurationUnitOfMeasure => UnitOfMeasureGlobals<TDurationUnitOfMeasure>.GlobalInstance;
-
-        private Durations.DurationUnitOfMeasure DurationUnitOfMeasure1 => DurationUnitOfMeasure;
-        Durations.DurationUnitOfMeasure ISpeed.DurationUnitOfMeasure => DurationUnitOfMeasure1;
+        
+        DurationUnitOfMeasure ISpeed.DurationUnitOfMeasure => DurationUnitOfMeasure;
+        
         #endregion
 
         #region ConvertTo
         [EditorBrowsable(EditorBrowsableState.Always)]
         public Speed<TNewLengthUnitOfMeasure, TNewDurationUnitOfMeasure, TNewDataType> ConvertTo<TNewLengthUnitOfMeasure, TNewDurationUnitOfMeasure, TNewDataType>()
-            where TNewLengthUnitOfMeasure : Lengths.Length1DUnitOfMeasure, IDefinedUnitOfMeasure
-            where TNewDurationUnitOfMeasure : Durations.DurationUnitOfMeasure, IDefinedUnitOfMeasure
-            where TNewDataType : struct, IComparable, IFormattable, IComparable<TNewDataType>, IEquatable<TNewDataType> => (TNewDataType)Convert.ChangeType(ValueAsDouble * LengthUnitOfMeasure.GetCompleteMultiplier<TNewLengthUnitOfMeasure>(1) / DurationUnitOfMeasure.GetCompleteMultiplier<TNewDurationUnitOfMeasure>(1), typeof(TNewDataType), null);
+            where TNewLengthUnitOfMeasure : Length1DUnitOfMeasure, IDefinedUnitOfMeasure
+            where TNewDurationUnitOfMeasure : DurationUnitOfMeasure, IDefinedUnitOfMeasure
+            where TNewDataType : struct, IComparable, IFormattable, IComparable<TNewDataType>, IEquatable<TNewDataType> => new Speed<TNewLengthUnitOfMeasure, TNewDurationUnitOfMeasure, TNewDataType>(this);
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TNewDataType> ConvertTo<TNewDataType>() where TNewDataType : struct, IComparable, IFormattable, IComparable<TNewDataType>, IEquatable<TNewDataType> => (TNewDataType)(Convert.ChangeType(SpeedValue, typeof(TNewDataType), null));
+        public Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TNewDataType> ConvertTo<TNewDataType>() where TNewDataType : struct, IComparable, IFormattable, IComparable<TNewDataType>, IEquatable<TNewDataType> => new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TNewDataType>(this);
         #endregion
 
         #region Casting Operators
@@ -108,107 +129,83 @@ namespace NGenericDimensions
         #endregion
 
         #region + Operators
-        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> operator +(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed2) => new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Add(speed1.SpeedValue, speed2.SpeedValue));
+        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> operator +(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed2) => new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(GenericOperatorMath<TDataType>.Add(speed1.SpeedValue, speed2.SpeedValue));
 
-        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double> operator +(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2) => speed1.ValueAsDouble + (new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double>(speed2)).ValueAsDouble;
+        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double> operator +(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2) => speed1.ValueAsDouble + new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double>(speed2);
         #endregion
 
         #region - Operators
-        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> operator -(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed2) => new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Subtract(speed1.SpeedValue, speed2.SpeedValue));
+        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> operator -(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed2) => new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(GenericOperatorMath<TDataType>.Subtract(speed1.SpeedValue, speed2.SpeedValue));
 
-        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double> operator -(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2) => speed1.ValueAsDouble - (new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double>(speed2)).ValueAsDouble;
+        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double> operator -(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2) => speed1.ValueAsDouble - new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double>(speed2);
         #endregion
 
         #region * Operators
-        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> operator *(TDataType speed1, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed2) => new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Multiply(speed1, speed2.SpeedValue));
+        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> operator *(TDataType speed1, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed2) => new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(GenericOperatorMath<TDataType>.Multiply(speed1, speed2.SpeedValue));
 
-        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> operator *(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, TDataType speed2) => new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Multiply(speed1.SpeedValue, speed2));
+        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> operator *(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, TDataType speed2) => new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(GenericOperatorMath<TDataType>.Multiply(speed1.SpeedValue, speed2));
 
-        public static Length<TLengthUnitOfMeasure, TDataType> operator *(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, Duration<TDurationUnitOfMeasure, TDataType> duration2)
-        {
-            return new Length<TLengthUnitOfMeasure, TDataType>(speed1.SpeedValue) * duration2.DurationValue;
-        }
+        public static Length<TLengthUnitOfMeasure, TDataType> operator *(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed, Duration<TDurationUnitOfMeasure, TDataType> duration) => new Length<TLengthUnitOfMeasure, TDataType>(speed.SpeedValue) * duration.DurationValue;
 
-        public static Length<TLengthUnitOfMeasure, TDataType> operator *(Duration<TDurationUnitOfMeasure, TDataType> duration2, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1)
-        {
-            return new Length<TLengthUnitOfMeasure, TDataType>(speed1.SpeedValue) * duration2.DurationValue;
-        }
+        public static Length<TLengthUnitOfMeasure, TDataType> operator *(Duration<TDurationUnitOfMeasure, TDataType> duration, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed) => new Length<TLengthUnitOfMeasure, TDataType>(speed.SpeedValue) * duration.DurationValue;
 
-        public static Length<TLengthUnitOfMeasure, double> operator *(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, DurationDouble<TDurationUnitOfMeasure> duration2)
-        {
-            return new Length<TLengthUnitOfMeasure, double>(speed1.ValueAsDouble * duration2.ValueAsDouble);
-        }
+        public static Length<TLengthUnitOfMeasure, double> operator *(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed, DurationDouble<TDurationUnitOfMeasure> duration) => new Length<TLengthUnitOfMeasure, double>(speed.ValueAsDouble * duration.ValueAsDouble);
 
-        public static Length<TLengthUnitOfMeasure, double> operator *(DurationDouble<TDurationUnitOfMeasure> duration2, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1)
-        {
-            return new Length<TLengthUnitOfMeasure, double>(speed1.ValueAsDouble * duration2.ValueAsDouble);
-        }
+        public static Length<TLengthUnitOfMeasure, double> operator *(DurationDouble<TDurationUnitOfMeasure> duration, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed) => new Length<TLengthUnitOfMeasure, double>(speed.ValueAsDouble * duration.ValueAsDouble);
 
-        public static Length<TLengthUnitOfMeasure, double> operator *(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, DurationDouble duration2)
-        {
-            return new Length<TLengthUnitOfMeasure, double>(speed1.ValueAsDouble * (new Duration<TDurationUnitOfMeasure, double>(duration2)).DurationValue);
-        }
+        public static Length<TLengthUnitOfMeasure, double> operator *(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed, DurationDouble duration) => new Length<TLengthUnitOfMeasure, double>(speed.ValueAsDouble * (new Duration<TDurationUnitOfMeasure, double>(duration)).DurationValue);
 
-        public static Length<TLengthUnitOfMeasure, double> operator *(DurationDouble duration2, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1)
-        {
-            return new Length<TLengthUnitOfMeasure, double>(speed1.ValueAsDouble * (new Duration<TDurationUnitOfMeasure, double>(duration2)).DurationValue);
-        }
+        public static Length<TLengthUnitOfMeasure, double> operator *(DurationDouble duration, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed) => new Length<TLengthUnitOfMeasure, double>(speed.ValueAsDouble * (new Duration<TDurationUnitOfMeasure, double>(duration)).DurationValue);
 
-        public static Length<TLengthUnitOfMeasure, double> operator *(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, TimeSpan duration2)
-        {
-            return new Length<TLengthUnitOfMeasure, double>(speed1.ValueAsDouble * (new Duration<TDurationUnitOfMeasure, double>(duration2)).DurationValue);
-        }
+        public static Length<TLengthUnitOfMeasure, double> operator *(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed, TimeSpan duration) => new Length<TLengthUnitOfMeasure, double>(speed.ValueAsDouble * (new Duration<TDurationUnitOfMeasure, double>(duration)).DurationValue);
 
-        public static Length<TLengthUnitOfMeasure, double> operator *(TimeSpan duration2, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1)
-        {
-            return new Length<TLengthUnitOfMeasure, double>(speed1.ValueAsDouble * (new Duration<TDurationUnitOfMeasure, double>(duration2)).DurationValue);
-        }
+        public static Length<TLengthUnitOfMeasure, double> operator *(TimeSpan duration, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed) => new Length<TLengthUnitOfMeasure, double>(speed.ValueAsDouble * (new Duration<TDurationUnitOfMeasure, double>(duration)).DurationValue);
         #endregion
 
         #region / Operators
-        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double> operator /(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, double speed2) => new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double>(Convert.ToDouble(speed1.SpeedValue, null) / speed2);
+        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double> operator /(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, double speed2) => new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double>(speed1.ValueAsDouble / speed2);
 
-        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double> operator /(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, decimal speed2) => new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double>(Convert.ToDouble(speed1.SpeedValue, null) / Convert.ToDouble(speed2));
+        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double> operator /(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, decimal speed2) => new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double>(speed1.ValueAsDouble / Convert.ToDouble(speed2));
 
-        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double> operator /(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, long speed2) => new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double>(Convert.ToDouble(speed1.SpeedValue, null) / speed2);
+        public static Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double> operator /(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, long speed2) => new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double>(speed1.ValueAsDouble / speed2);
 
-        public static double operator /(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2) => speed1.ValueAsDouble / speed2.ValueAsDouble;
+        public static double operator /(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2) => speed1.ValueAsDouble / (new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double>(speed2).SpeedValue);
         #endregion
 
         #region == Operators
-        public static bool operator ==(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed2) => speed1.SpeedValue.CompareTo(speed2.SpeedValue) == 0;
+        public static bool operator ==(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed2) => EqualityComparer<TDataType>.Default.Equals(speed1.SpeedValue, speed2.SpeedValue);
 
-        public static bool operator ==(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2) => speed1.ValueAsDouble.CompareTo((new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(speed2)).ValueAsDouble) == 0;
+        public static bool operator ==(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2) => speed1.ValueAsDouble.CompareTo((new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double>(speed2)).ValueAsDouble) == 0;
         #endregion
 
         #region != Operators
-        public static bool operator !=(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed2) => speed1.SpeedValue.CompareTo(speed2.SpeedValue) != 0;
+        public static bool operator !=(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed2) => !EqualityComparer<TDataType>.Default.Equals(speed1.SpeedValue, speed2.SpeedValue);
 
-        public static bool operator !=(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2) => speed1.ValueAsDouble.CompareTo((new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(speed2)).ValueAsDouble) != 0;
+        public static bool operator !=(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2) => speed1.ValueAsDouble.CompareTo((new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double>(speed2)).ValueAsDouble) != 0;
         #endregion
 
         #region > Operators
-        public static bool operator >(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed2) => speed1.SpeedValue.CompareTo(speed2.SpeedValue) > 0;
+        public static bool operator >(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed2) => GenericOperatorMath<TDataType>.GreaterThan(speed1.SpeedValue, speed2.SpeedValue);
 
-        public static bool operator >(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2) => speed1.ValueAsDouble.CompareTo((new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(speed2)).ValueAsDouble) > 0;
+        public static bool operator >(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2) => speed1.ValueAsDouble.CompareTo((new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double>(speed2)).ValueAsDouble) > 0;
         #endregion
 
         #region < Operators
-        public static bool operator <(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed2) => speed1.SpeedValue.CompareTo(speed2.SpeedValue) < 0;
+        public static bool operator <(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed2) => GenericOperatorMath<TDataType>.LessThan(speed1.SpeedValue, speed2.SpeedValue);
 
-        public static bool operator <(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2) => speed1.ValueAsDouble.CompareTo((new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(speed2)).ValueAsDouble) < 0;
+        public static bool operator <(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2) => speed1.ValueAsDouble.CompareTo((new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double>(speed2)).ValueAsDouble) < 0;
         #endregion
 
         #region >= Operators
-        public static bool operator >=(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed2) => speed1.SpeedValue.CompareTo(speed2.SpeedValue) >= 0;
+        public static bool operator >=(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed2) => GenericOperatorMath<TDataType>.GreaterThanOrEqualTo(speed1.SpeedValue, speed2.SpeedValue);
 
-        public static bool operator >=(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2) => speed1.ValueAsDouble.CompareTo((new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(speed2)).ValueAsDouble) >= 0;
+        public static bool operator >=(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2) => speed1.ValueAsDouble.CompareTo((new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double>(speed2)).ValueAsDouble) >= 0;
         #endregion
 
         #region <= Operators
-        public static bool operator <=(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed2) => speed1.SpeedValue.CompareTo(speed2.SpeedValue) <= 0;
+        public static bool operator <=(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed2) => GenericOperatorMath<TDataType>.LessThanOrEqualTo(speed1.SpeedValue, speed2.SpeedValue);
 
-        public static bool operator <=(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2) => speed1.ValueAsDouble.CompareTo((new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(speed2)).ValueAsDouble) <= 0;
+        public static bool operator <=(Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType> speed1, SpeedDouble speed2) => speed1.ValueAsDouble.CompareTo((new Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, double>(speed2)).ValueAsDouble) <= 0;
         #endregion
 
         #region ToString
@@ -270,10 +267,12 @@ namespace NGenericDimensions.Extensions
 {
     public static class SpeedExtensionMethods
     {
+        #region Nullable SpeedValue
         [EditorBrowsable(EditorBrowsableState.Always)]
         public static TDataType? SpeedValue<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>(this Speed<TLengthUnitOfMeasure, TDurationUnitOfMeasure, TDataType>? speed)
-            where TLengthUnitOfMeasure : Lengths.Length1DUnitOfMeasure, IDefinedUnitOfMeasure
-            where TDurationUnitOfMeasure : Durations.DurationUnitOfMeasure, IDefinedUnitOfMeasure
-            where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType> => speed.HasValue ? speed.Value.SpeedValue : (TDataType?)null;
+            where TLengthUnitOfMeasure : Length1DUnitOfMeasure, IDefinedUnitOfMeasure
+            where TDurationUnitOfMeasure : DurationUnitOfMeasure, IDefinedUnitOfMeasure
+            where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType> => speed?.SpeedValue;
+        #endregion
     }
 }

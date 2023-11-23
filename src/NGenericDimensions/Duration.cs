@@ -1,4 +1,6 @@
-﻿using NGenericDimensions.Math;
+﻿using NGenericDimensions.Durations;
+using NGenericDimensions.Math;
+using NGenericDimensions.MetricPrefix;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,42 +10,45 @@ namespace NGenericDimensions
 {
     public interface IDuration : IDimension
     {
-        Durations.DurationUnitOfMeasure UnitOfMeasure { get; }
+        DurationUnitOfMeasure DurationUnitOfMeasure { get; }
     }
 
     public readonly struct DurationDouble : IEquatable<DurationDouble>
     {
         internal readonly double ValueAsDouble;
-        internal readonly Durations.DurationUnitOfMeasure UnitOfMeasure;
+        internal readonly DurationUnitOfMeasure DurationUnitOfMeasure;
 
-        internal DurationDouble(double valueAsDouble, Durations.DurationUnitOfMeasure unitOfMeasure)
+        internal DurationDouble(double valueAsDouble, DurationUnitOfMeasure durationUnitOfMeasure)
         {
             ValueAsDouble = valueAsDouble;
-            UnitOfMeasure = unitOfMeasure;
+            DurationUnitOfMeasure = durationUnitOfMeasure;
         }
 
-        public override bool Equals(object? obj) => obj != null && obj is DurationDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.UnitOfMeasure.Equals(UnitOfMeasure);
+        public override bool Equals(object? obj) => obj != null && obj is DurationDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.DurationUnitOfMeasure.Equals(DurationUnitOfMeasure);
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
-        bool IEquatable<DurationDouble>.Equals(DurationDouble other) => EqualityComparer<double>.Default.Equals(ValueAsDouble, other.ValueAsDouble) && EqualityComparer<Durations.DurationUnitOfMeasure>.Default.Equals(UnitOfMeasure, other.UnitOfMeasure);
+        bool IEquatable<DurationDouble>.Equals(DurationDouble other) => EqualityComparer<double>.Default.Equals(ValueAsDouble, other.ValueAsDouble) && EqualityComparer<DurationUnitOfMeasure>.Default.Equals(DurationUnitOfMeasure, other.DurationUnitOfMeasure);
         public static bool operator ==(DurationDouble left, DurationDouble right) => left.Equals(right);
-        public static bool operator !=(DurationDouble left, DurationDouble right) => !(left == right);
+        public static bool operator !=(DurationDouble left, DurationDouble right) => !left.Equals(right);
     }
 
-    public readonly struct DurationDouble<TUnitOfMeasure> : IEquatable<DurationDouble<TUnitOfMeasure>>
-        where TUnitOfMeasure : Durations.DurationUnitOfMeasure, IDefinedUnitOfMeasure
+    public readonly struct DurationDouble<TDurationUnitOfMeasure> : IEquatable<DurationDouble<TDurationUnitOfMeasure>>
+        where TDurationUnitOfMeasure : DurationUnitOfMeasure, IDefinedUnitOfMeasure
     {
         internal readonly double ValueAsDouble;
         internal DurationDouble(double valueAsDouble) => ValueAsDouble = valueAsDouble;
-        public override bool Equals(object? obj) => obj != null && obj is DurationDouble<TUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
+        public override bool Equals(object? obj) => obj != null && obj is DurationDouble<TDurationUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
-        bool IEquatable<DurationDouble<TUnitOfMeasure>>.Equals(DurationDouble<TUnitOfMeasure> other) => EqualityComparer<double>.Default.Equals(ValueAsDouble, other.ValueAsDouble);
-        public static bool operator ==(DurationDouble<TUnitOfMeasure> left, DurationDouble<TUnitOfMeasure> right) => left.Equals(right);
-        public static bool operator !=(DurationDouble<TUnitOfMeasure> left, DurationDouble<TUnitOfMeasure> right) => !(left == right);
+        bool IEquatable<DurationDouble<TDurationUnitOfMeasure>>.Equals(DurationDouble<TDurationUnitOfMeasure> other) => EqualityComparer<double>.Default.Equals(ValueAsDouble, other.ValueAsDouble);
+        public static bool operator ==(DurationDouble<TDurationUnitOfMeasure> left, DurationDouble<TDurationUnitOfMeasure> right) => left.Equals(right);
+        public static bool operator !=(DurationDouble<TDurationUnitOfMeasure> left, DurationDouble<TDurationUnitOfMeasure> right) => !left.Equals(right);
+
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public TDurationUnitOfMeasure DurationUnitOfMeasure => UnitOfMeasureGlobals<TDurationUnitOfMeasure>.GlobalInstance;
     }
 
     [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "This is not needed yet.")]
-    public readonly struct Duration<TUnitOfMeasure, TDataType> : IDuration, IEquatable<Duration<TUnitOfMeasure, TDataType>>
-        where TUnitOfMeasure : Durations.DurationUnitOfMeasure, IDefinedUnitOfMeasure
+    public readonly struct Duration<TDurationUnitOfMeasure, TDataType> : IDuration, IEquatable<Duration<TDurationUnitOfMeasure, TDataType>>
+        where TDurationUnitOfMeasure : DurationUnitOfMeasure, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
     {
         #region Constructors
@@ -51,138 +56,143 @@ namespace NGenericDimensions
 
         public Duration(TimeSpan duration)
         {
-            if (ReferenceEquals(typeof(TUnitOfMeasure), typeof(Durations.Ticks)))
+            if (ReferenceEquals(typeof(TDurationUnitOfMeasure), typeof(Ticks)))
             {
                 DurationValue = (TDataType)(Convert.ChangeType(duration.Ticks, typeof(TDataType), null));
             }
             else
             {
-                DurationValue = (TDataType)(Convert.ChangeType(duration.Ticks * UnitOfMeasureGlobals<Durations.Ticks>.GlobalInstance.GetCompleteMultiplier<TUnitOfMeasure>(1), typeof(TDataType), null));
+                DurationValue = GenericOperatorMath<TDataType>.ConvertFromDouble(duration.Ticks * UnitOfMeasureGlobals<Ticks>.GlobalInstance.GetCompleteMultiplier<TDurationUnitOfMeasure>(1));
             }
         }
 
-        public Duration(Duration<TUnitOfMeasure, TDataType> duration) => DurationValue = duration.DurationValue;
-
-        public Duration(DurationDouble durationToConvertFrom) => DurationValue = (TDataType)(Convert.ChangeType(durationToConvertFrom.ValueAsDouble * durationToConvertFrom.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1), typeof(TDataType), null));
+        public Duration(Duration<TDurationUnitOfMeasure, TDataType> duration) => DurationValue = duration.DurationValue;
+        
+        public Duration(DurationDouble durationToConvertFrom)
+            => DurationValue = GenericOperatorMath<TDataType>.ConvertFromDouble(
+            durationToConvertFrom.ValueAsDouble
+            * durationToConvertFrom.DurationUnitOfMeasure.GetCompleteMultiplier<TDurationUnitOfMeasure>(1)
+            );
+        
         #endregion
 
         #region Value
-
-        [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public TDataType DurationValue { get; }
-
-        private double ValueAsDouble => Convert.ToDouble(DurationValue, null);
-        double IDimension.Value => ValueAsDouble;
-
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public TimeSpan TimeSpan => new TimeSpan(Convert.ToInt64(ValueAsDouble * UnitOfMeasure.GetCompleteMultiplier<Durations.Ticks>(1)));
+        public TDataType DurationValue { get; }
+        
+        private double ValueAsDouble => GenericOperatorMath<TDataType>.ConvertToDouble(DurationValue);
+        double IDimension.Value => ValueAsDouble;
+        
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public TimeSpan TimeSpan => new TimeSpan(Convert.ToInt64(ValueAsDouble * DurationUnitOfMeasure.GetCompleteMultiplier<Ticks>(1)));
         #endregion
 
         #region UnitOfMeasure
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public TUnitOfMeasure UnitOfMeasure => UnitOfMeasureGlobals<TUnitOfMeasure>.GlobalInstance;
-
-        Durations.DurationUnitOfMeasure IDuration.UnitOfMeasure => UnitOfMeasure;
+        public TDurationUnitOfMeasure DurationUnitOfMeasure => UnitOfMeasureGlobals<TDurationUnitOfMeasure>.GlobalInstance;
+        
+        DurationUnitOfMeasure IDuration.DurationUnitOfMeasure => DurationUnitOfMeasure;
+        
         #endregion
 
         #region ConvertTo
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public Duration<TNewUnitOfMeasure, TNewDataType> ConvertTo<TNewUnitOfMeasure, TNewDataType>()
-            where TNewUnitOfMeasure : Durations.DurationUnitOfMeasure, IDefinedUnitOfMeasure
-            where TNewDataType : struct, IComparable, IFormattable, IComparable<TNewDataType>, IEquatable<TNewDataType> => new Duration<TNewUnitOfMeasure, TNewDataType>(this);
+        public Duration<TNewDurationUnitOfMeasure, TNewDataType> ConvertTo<TNewDurationUnitOfMeasure, TNewDataType>()
+            where TNewDurationUnitOfMeasure : DurationUnitOfMeasure, IDefinedUnitOfMeasure
+            where TNewDataType : struct, IComparable, IFormattable, IComparable<TNewDataType>, IEquatable<TNewDataType> => new Duration<TNewDurationUnitOfMeasure, TNewDataType>(this);
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public Duration<TUnitOfMeasure, TNewDataType> ConvertTo<TNewDataType>() where TNewDataType : struct, IComparable, IFormattable, IComparable<TNewDataType>, IEquatable<TNewDataType> => new Duration<TUnitOfMeasure, TNewDataType>(this);
+        public Duration<TDurationUnitOfMeasure, TNewDataType> ConvertTo<TNewDataType>() where TNewDataType : struct, IComparable, IFormattable, IComparable<TNewDataType>, IEquatable<TNewDataType> => new Duration<TDurationUnitOfMeasure, TNewDataType>(this);
         #endregion
 
         #region Casting Operators
-        public static implicit operator Duration<TUnitOfMeasure, TDataType>(TDataType duration) => new Duration<TUnitOfMeasure, TDataType>(duration);
+        public static implicit operator Duration<TDurationUnitOfMeasure, TDataType>(TDataType duration) => new Duration<TDurationUnitOfMeasure, TDataType>(duration);
 
-        public static explicit operator TimeSpan(Duration<TUnitOfMeasure, TDataType> duration) => new TimeSpan(Convert.ToInt64(duration.ValueAsDouble * duration.UnitOfMeasure.GetCompleteMultiplier<Durations.Ticks>(1)));
+        public static explicit operator TDataType(Duration<TDurationUnitOfMeasure, TDataType> duration) => duration.DurationValue;
 
-        public static explicit operator TDataType(Duration<TUnitOfMeasure, TDataType> duration) => duration.DurationValue;
+        public static implicit operator DurationDouble(Duration<TDurationUnitOfMeasure, TDataType> duration) => new DurationDouble(duration.ValueAsDouble, duration.DurationUnitOfMeasure);
 
-        public static explicit operator Duration<TUnitOfMeasure, TDataType>(TimeSpan durationSpan) => new Duration<TUnitOfMeasure, TDataType>(durationSpan);
+        public static implicit operator DurationDouble<TDurationUnitOfMeasure>(Duration<TDurationUnitOfMeasure, TDataType> duration) => new DurationDouble<TDurationUnitOfMeasure>(duration.ValueAsDouble);
 
-        public static implicit operator DurationDouble(Duration<TUnitOfMeasure, TDataType> duration) => new DurationDouble(duration.ValueAsDouble, duration.UnitOfMeasure);
+        public static explicit operator TimeSpan(Duration<TDurationUnitOfMeasure, TDataType> duration) => new TimeSpan(Convert.ToInt64(duration.ValueAsDouble * duration.DurationUnitOfMeasure.GetCompleteMultiplier<Ticks>(1)));
 
-        public static implicit operator DurationDouble<TUnitOfMeasure>(Duration<TUnitOfMeasure, TDataType> duration) => new DurationDouble<TUnitOfMeasure>(duration.ValueAsDouble);
+        public static explicit operator Duration<TDurationUnitOfMeasure, TDataType>(TimeSpan durationSpan) => new Duration<TDurationUnitOfMeasure, TDataType>(durationSpan);
         #endregion
 
         #region + Operators
-        public static Duration<TUnitOfMeasure, TDataType> operator +(Duration<TUnitOfMeasure, TDataType> duration1, Duration<TUnitOfMeasure, TDataType> duration2) => new Duration<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Add(duration1.DurationValue, duration2.DurationValue));
+        public static Duration<TDurationUnitOfMeasure, TDataType> operator +(Duration<TDurationUnitOfMeasure, TDataType> duration1, Duration<TDurationUnitOfMeasure, TDataType> duration2) => new Duration<TDurationUnitOfMeasure, TDataType>(GenericOperatorMath<TDataType>.Add(duration1.DurationValue, duration2.DurationValue));
 
-        public static Duration<TUnitOfMeasure, double> operator +(Duration<TUnitOfMeasure, TDataType> duration1, DurationDouble duration2) => duration1.ValueAsDouble + (duration2.ValueAsDouble * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1));
+        public static Duration<TDurationUnitOfMeasure, double> operator +(Duration<TDurationUnitOfMeasure, TDataType> duration1, DurationDouble duration2) => duration1.ValueAsDouble + (duration2.ValueAsDouble * duration2.DurationUnitOfMeasure.GetCompleteMultiplier<TDurationUnitOfMeasure>(1));
         #endregion
 
         #region - Operators
-        public static Duration<TUnitOfMeasure, TDataType> operator -(Duration<TUnitOfMeasure, TDataType> duration1, Duration<TUnitOfMeasure, TDataType> duration2) => new Duration<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Subtract(duration1.DurationValue, duration2.DurationValue));
+        public static Duration<TDurationUnitOfMeasure, TDataType> operator -(Duration<TDurationUnitOfMeasure, TDataType> duration1, Duration<TDurationUnitOfMeasure, TDataType> duration2) => new Duration<TDurationUnitOfMeasure, TDataType>(GenericOperatorMath<TDataType>.Subtract(duration1.DurationValue, duration2.DurationValue));
 
-        public static Duration<TUnitOfMeasure, double> operator -(Duration<TUnitOfMeasure, TDataType> duration1, DurationDouble duration2) => duration1.ValueAsDouble - (duration2.ValueAsDouble * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1));
+        public static Duration<TDurationUnitOfMeasure, double> operator -(Duration<TDurationUnitOfMeasure, TDataType> duration1, DurationDouble duration2) => duration1.ValueAsDouble - (duration2.ValueAsDouble * duration2.DurationUnitOfMeasure.GetCompleteMultiplier<TDurationUnitOfMeasure>(1));
         #endregion
 
         #region * Operators
-        public static Duration<TUnitOfMeasure, TDataType> operator *(TDataType duration1, Duration<TUnitOfMeasure, TDataType> duration2) => new Duration<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Multiply(duration1, duration2.DurationValue));
+        public static Duration<TDurationUnitOfMeasure, TDataType> operator *(TDataType duration1, Duration<TDurationUnitOfMeasure, TDataType> duration2) => new Duration<TDurationUnitOfMeasure, TDataType>(GenericOperatorMath<TDataType>.Multiply(duration1, duration2.DurationValue));
 
-        public static Duration<TUnitOfMeasure, TDataType> operator *(Duration<TUnitOfMeasure, TDataType> duration1, TDataType duration2) => new Duration<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Multiply(duration1.DurationValue, duration2));
+        public static Duration<TDurationUnitOfMeasure, TDataType> operator *(Duration<TDurationUnitOfMeasure, TDataType> duration1, TDataType duration2) => new Duration<TDurationUnitOfMeasure, TDataType>(GenericOperatorMath<TDataType>.Multiply(duration1.DurationValue, duration2));
         #endregion
 
         #region / Operators
-        public static Duration<TUnitOfMeasure, double> operator /(Duration<TUnitOfMeasure, TDataType> duration1, double duration2) => new Duration<TUnitOfMeasure, double>(Convert.ToDouble(duration1.DurationValue, null) / duration2);
+        public static Duration<TDurationUnitOfMeasure, double> operator /(Duration<TDurationUnitOfMeasure, TDataType> duration1, double duration2) => new Duration<TDurationUnitOfMeasure, double>(duration1.ValueAsDouble / duration2);
 
-        public static Duration<TUnitOfMeasure, double> operator /(Duration<TUnitOfMeasure, TDataType> duration1, decimal duration2) => new Duration<TUnitOfMeasure, double>(Convert.ToDouble(duration1.DurationValue, null) / Convert.ToDouble(duration2));
+        public static Duration<TDurationUnitOfMeasure, double> operator /(Duration<TDurationUnitOfMeasure, TDataType> duration1, decimal duration2) => new Duration<TDurationUnitOfMeasure, double>(duration1.ValueAsDouble / Convert.ToDouble(duration2));
 
-        public static Duration<TUnitOfMeasure, double> operator /(Duration<TUnitOfMeasure, TDataType> duration1, long duration2) => new Duration<TUnitOfMeasure, double>(Convert.ToDouble(duration1.DurationValue, null) / duration2);
+        public static Duration<TDurationUnitOfMeasure, double> operator /(Duration<TDurationUnitOfMeasure, TDataType> duration1, long duration2) => new Duration<TDurationUnitOfMeasure, double>(duration1.ValueAsDouble / duration2);
 
-        public static double operator /(Duration<TUnitOfMeasure, TDataType> duration1, DurationDouble duration2) => duration1.ValueAsDouble / (new Duration<TUnitOfMeasure, double>(duration2.ValueAsDouble).DurationValue);
+        public static double operator /(Duration<TDurationUnitOfMeasure, TDataType> duration1, DurationDouble duration2) => duration1.ValueAsDouble / (new Duration<TDurationUnitOfMeasure, double>(duration2).DurationValue);
         #endregion
 
         #region == Operators
-        public static bool operator ==(Duration<TUnitOfMeasure, TDataType> duration1, Duration<TUnitOfMeasure, TDataType> duration2) => duration1.DurationValue.CompareTo(duration2.DurationValue) == 0;
+        public static bool operator ==(Duration<TDurationUnitOfMeasure, TDataType> duration1, Duration<TDurationUnitOfMeasure, TDataType> duration2) => EqualityComparer<TDataType>.Default.Equals(duration1.DurationValue, duration2.DurationValue);
 
-        public static bool operator ==(Duration<TUnitOfMeasure, TDataType> duration1, DurationDouble duration2) => duration1.ValueAsDouble.CompareTo(duration2.ValueAsDouble * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) == 0;
+        public static bool operator ==(Duration<TDurationUnitOfMeasure, TDataType> duration1, DurationDouble duration2) => duration1.ValueAsDouble.CompareTo(duration2.ValueAsDouble * duration2.DurationUnitOfMeasure.GetCompleteMultiplier<TDurationUnitOfMeasure>(1)) == 0;
         #endregion
 
         #region != Operators
-        public static bool operator !=(Duration<TUnitOfMeasure, TDataType> duration1, Duration<TUnitOfMeasure, TDataType> duration2) => duration1.DurationValue.CompareTo(duration2.DurationValue) != 0;
+        public static bool operator !=(Duration<TDurationUnitOfMeasure, TDataType> duration1, Duration<TDurationUnitOfMeasure, TDataType> duration2) => !EqualityComparer<TDataType>.Default.Equals(duration1.DurationValue, duration2.DurationValue);
 
-        public static bool operator !=(Duration<TUnitOfMeasure, TDataType> duration1, DurationDouble duration2) => duration1.ValueAsDouble.CompareTo(duration2.ValueAsDouble * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) != 0;
+        public static bool operator !=(Duration<TDurationUnitOfMeasure, TDataType> duration1, DurationDouble duration2) => duration1.ValueAsDouble.CompareTo(duration2.ValueAsDouble * duration2.DurationUnitOfMeasure.GetCompleteMultiplier<TDurationUnitOfMeasure>(1)) != 0;
         #endregion
 
         #region > Operators
-        public static bool operator >(Duration<TUnitOfMeasure, TDataType> duration1, Duration<TUnitOfMeasure, TDataType> duration2) => duration1.DurationValue.CompareTo(duration2.DurationValue) > 0;
+        public static bool operator >(Duration<TDurationUnitOfMeasure, TDataType> duration1, Duration<TDurationUnitOfMeasure, TDataType> duration2) => GenericOperatorMath<TDataType>.GreaterThan(duration1.DurationValue, duration2.DurationValue);
 
-        public static bool operator >(Duration<TUnitOfMeasure, TDataType> duration1, DurationDouble duration2) => duration1.ValueAsDouble.CompareTo(duration2.ValueAsDouble * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) > 0;
+        public static bool operator >(Duration<TDurationUnitOfMeasure, TDataType> duration1, DurationDouble duration2) => duration1.ValueAsDouble.CompareTo(duration2.ValueAsDouble * duration2.DurationUnitOfMeasure.GetCompleteMultiplier<TDurationUnitOfMeasure>(1)) > 0;
         #endregion
 
         #region < Operators
-        public static bool operator <(Duration<TUnitOfMeasure, TDataType> duration1, Duration<TUnitOfMeasure, TDataType> duration2) => duration1.DurationValue.CompareTo(duration2.DurationValue) < 0;
+        public static bool operator <(Duration<TDurationUnitOfMeasure, TDataType> duration1, Duration<TDurationUnitOfMeasure, TDataType> duration2) => GenericOperatorMath<TDataType>.LessThan(duration1.DurationValue, duration2.DurationValue);
 
-        public static bool operator <(Duration<TUnitOfMeasure, TDataType> duration1, DurationDouble duration2) => duration1.ValueAsDouble.CompareTo(duration2.ValueAsDouble * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) < 0;
+        public static bool operator <(Duration<TDurationUnitOfMeasure, TDataType> duration1, DurationDouble duration2) => duration1.ValueAsDouble.CompareTo(duration2.ValueAsDouble * duration2.DurationUnitOfMeasure.GetCompleteMultiplier<TDurationUnitOfMeasure>(1)) < 0;
         #endregion
 
         #region >= Operators
-        public static bool operator >=(Duration<TUnitOfMeasure, TDataType> duration1, Duration<TUnitOfMeasure, TDataType> duration2) => duration1.DurationValue.CompareTo(duration2.DurationValue) >= 0;
+        public static bool operator >=(Duration<TDurationUnitOfMeasure, TDataType> duration1, Duration<TDurationUnitOfMeasure, TDataType> duration2) => GenericOperatorMath<TDataType>.GreaterThanOrEqualTo(duration1.DurationValue, duration2.DurationValue);
 
-        public static bool operator >=(Duration<TUnitOfMeasure, TDataType> duration1, DurationDouble duration2) => duration1.ValueAsDouble.CompareTo(duration2.ValueAsDouble * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) >= 0;
+        public static bool operator >=(Duration<TDurationUnitOfMeasure, TDataType> duration1, DurationDouble duration2) => duration1.ValueAsDouble.CompareTo(duration2.ValueAsDouble * duration2.DurationUnitOfMeasure.GetCompleteMultiplier<TDurationUnitOfMeasure>(1)) >= 0;
         #endregion
 
         #region <= Operators
-        public static bool operator <=(Duration<TUnitOfMeasure, TDataType> duration1, Duration<TUnitOfMeasure, TDataType> duration2) => duration1.DurationValue.CompareTo(duration2.DurationValue) <= 0;
+        public static bool operator <=(Duration<TDurationUnitOfMeasure, TDataType> duration1, Duration<TDurationUnitOfMeasure, TDataType> duration2) => GenericOperatorMath<TDataType>.LessThanOrEqualTo(duration1.DurationValue, duration2.DurationValue);
 
-        public static bool operator <=(Duration<TUnitOfMeasure, TDataType> duration1, DurationDouble duration2) => duration1.ValueAsDouble.CompareTo(duration2.ValueAsDouble * duration2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(1)) <= 0;
+        public static bool operator <=(Duration<TDurationUnitOfMeasure, TDataType> duration1, DurationDouble duration2) => duration1.ValueAsDouble.CompareTo(duration2.ValueAsDouble * duration2.DurationUnitOfMeasure.GetCompleteMultiplier<TDurationUnitOfMeasure>(1)) <= 0;
         #endregion
 
         #region ToString
-        public override string ToString() => UnitOfMeasure.ToString(DurationValue, null, null);
+        public override string ToString() => DurationUnitOfMeasure.ToString(DurationValue, null, null);
 
-        public string ToString(string? format, IFormatProvider? formatProvider) => UnitOfMeasure.ToString(DurationValue, format, formatProvider);
+        public string ToString(string? format, IFormatProvider? formatProvider) => DurationUnitOfMeasure.ToString(DurationValue, format, formatProvider);
         #endregion
 
         #region Equals
-        public override bool Equals(object? obj) => obj != null && obj is Duration<TUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(DurationValue, o.DurationValue);
+        public override bool Equals(object? obj) => obj != null && obj is Duration<TDurationUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(DurationValue, o.DurationValue);
 
-        bool IEquatable<Duration<TUnitOfMeasure, TDataType>>.Equals(Duration<TUnitOfMeasure, TDataType> other) => EqualityComparer<TDataType>.Default.Equals(DurationValue, other.DurationValue);
+        bool IEquatable<Duration<TDurationUnitOfMeasure, TDataType>>.Equals(Duration<TDurationUnitOfMeasure, TDataType> other) => EqualityComparer<TDataType>.Default.Equals(DurationValue, other.DurationValue);
         #endregion
 
         #region GetHashCode
@@ -197,7 +207,7 @@ namespace NGenericDimensions
             {
                 return (TimeSpan)this;
             }
-            else if (typeof(IDuration).IsAssignableFrom(conversionType))
+            if (typeof(IDuration).IsAssignableFrom(conversionType))
             {
                 var convertedInstance = Activator.CreateInstance(conversionType, (DurationDouble)this);
                 if (convertedInstance != null) return convertedInstance;
@@ -221,13 +231,13 @@ namespace NGenericDimensions
 
 namespace NGenericDimensions.Extensions
 {
-
     public static class DurationExtensionMethods
     {
-
+        #region Nullable DurationValue
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static TDataType? DurationValue<TUnitOfMeasure, TDataType>(this Duration<TUnitOfMeasure, TDataType>? duration)
-            where TUnitOfMeasure : Durations.DurationUnitOfMeasure, IDefinedUnitOfMeasure
-            where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType> => duration.HasValue ? duration.Value.DurationValue : (TDataType?)null;
+        public static TDataType? DurationValue<TDurationUnitOfMeasure, TDataType>(this Duration<TDurationUnitOfMeasure, TDataType>? duration)
+            where TDurationUnitOfMeasure : DurationUnitOfMeasure, IDefinedUnitOfMeasure
+            where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType> => duration?.DurationValue;
+        #endregion
     }
 }

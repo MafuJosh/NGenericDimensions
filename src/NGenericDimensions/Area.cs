@@ -1,5 +1,6 @@
 ﻿using NGenericDimensions.Lengths;
 using NGenericDimensions.Math;
+using NGenericDimensions.MetricPrefix;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,151 +10,158 @@ namespace NGenericDimensions
 {
     public interface IArea : IDimension
     {
-        LengthUnitOfMeasure UnitOfMeasure { get; }
+        LengthUnitOfMeasure AreaUnitOfMeasure { get; }
     }
 
     public readonly struct AreaDouble : IEquatable<AreaDouble>
     {
         internal readonly double ValueAsDouble;
-        internal readonly LengthUnitOfMeasure UnitOfMeasure;
+        internal readonly LengthUnitOfMeasure AreaUnitOfMeasure;
 
-        internal AreaDouble(double valueAsDouble, LengthUnitOfMeasure unitOfMeasure)
+        internal AreaDouble(double valueAsDouble, LengthUnitOfMeasure areaUnitOfMeasure)
         {
             ValueAsDouble = valueAsDouble;
-            UnitOfMeasure = unitOfMeasure;
+            AreaUnitOfMeasure = areaUnitOfMeasure;
         }
 
-        public override bool Equals(object? obj) => obj != null && obj is AreaDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.UnitOfMeasure.Equals(UnitOfMeasure);
+        public override bool Equals(object? obj) => obj != null && obj is AreaDouble o && o.ValueAsDouble.Equals(ValueAsDouble) && o.AreaUnitOfMeasure.Equals(AreaUnitOfMeasure);
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
-        bool IEquatable<AreaDouble>.Equals(AreaDouble other) => EqualityComparer<double>.Default.Equals(ValueAsDouble, other.ValueAsDouble) && EqualityComparer<LengthUnitOfMeasure>.Default.Equals(UnitOfMeasure, other.UnitOfMeasure);
+        bool IEquatable<AreaDouble>.Equals(AreaDouble other) => EqualityComparer<double>.Default.Equals(ValueAsDouble, other.ValueAsDouble) && EqualityComparer<LengthUnitOfMeasure>.Default.Equals(AreaUnitOfMeasure, other.AreaUnitOfMeasure);
         public static bool operator ==(AreaDouble left, AreaDouble right) => left.Equals(right);
-        public static bool operator !=(AreaDouble left, AreaDouble right) => !(left == right);
+        public static bool operator !=(AreaDouble left, AreaDouble right) => !left.Equals(right);
     }
 
-    public readonly struct AreaDouble<TUnitOfMeasure> : IEquatable<AreaDouble<TUnitOfMeasure>>
-        where TUnitOfMeasure : LengthUnitOfMeasure, IExponent1Or2, IDefinedUnitOfMeasure
+    public readonly struct AreaDouble<TAreaUnitOfMeasure> : IEquatable<AreaDouble<TAreaUnitOfMeasure>>
+        where TAreaUnitOfMeasure : LengthUnitOfMeasure, IExponent1Or2, IDefinedUnitOfMeasure
     {
         internal readonly double ValueAsDouble;
         internal AreaDouble(double valueAsDouble) => ValueAsDouble = valueAsDouble;
-        public override bool Equals(object? obj) => obj != null && obj is AreaDouble<TUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
+        public override bool Equals(object? obj) => obj != null && obj is AreaDouble<TAreaUnitOfMeasure> o && o.ValueAsDouble.Equals(ValueAsDouble);
         public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
-        bool IEquatable<AreaDouble<TUnitOfMeasure>>.Equals(AreaDouble<TUnitOfMeasure> other) => EqualityComparer<double>.Default.Equals(ValueAsDouble, other.ValueAsDouble);
-        public static bool operator ==(AreaDouble<TUnitOfMeasure> left, AreaDouble<TUnitOfMeasure> right) => left.Equals(right);
-        public static bool operator !=(AreaDouble<TUnitOfMeasure> left, AreaDouble<TUnitOfMeasure> right) => !(left == right);
+        bool IEquatable<AreaDouble<TAreaUnitOfMeasure>>.Equals(AreaDouble<TAreaUnitOfMeasure> other) => EqualityComparer<double>.Default.Equals(ValueAsDouble, other.ValueAsDouble);
+        public static bool operator ==(AreaDouble<TAreaUnitOfMeasure> left, AreaDouble<TAreaUnitOfMeasure> right) => left.Equals(right);
+        public static bool operator !=(AreaDouble<TAreaUnitOfMeasure> left, AreaDouble<TAreaUnitOfMeasure> right) => !left.Equals(right);
+
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public TAreaUnitOfMeasure AreaUnitOfMeasure => UnitOfMeasureGlobals<TAreaUnitOfMeasure>.GlobalInstance;
     }
 
     [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "This is not needed yet.")]
-    public readonly struct Area<TUnitOfMeasure, TDataType> : IArea, IEquatable<Area<TUnitOfMeasure, TDataType>>
-        where TUnitOfMeasure : Lengths.LengthUnitOfMeasure, IExponent1Or2, IDefinedUnitOfMeasure
+    public readonly struct Area<TAreaUnitOfMeasure, TDataType> : IArea, IEquatable<Area<TAreaUnitOfMeasure, TDataType>>
+        where TAreaUnitOfMeasure : LengthUnitOfMeasure, IExponent1Or2, IDefinedUnitOfMeasure
         where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
     {
         #region Constructors
         public Area(TDataType area) => AreaValue = area;
 
-        public Area(Area<TUnitOfMeasure, TDataType> area) => AreaValue = area.AreaValue;
-
-        public Area(AreaDouble areaToConvertFrom) => AreaValue = (TDataType)(Convert.ChangeType(areaToConvertFrom.ValueAsDouble * (areaToConvertFrom.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2)), typeof(TDataType), null));
+        public Area(Area<TAreaUnitOfMeasure, TDataType> area) => AreaValue = area.AreaValue;
+        
+        public Area(AreaDouble areaToConvertFrom)
+            => AreaValue = GenericOperatorMath<TDataType>.ConvertFromDouble(
+            areaToConvertFrom.ValueAsDouble
+            * areaToConvertFrom.AreaUnitOfMeasure.GetCompleteMultiplier<TAreaUnitOfMeasure>(2)
+            );
+        
         #endregion
 
         #region Value
         [EditorBrowsable(EditorBrowsableState.Always)]
         public TDataType AreaValue { get; }
-
-        private double ValueAsDouble => Convert.ToDouble(AreaValue, null);
-
+        
+        private double ValueAsDouble => GenericOperatorMath<TDataType>.ConvertToDouble(AreaValue);
         double IDimension.Value => ValueAsDouble;
         #endregion
 
         #region UnitOfMeasure
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public TUnitOfMeasure UnitOfMeasure => UnitOfMeasureGlobals<TUnitOfMeasure>.GlobalInstance;
-
-        private LengthUnitOfMeasure UnitOfMeasure1 => UnitOfMeasure;
-        LengthUnitOfMeasure IArea.UnitOfMeasure => UnitOfMeasure1;
+        public TAreaUnitOfMeasure AreaUnitOfMeasure => UnitOfMeasureGlobals<TAreaUnitOfMeasure>.GlobalInstance;
+        
+        LengthUnitOfMeasure IArea.AreaUnitOfMeasure => AreaUnitOfMeasure;
+        
         #endregion
 
         #region ConvertTo
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public Area<TNewUnitOfMeasure, TNewDataType> ConvertTo<TNewUnitOfMeasure, TNewDataType>()
-            where TNewUnitOfMeasure : Lengths.LengthUnitOfMeasure, IExponent1Or2, IDefinedUnitOfMeasure
-            where TNewDataType : struct, IComparable, IFormattable, IComparable<TNewDataType>, IEquatable<TNewDataType> => (TNewDataType)Convert.ChangeType(ValueAsDouble * (UnitOfMeasure1.GetCompleteMultiplier<TNewUnitOfMeasure>(2)), typeof(TNewDataType), null);
+        public Area<TNewAreaUnitOfMeasure, TNewDataType> ConvertTo<TNewAreaUnitOfMeasure, TNewDataType>()
+            where TNewAreaUnitOfMeasure : LengthUnitOfMeasure, IExponent1Or2, IDefinedUnitOfMeasure
+            where TNewDataType : struct, IComparable, IFormattable, IComparable<TNewDataType>, IEquatable<TNewDataType> => new Area<TNewAreaUnitOfMeasure, TNewDataType>(this);
 
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public Area<TUnitOfMeasure, TNewDataType> ConvertTo<TNewDataType>() where TNewDataType : struct, IComparable, IFormattable, IComparable<TNewDataType>, IEquatable<TNewDataType> => (TNewDataType)Convert.ChangeType(AreaValue, typeof(TNewDataType), null);
+        public Area<TAreaUnitOfMeasure, TNewDataType> ConvertTo<TNewDataType>() where TNewDataType : struct, IComparable, IFormattable, IComparable<TNewDataType>, IEquatable<TNewDataType> => new Area<TAreaUnitOfMeasure, TNewDataType>(this);
         #endregion
 
         #region Casting Operators
-        public static implicit operator Area<TUnitOfMeasure, TDataType>(TDataType area) => new Area<TUnitOfMeasure, TDataType>(area);
+        public static implicit operator Area<TAreaUnitOfMeasure, TDataType>(TDataType area) => new Area<TAreaUnitOfMeasure, TDataType>(area);
 
-        public static explicit operator TDataType(Area<TUnitOfMeasure, TDataType> area) => area.AreaValue;
+        public static explicit operator TDataType(Area<TAreaUnitOfMeasure, TDataType> area) => area.AreaValue;
 
-        public static implicit operator AreaDouble(Area<TUnitOfMeasure, TDataType> area) => new AreaDouble(area.ValueAsDouble, area.UnitOfMeasure);
+        public static implicit operator AreaDouble(Area<TAreaUnitOfMeasure, TDataType> area) => new AreaDouble(area.ValueAsDouble, area.AreaUnitOfMeasure);
 
-        public static implicit operator AreaDouble<TUnitOfMeasure>(Area<TUnitOfMeasure, TDataType> area) => new AreaDouble<TUnitOfMeasure>(area.ValueAsDouble);
+        public static implicit operator AreaDouble<TAreaUnitOfMeasure>(Area<TAreaUnitOfMeasure, TDataType> area) => new AreaDouble<TAreaUnitOfMeasure>(area.ValueAsDouble);
         #endregion
 
         #region + Operators
-        public static Area<TUnitOfMeasure, TDataType> operator +(Area<TUnitOfMeasure, TDataType> area1, Area<TUnitOfMeasure, TDataType> area2) => new Area<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Add(area1.AreaValue, area2.AreaValue));
+        public static Area<TAreaUnitOfMeasure, TDataType> operator +(Area<TAreaUnitOfMeasure, TDataType> area1, Area<TAreaUnitOfMeasure, TDataType> area2) => new Area<TAreaUnitOfMeasure, TDataType>(GenericOperatorMath<TDataType>.Add(area1.AreaValue, area2.AreaValue));
 
-        public static Area<TUnitOfMeasure, double> operator +(Area<TUnitOfMeasure, TDataType> area1, AreaDouble area2) => area1.ValueAsDouble + (area2.ValueAsDouble * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2)));
+        public static Area<TAreaUnitOfMeasure, double> operator +(Area<TAreaUnitOfMeasure, TDataType> area1, AreaDouble area2) => area1.ValueAsDouble + (area2.ValueAsDouble * area2.AreaUnitOfMeasure.GetCompleteMultiplier<TAreaUnitOfMeasure>(2));
         #endregion
 
         #region - Operators
-        public static Area<TUnitOfMeasure, TDataType> operator -(Area<TUnitOfMeasure, TDataType> area1, Area<TUnitOfMeasure, TDataType> area2) => new Area<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Subtract(area1.AreaValue, area2.AreaValue));
+        public static Area<TAreaUnitOfMeasure, TDataType> operator -(Area<TAreaUnitOfMeasure, TDataType> area1, Area<TAreaUnitOfMeasure, TDataType> area2) => new Area<TAreaUnitOfMeasure, TDataType>(GenericOperatorMath<TDataType>.Subtract(area1.AreaValue, area2.AreaValue));
 
-        public static Area<TUnitOfMeasure, double> operator -(Area<TUnitOfMeasure, TDataType> area1, AreaDouble area2) => area1.ValueAsDouble - (area2.ValueAsDouble * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2)));
+        public static Area<TAreaUnitOfMeasure, double> operator -(Area<TAreaUnitOfMeasure, TDataType> area1, AreaDouble area2) => area1.ValueAsDouble - (area2.ValueAsDouble * area2.AreaUnitOfMeasure.GetCompleteMultiplier<TAreaUnitOfMeasure>(2));
         #endregion
 
         #region * Operators
-        public static Area<TUnitOfMeasure, TDataType> operator *(TDataType area1, Area<TUnitOfMeasure, TDataType> area2) => new Area<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Multiply(area1, area2.AreaValue));
+        public static Area<TAreaUnitOfMeasure, TDataType> operator *(TDataType area1, Area<TAreaUnitOfMeasure, TDataType> area2) => new Area<TAreaUnitOfMeasure, TDataType>(GenericOperatorMath<TDataType>.Multiply(area1, area2.AreaValue));
 
-        public static Area<TUnitOfMeasure, TDataType> operator *(Area<TUnitOfMeasure, TDataType> area1, TDataType area2) => new Area<TUnitOfMeasure, TDataType>(Math.GenericOperatorMath<TDataType>.Multiply(area1.AreaValue, area2));
+        public static Area<TAreaUnitOfMeasure, TDataType> operator *(Area<TAreaUnitOfMeasure, TDataType> area1, TDataType area2) => new Area<TAreaUnitOfMeasure, TDataType>(GenericOperatorMath<TDataType>.Multiply(area1.AreaValue, area2));
         #endregion
 
         #region / Operators
-        public static Area<TUnitOfMeasure, double> operator /(Area<TUnitOfMeasure, TDataType> area1, double area2) => new Area<TUnitOfMeasure, double>(Convert.ToDouble(area1.AreaValue, null) / area2);
+        public static Area<TAreaUnitOfMeasure, double> operator /(Area<TAreaUnitOfMeasure, TDataType> area1, double area2) => new Area<TAreaUnitOfMeasure, double>(area1.ValueAsDouble / area2);
 
-        public static Area<TUnitOfMeasure, double> operator /(Area<TUnitOfMeasure, TDataType> area1, decimal area2) => new Area<TUnitOfMeasure, double>(Convert.ToDouble(area1.AreaValue, null) / Convert.ToDouble(area2));
+        public static Area<TAreaUnitOfMeasure, double> operator /(Area<TAreaUnitOfMeasure, TDataType> area1, decimal area2) => new Area<TAreaUnitOfMeasure, double>(area1.ValueAsDouble / Convert.ToDouble(area2));
 
-        public static Area<TUnitOfMeasure, double> operator /(Area<TUnitOfMeasure, TDataType> area1, long area2) => new Area<TUnitOfMeasure, double>(Convert.ToDouble(area1.AreaValue, null) / area2);
+        public static Area<TAreaUnitOfMeasure, double> operator /(Area<TAreaUnitOfMeasure, TDataType> area1, long area2) => new Area<TAreaUnitOfMeasure, double>(area1.ValueAsDouble / area2);
 
-        public static double operator /(Area<TUnitOfMeasure, TDataType> area1, AreaDouble area2) => area1.ValueAsDouble / (new Area<TUnitOfMeasure, double>(area2).AreaValue);
+        public static double operator /(Area<TAreaUnitOfMeasure, TDataType> area1, AreaDouble area2) => area1.ValueAsDouble / (new Area<TAreaUnitOfMeasure, double>(area2).AreaValue);
         #endregion
 
         #region == Operators
-        public static bool operator ==(Area<TUnitOfMeasure, TDataType> area1, Area<TUnitOfMeasure, TDataType> area2) => area1.AreaValue.CompareTo(area2.AreaValue) == 0;
+        public static bool operator ==(Area<TAreaUnitOfMeasure, TDataType> area1, Area<TAreaUnitOfMeasure, TDataType> area2) => EqualityComparer<TDataType>.Default.Equals(area1.AreaValue, area2.AreaValue);
 
-        public static bool operator ==(Area<TUnitOfMeasure, TDataType> area1, AreaDouble area2) => area1.ValueAsDouble.CompareTo(area2.ValueAsDouble * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2))) == 0;
+        public static bool operator ==(Area<TAreaUnitOfMeasure, TDataType> area1, AreaDouble area2) => area1.ValueAsDouble.CompareTo(area2.ValueAsDouble * area2.AreaUnitOfMeasure.GetCompleteMultiplier<TAreaUnitOfMeasure>(2)) == 0;
         #endregion
 
         #region != Operators
-        public static bool operator !=(Area<TUnitOfMeasure, TDataType> area1, Area<TUnitOfMeasure, TDataType> area2) => area1.AreaValue.CompareTo(area2.AreaValue) != 0;
+        public static bool operator !=(Area<TAreaUnitOfMeasure, TDataType> area1, Area<TAreaUnitOfMeasure, TDataType> area2) => !EqualityComparer<TDataType>.Default.Equals(area1.AreaValue, area2.AreaValue);
 
-        public static bool operator !=(Area<TUnitOfMeasure, TDataType> area1, AreaDouble area2) => area1.ValueAsDouble.CompareTo(area2.ValueAsDouble * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2))) != 0;
+        public static bool operator !=(Area<TAreaUnitOfMeasure, TDataType> area1, AreaDouble area2) => area1.ValueAsDouble.CompareTo(area2.ValueAsDouble * area2.AreaUnitOfMeasure.GetCompleteMultiplier<TAreaUnitOfMeasure>(2)) != 0;
         #endregion
 
         #region > Operators
-        public static bool operator >(Area<TUnitOfMeasure, TDataType> area1, Area<TUnitOfMeasure, TDataType> area2) => area1.AreaValue.CompareTo(area2.AreaValue) > 0;
+        public static bool operator >(Area<TAreaUnitOfMeasure, TDataType> area1, Area<TAreaUnitOfMeasure, TDataType> area2) => GenericOperatorMath<TDataType>.GreaterThan(area1.AreaValue, area2.AreaValue);
 
-        public static bool operator >(Area<TUnitOfMeasure, TDataType> area1, AreaDouble area2) => area1.ValueAsDouble.CompareTo(area2.ValueAsDouble * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2))) > 0;
+        public static bool operator >(Area<TAreaUnitOfMeasure, TDataType> area1, AreaDouble area2) => area1.ValueAsDouble.CompareTo(area2.ValueAsDouble * area2.AreaUnitOfMeasure.GetCompleteMultiplier<TAreaUnitOfMeasure>(2)) > 0;
         #endregion
 
         #region < Operators
-        public static bool operator <(Area<TUnitOfMeasure, TDataType> area1, Area<TUnitOfMeasure, TDataType> area2) => area1.AreaValue.CompareTo(area2.AreaValue) < 0;
+        public static bool operator <(Area<TAreaUnitOfMeasure, TDataType> area1, Area<TAreaUnitOfMeasure, TDataType> area2) => GenericOperatorMath<TDataType>.LessThan(area1.AreaValue, area2.AreaValue);
 
-        public static bool operator <(Area<TUnitOfMeasure, TDataType> area1, AreaDouble area2) => area1.ValueAsDouble.CompareTo(area2.ValueAsDouble * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2))) < 0;
+        public static bool operator <(Area<TAreaUnitOfMeasure, TDataType> area1, AreaDouble area2) => area1.ValueAsDouble.CompareTo(area2.ValueAsDouble * area2.AreaUnitOfMeasure.GetCompleteMultiplier<TAreaUnitOfMeasure>(2)) < 0;
         #endregion
 
         #region >= Operators
-        public static bool operator >=(Area<TUnitOfMeasure, TDataType> area1, Area<TUnitOfMeasure, TDataType> area2) => area1.AreaValue.CompareTo(area2.AreaValue) >= 0;
+        public static bool operator >=(Area<TAreaUnitOfMeasure, TDataType> area1, Area<TAreaUnitOfMeasure, TDataType> area2) => GenericOperatorMath<TDataType>.GreaterThanOrEqualTo(area1.AreaValue, area2.AreaValue);
 
-        public static bool operator >=(Area<TUnitOfMeasure, TDataType> area1, AreaDouble area2) => area1.ValueAsDouble.CompareTo(area2.ValueAsDouble * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2))) >= 0;
+        public static bool operator >=(Area<TAreaUnitOfMeasure, TDataType> area1, AreaDouble area2) => area1.ValueAsDouble.CompareTo(area2.ValueAsDouble * area2.AreaUnitOfMeasure.GetCompleteMultiplier<TAreaUnitOfMeasure>(2)) >= 0;
         #endregion
 
         #region <= Operators
-        public static bool operator <=(Area<TUnitOfMeasure, TDataType> area1, Area<TUnitOfMeasure, TDataType> area2) => area1.AreaValue.CompareTo(area2.AreaValue) <= 0;
+        public static bool operator <=(Area<TAreaUnitOfMeasure, TDataType> area1, Area<TAreaUnitOfMeasure, TDataType> area2) => GenericOperatorMath<TDataType>.LessThanOrEqualTo(area1.AreaValue, area2.AreaValue);
 
-        public static bool operator <=(Area<TUnitOfMeasure, TDataType> area1, AreaDouble area2) => area1.ValueAsDouble.CompareTo(area2.ValueAsDouble * (area2.UnitOfMeasure.GetCompleteMultiplier<TUnitOfMeasure>(2))) <= 0;
+        public static bool operator <=(Area<TAreaUnitOfMeasure, TDataType> area1, AreaDouble area2) => area1.ValueAsDouble.CompareTo(area2.ValueAsDouble * area2.AreaUnitOfMeasure.GetCompleteMultiplier<TAreaUnitOfMeasure>(2)) <= 0;
         #endregion
 
         #region ToString
@@ -165,27 +173,27 @@ namespace NGenericDimensions
             { }
             else if (format.Contains("NU", StringComparison.Ordinal))
             {
-                return UnitOfMeasure.ToString(AreaValue, format, formatProvider);
+                return AreaUnitOfMeasure.ToString(AreaValue, format, formatProvider);
             }
             else if (format.Contains("SU", StringComparison.Ordinal))
             {
-                if (UnitOfMeasure is Length1DUnitOfMeasure length1DUom)
+                if (AreaUnitOfMeasure is Length1DUnitOfMeasure length1DUom)
                 {
-                    return UnitOfMeasure.ToString(AreaValue, format.Replace("SU", "NU", StringComparison.Ordinal), formatProvider) + @" " + length1DUom.AreaUnitSymbol;
+                    return AreaUnitOfMeasure.ToString(AreaValue, format.Replace("SU", "NU", StringComparison.Ordinal), formatProvider) + @" " + length1DUom.AreaUnitSymbol;
                 }
                 else
                 {
-                    return UnitOfMeasure.ToString(AreaValue, format, formatProvider);
+                    return AreaUnitOfMeasure.ToString(AreaValue, format, formatProvider);
                 }
             }
-            return AreaValue.ToString((format ?? "").Replace("LU", "", StringComparison.Ordinal), formatProvider) + @" Square " + UnitOfMeasure.ToString(format, formatProvider);
+            return AreaValue.ToString((format ?? "").Replace("LU", "", StringComparison.Ordinal), formatProvider) + @" Square " + AreaUnitOfMeasure.ToString(format, formatProvider);
         }
         #endregion
 
         #region Equals
-        public override bool Equals(object? obj) => obj != null && obj is Area<TUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(AreaValue, o.AreaValue);
+        public override bool Equals(object? obj) => obj != null && obj is Area<TAreaUnitOfMeasure, TDataType> o && EqualityComparer<TDataType>.Default.Equals(AreaValue, o.AreaValue);
 
-        bool IEquatable<Area<TUnitOfMeasure, TDataType>>.Equals(Area<TUnitOfMeasure, TDataType> other) => EqualityComparer<TDataType>.Default.Equals(AreaValue, other.AreaValue);
+        bool IEquatable<Area<TAreaUnitOfMeasure, TDataType>>.Equals(Area<TAreaUnitOfMeasure, TDataType> other) => EqualityComparer<TDataType>.Default.Equals(AreaValue, other.AreaValue);
         #endregion
 
         #region GetHashCode
@@ -220,15 +228,13 @@ namespace NGenericDimensions
 
 namespace NGenericDimensions.Extensions
 {
-
     public static class AreaExtensionMethods
     {
-
+        #region Nullable AreaValue
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public static TDataType? AreaValue<TUnitOfMeasure, TDataType>(this Area<TUnitOfMeasure, TDataType>? area)
-            where TUnitOfMeasure : Lengths.LengthUnitOfMeasure, IExponent1Or2, IDefinedUnitOfMeasure, new()
-            where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType> => area.HasValue ? area.Value.AreaValue : (TDataType?)null;
-
+        public static TDataType? AreaValue<TAreaUnitOfMeasure, TDataType>(this Area<TAreaUnitOfMeasure, TDataType>? area)
+            where TAreaUnitOfMeasure : LengthUnitOfMeasure, IExponent1Or2, IDefinedUnitOfMeasure
+            where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType> => area?.AreaValue;
+        #endregion
     }
-
 }

@@ -16,21 +16,22 @@ namespace NGenericDimensions.Extensions
     {
         [EditorBrowsable(EditorBrowsableState.Always)]
         public static T NanometresValue<T>(this Length<Lengths.MetricSI.Nanometres, T> length) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => length.LengthValue;
-
+        
         [EditorBrowsable(EditorBrowsableState.Always)]
         public static T? NanometresValue<T>(this Length<Lengths.MetricSI.Nanometres, T>? length) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => length?.LengthValue;
-
+        
         [EditorBrowsable(EditorBrowsableState.Always)]
         public static T SquareNanometresValue<T>(this Area<Lengths.MetricSI.Nanometres, T> area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => area.AreaValue;
-
+        
         [EditorBrowsable(EditorBrowsableState.Always)]
         public static T? SquareNanometresValue<T>(this Area<Lengths.MetricSI.Nanometres, T>? area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => area?.AreaValue;
-
+        
         [EditorBrowsable(EditorBrowsableState.Always)]
         public static T CubeNanometresValue<T>(this Volume<Lengths.MetricSI.Nanometres, T> volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => volume.VolumeValue;
-
+        
         [EditorBrowsable(EditorBrowsableState.Always)]
         public static T? CubeNanometresValue<T>(this Volume<Lengths.MetricSI.Nanometres, T>? volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => volume?.VolumeValue;
+        
     }
 }
 
@@ -41,10 +42,10 @@ namespace NGenericDimensions.Extensions.Numbers
     {
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static Length<Lengths.MetricSI.Nanometres, T> nanometres<T>(this T length) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => length;
-
+        
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static Area<Lengths.MetricSI.Nanometres, T> nanometres<T>(this DimensionSquareExtension<T> area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => area.SquaredValue;
-
+        
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static Volume<Lengths.MetricSI.Nanometres, T> nanometres<T>(this DimensionCubeExtension<T> volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => volume.CubedValue;
     }

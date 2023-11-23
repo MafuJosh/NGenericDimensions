@@ -27,6 +27,13 @@ namespace NGenericDimensions.MetricPrefix
         }
     }
 
+    public class NoPrefix : MetricPrefixBase
+    {
+        public NoPrefix() => Multiplier = 1m;
+        public override string UnitSymbol => "";
+        public override string ToString() => "";
+    }
+
     public class Deca : MetricPrefixBase
     {
         public Deca() => Multiplier = 10m;
