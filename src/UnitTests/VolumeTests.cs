@@ -25,14 +25,14 @@ namespace NGenericDimensionsUnitTests
                      && o.Name != "Length1DUnitOfMeasure"
                      && o.Name != "MetricNonSIVolumeUnitOfMeasure" 
                      && o.Name != "UscsLengthUnitOfMeasure" 
-                     && o.Name != "SILengthUnitOfMeasure")
+                     && o.Name != "MetricSILengthUnitOfMeasure")
             .OrderBy(o => o.FullName).ToArray();
 
         private static readonly Type[] actualUomsTypesOfUscsLengthUnitOfMeasure
             = GetUnitOfMeasuresTypes<UscsLengthUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
 
         private static readonly Type[] actualUomsTypesOfSILengthUnitOfMeasure
-            = GetUnitOfMeasuresTypes<SILengthUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
+            = GetUnitOfMeasuresTypes<MetricSILengthUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
 
         private static readonly Type[] actualUomsTypesOfMetricNonSIVolumeUnitOfMeasure
             = GetUnitOfMeasuresTypes<NGenericDimensions.Volumes.MetricNonSI.MetricNonSIVolumeUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
@@ -41,6 +41,7 @@ namespace NGenericDimensionsUnitTests
         public void VolumeUOMsBaseClassesAndInterfaces()
         {
             var expectedUomsOfMetricNonSIVolumeUnitOfMeasure = new[] {
+                typeof(Litres<NoPrefix>),
                 typeof(Litres<Deca>),
                 typeof(Litres<Hecto>),
                 typeof(Litres<Kilo>),
@@ -76,6 +77,7 @@ namespace NGenericDimensionsUnitTests
                 typeof(Micrometres),
                 typeof(Millimetres),
                 typeof(Nanometres),
+                typeof(Metres<NoPrefix>),
                 typeof(Metres<Deca>),
                 typeof(Metres<Hecto>),
                 typeof(Metres<Kilo>),
@@ -134,7 +136,7 @@ namespace NGenericDimensionsUnitTests
             var volumeC = new Volume<Kilometres, Int32>(volumeB);
             Assert.Equal(volumeB.VolumeValue, volumeC.VolumeValue);
             Assert.Equal(3, volumeC.VolumeValue);
-            Assert.Same(volumeB.UnitOfMeasure, volumeC.UnitOfMeasure);
+            Assert.Same(volumeB.VolumeUnitOfMeasure, volumeC.VolumeUnitOfMeasure);
 
             // make sure value of different unit converts propertly via constructor.
             Assert.Equal(2000000000, (new Volume<Metres, Int32>(new Volume<Kilometres, Int32>(2))).VolumeValue);
@@ -150,8 +152,8 @@ namespace NGenericDimensionsUnitTests
         public void TestUnitOfMeasureProperty()
         {
             // make sure the UnitOfMeasure is actually the correct type
-            Assert.Same(typeof(Kilometres), (new Volume<Kilometres, Int32>(33)).UnitOfMeasure.GetType());
-            Assert.Same(typeof(Kilometres), ((IVolume)(new Volume<Kilometres, Int32>(33))).UnitOfMeasure.GetType());
+            Assert.Same(typeof(Kilometres), (new Volume<Kilometres, Int32>(33)).VolumeUnitOfMeasure.GetType());
+            Assert.Same(typeof(Kilometres), ((IVolume)(new Volume<Kilometres, Int32>(33))).VolumeUnitOfMeasure.GetType());
         }
 
         [Fact]
@@ -160,7 +162,7 @@ namespace NGenericDimensionsUnitTests
             var volumeA = new Volume<Kilometres, Int32>(25);
             var volumeB = volumeA.ConvertTo<Millimetres, Decimal>();
             Assert.Equal(Convert.ToDecimal(25000000000000000000.0), volumeB.VolumeValue);
-            Assert.Same(typeof(Millimetres), volumeB.UnitOfMeasure.GetType());
+            Assert.Same(typeof(Millimetres), volumeB.VolumeUnitOfMeasure.GetType());
             var volumeC = new Volume<Kilometres, Int32>(25);
             var volumeD = volumeC.ConvertTo<decimal>();
             Assert.Equal(25, volumeD.VolumeValue);
@@ -202,7 +204,7 @@ namespace NGenericDimensionsUnitTests
                 var volumeC = new Volume<Feet, Int32>(2);
                 var volumeD = new Volume<Feet, Byte>(8);
                 var volumeCD = volumeC + volumeD;
-                Assert.Same(volumeC.UnitOfMeasure.GetType(), volumeCD.UnitOfMeasure.GetType());
+                Assert.Same(volumeC.VolumeUnitOfMeasure.GetType(), volumeCD.VolumeUnitOfMeasure.GetType());
                 Assert.Same(typeof(double), volumeCD.VolumeValue.GetType());
                 Assert.Equal(10, volumeCD.VolumeValue);
             }
@@ -210,7 +212,7 @@ namespace NGenericDimensionsUnitTests
                 var volumeC = new Volume<Inches, Int32>(5);
                 var volumeD = new Volume<Feet, Byte>(2);
                 var volumeCD = volumeC + volumeD;
-                Assert.Same(volumeC.UnitOfMeasure.GetType(), volumeCD.UnitOfMeasure.GetType());
+                Assert.Same(volumeC.VolumeUnitOfMeasure.GetType(), volumeCD.VolumeUnitOfMeasure.GetType());
                 Assert.Same(typeof(double), volumeCD.VolumeValue.GetType());
                 Assert.Equal(3461, volumeCD.VolumeValue);
             }
@@ -244,7 +246,7 @@ namespace NGenericDimensionsUnitTests
                 var volumeC = new Volume<Feet, Int32>(2);
                 var volumeD = new Volume<Feet, Byte>(8);
                 var volumeCD = volumeC - volumeD;
-                Assert.Same(volumeC.UnitOfMeasure.GetType(), volumeCD.UnitOfMeasure.GetType());
+                Assert.Same(volumeC.VolumeUnitOfMeasure.GetType(), volumeCD.VolumeUnitOfMeasure.GetType());
                 Assert.Same(typeof(double), volumeCD.VolumeValue.GetType());
                 Assert.Equal(-6, volumeCD.VolumeValue);
             }
@@ -252,7 +254,7 @@ namespace NGenericDimensionsUnitTests
                 var volumeC = new Volume<Inches, Int32>(5);
                 var volumeD = new Volume<Feet, Byte>(2);
                 var volumeCD = volumeC - volumeD;
-                Assert.Same(volumeC.UnitOfMeasure.GetType(), volumeCD.UnitOfMeasure.GetType());
+                Assert.Same(volumeC.VolumeUnitOfMeasure.GetType(), volumeCD.VolumeUnitOfMeasure.GetType());
                 Assert.Same(typeof(double), volumeCD.VolumeValue.GetType());
                 Assert.Equal(-3451, volumeCD.VolumeValue);
             }

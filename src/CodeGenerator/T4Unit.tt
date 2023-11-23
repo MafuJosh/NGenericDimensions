@@ -1,0 +1,157 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#  if (unit.InheritsSIPrefix || unit.IsMetricBaseUnit) { #>
+using NGenericDimensions.MetricPrefix;
+<#  } #>
+using System;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+
+namespace NGenericDimensions.<#=unit.Namespace#>
+{
+<#/*
+
+
+
+
+
+
+The main class for this unit, without a generic metric prefix (but possibly a hardcoded metric prefix).
+Examples:
+    public class Metres : MetricSILengthUnitOfMeasure, IDefinedUnitOfMeasure
+    public class Inches : UscsLengthUnitOfMeasure, IDefinedUnitOfMeasure
+    public class Kilometres : Metres<Kilo>
+*/#>
+<#  if (unit.InheritsSIPrefix) { #>
+    public class <#=unit.NamePluralUppercase#> : <#=unit.MetricBaseClassName#><<#=unit.SIPrefix#>>
+<#  } else { #>
+    public class <#=unit.NamePluralUppercase#> : <#=unit.UnitGroupName#><#=unit.Dimension.NameUppercase#>UnitOfMeasure, IDefinedUnitOfMeasure
+<#  } #>
+    {
+<#/* protected override double GetMultiplier(bool stayWithinFamily) */#>
+<#  if (unit.InheritsSIPrefix) { #>
+<#  } else if (unit.FamilyBaseUnit.NameUppercase == unit.SIBaseUnit.NameUppercase) { #>
+        protected override double GetMultiplier(bool stayWithinFamily) => <#=unit.FamilyMultiplier#>;
+        
+<#  } else if (unit.FamilyMultiplier != null && unit.FamilyMultiplier != "1") { #>
+        protected override double GetMultiplier(bool stayWithinFamily) => base.GetMultiplier(stayWithinFamily) * <#=unit.FamilyMultiplier#>;
+        
+<#  } else if (unit.FamilyDivisor != null && unit.FamilyDivisor != "1") { #>
+        protected override double GetMultiplier(bool stayWithinFamily) => base.GetMultiplier(stayWithinFamily) / <#=unit.FamilyDivisor#>;
+        
+<#  } #>
+<#/* public override string UnitSymbol */#>
+<#  if (unit.UnitSymbol != null) { #>
+        public override string UnitSymbol => "<#=unit.UnitSymbol#>";
+<#  } #>
+<#/* public override string for things like mph */#>
+<#  foreach (var derivedUnit in units.Where(o => o.IsDerivedUnit && !string.IsNullOrEmpty(o.UnitSymbol) && o.NameUppercase.StartsWith(unit.NameUppercase + "Per"))) { #>
+<#      var denominatorUnit = units.Single(o => o.NameUppercase == derivedUnit.NameUppercase.Split(new[]{"Per"}, StringSplitOptions.None)[1]); #>
+
+        protected override string? DimensionUnitSymbol(IDimension dimension)
+        {
+            if (dimension == null) return null;
+            if (((I<#=derivedUnit.Dimension.NameUppercase#>)dimension).<#=denominatorUnit.Dimension.NameUppercase#>UnitOfMeasure == UnitOfMeasureGlobals<<#=denominatorUnit.FullClassName#>>.GlobalInstance)
+            {
+                return "<#=derivedUnit.UnitSymbol#>";
+            }
+            return base.DimensionUnitSymbol(dimension);
+        }
+<#  } #>
+    }
+<#/*
+
+
+
+
+
+
+Another class for this unit with the same name but with a generic metric prefix.
+Examples:
+    public class Metres<T> : MetricSILengthUnitOfMeasure, IDefinedUnitOfMeasure where T : MetricPrefixBase
+*/#>
+<#  if (unit.IsMetricBaseUnit) {#>
+
+    public class <#=unit.NamePluralUppercase#><T> : <#=unit.UnitGroupName#><#=unit.Dimension.NameUppercase#>UnitOfMeasure, IDefinedUnitOfMeasure where T : MetricPrefixBase
+    {
+<#/* protected override double GetMultiplier(bool stayWithinFamily) */#>
+<#  if (unit.FamilyMultiplier != null && unit.FamilyMultiplier != "1") { #>
+        protected override double GetMultiplier(bool stayWithinFamily) => (double)(<#=unit.FamilyMultiplier#> * UnitOfMeasureGlobals<T>.GlobalInstance.Multiplier);
+<#  } else if (unit.FamilyMultiplier != null && unit.FamilyMultiplier == "1" && unit.SIMultiplier != "1") { #>
+        protected override double GetMultiplier(bool stayWithinFamily) => (double)UnitOfMeasureGlobals<T>.GlobalInstance.Multiplier * base.GetMultiplier(stayWithinFamily);
+<#  } else { #>
+        protected override double GetMultiplier(bool stayWithinFamily) => (double)UnitOfMeasureGlobals<T>.GlobalInstance.Multiplier;
+<#  } #>
+
+        public override string UnitSymbol => MetricPrefix.UnitSymbol + "<#=unit.UnitSymbol#>";
+
+        /// <summary>
+        /// Returns the simple name of the derived class.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString() => MetricPrefix.ToString() + "<#=unit.NamePluralLowercase#>";
+
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public MetricPrefixBase MetricPrefix => UnitOfMeasureGlobals<T>.GlobalInstance;
+    }
+<#  } #>
+}
+
+namespace NGenericDimensions.Extensions
+{
+    public static class <#=unit.NamePluralUppercase#>ExtensionMethods
+    {
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static T <#=unit.NamePluralUppercase#>Value<T>(this <#=unit.Dimension.NameUppercase#><<#=unit.Namespace#>.<#=unit.NamePluralUppercase#>, T> <#=unit.Dimension.NameLowercase#>) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => <#=unit.Dimension.NameLowercase#>.<#=unit.Dimension.NameUppercase#>Value;
+        
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static T? <#=unit.NamePluralUppercase#>Value<T>(this <#=unit.Dimension.NameUppercase#><<#=unit.Namespace#>.<#=unit.NamePluralUppercase#>, T>? <#=unit.Dimension.NameLowercase#>) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => <#=unit.Dimension.NameLowercase#>?.<#=unit.Dimension.NameUppercase#>Value;
+        
+<#  if (unit.Dimension.IsUsedExponentiallyInDimensions) { #>
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static T Square<#=unit.NamePluralUppercase#>Value<T>(this Area<<#=unit.Namespace#>.<#=unit.NamePluralUppercase#>, T> area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => area.AreaValue;
+        
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static T? Square<#=unit.NamePluralUppercase#>Value<T>(this Area<<#=unit.Namespace#>.<#=unit.NamePluralUppercase#>, T>? area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => area?.AreaValue;
+        
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static T Cube<#=unit.NamePluralUppercase#>Value<T>(this Volume<<#=unit.Namespace#>.<#=unit.NamePluralUppercase#>, T> volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => volume.VolumeValue;
+        
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static T? Cube<#=unit.NamePluralUppercase#>Value<T>(this Volume<<#=unit.Namespace#>.<#=unit.NamePluralUppercase#>, T>? volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => volume?.VolumeValue;
+        
+<#  } #>
+<#  foreach (var dimensionPair in unit.Dimension.DerivedDimensionsFromThisBase.Where(o => o.IsBaseInDenominator && o.DerivedDimension.BaseDimensionsThisDerivedFromInDenominator.Length == 1 && o.DerivedDimension.BaseDimensionsThisDerivedFromInNumerator.Length == 1)) {  #>
+<#      var numeratorBaseDimension   = dimensionPair.DerivedDimension.BaseDimensionsThisDerivedFromInNumerator[0].BaseDimension; #>
+<#      var denominatorBaseDimension = dimensionPair.BaseDimension; #>
+<#      var derivedDimension         = dimensionPair.DerivedDimension; #>
+        [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "In this case we want it to be lowercase, to appear different than other functions.")]
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static <#=derivedDimension.NameUppercase#><TUnitOfMeasure, <#=unit.FullClassName#>, TDataType> <#=unit.NameLowercase#><TUnitOfMeasure, TDataType>(this DimensionPerExtension<<#=numeratorBaseDimension.NameUppercase#><TUnitOfMeasure, TDataType>> <#=numeratorBaseDimension.NameLowercase#>)
+            where TUnitOfMeasure : <#=numeratorBaseDimension.NamePluralUppercase#>.<#=dimensionPair.DerivedDimension.BaseDimensionsThisDerivedFromInNumerator[0].UnitOfMeasureBase.InterfaceName#>, IDefinedUnitOfMeasure
+            where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType> => <#=numeratorBaseDimension.NameLowercase#>.PerValue.<#=numeratorBaseDimension.NameUppercase#>Value;
+        
+<#  } #>
+    }
+}
+
+namespace NGenericDimensions.Extensions.Numbers
+{
+    [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "In this case we want it to be lowercase, to appear different than other functions.")]
+    public static class <#=unit.NamePluralUppercase#>NumberExtensionMethods
+    {
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static <#=unit.Dimension.NameUppercase#><<#=unit.FullClassName#>, T> <#=unit.NamePluralLowercase#><T>(this T <#=unit.Dimension.NameLowercase#>) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => <#=unit.Dimension.NameLowercase#>;
+        
+<#  if (unit.Dimension.IsUsedExponentiallyInDimensions) { #>
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static Area<<#=unit.FullClassName#>, T> <#=unit.NamePluralLowercase#><T>(this DimensionSquareExtension<T> area) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => area.SquaredValue;
+        
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static Volume<<#=unit.FullClassName#>, T> <#=unit.NamePluralLowercase#><T>(this DimensionCubeExtension<T> volume) where T : struct, IComparable, IFormattable, IComparable<T>, IEquatable<T> => volume.CubedValue;
+<#  } #>
+    }
+}

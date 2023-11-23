@@ -24,7 +24,7 @@ namespace NGenericDimensionsUnitTests
             .Where(o => o.Name != "Length2DUnitOfMeasure" 
                      && o.Name != "Length1DUnitOfMeasure" 
                      && o.Name != "UscsLengthUnitOfMeasure" 
-                     && o.Name != "SILengthUnitOfMeasure" 
+                     && o.Name != "MetricSILengthUnitOfMeasure"
                      && o.Name != "MetricNonSIAreaUnitOfMeasure")
             .OrderBy(o => o.FullName).ToArray();
 
@@ -32,7 +32,7 @@ namespace NGenericDimensionsUnitTests
             = GetUnitOfMeasuresTypes<UscsLengthUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
 
         private static readonly Type[] actualUomsTypesOfSILengthUnitOfMeasure
-            = GetUnitOfMeasuresTypes<SILengthUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
+            = GetUnitOfMeasuresTypes<MetricSILengthUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
 
         private static readonly Type[] actualUomsTypesOfMetricNonSIAreaUnitOfMeasure
             = GetUnitOfMeasuresTypes<NGenericDimensions.Areas.MetricNonSI.MetricNonSIAreaUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
@@ -56,6 +56,7 @@ namespace NGenericDimensionsUnitTests
                 typeof(Micrometres),
                 typeof(Millimetres),
                 typeof(Nanometres),
+                typeof(Metres<NoPrefix>),
                 typeof(Metres<Deca>),
                 typeof(Metres<Hecto>),
                 typeof(Metres<Kilo>),
@@ -114,7 +115,7 @@ namespace NGenericDimensionsUnitTests
             var areaC = new Area<Kilometres, Int32>(areaB);
             Assert.Equal(areaB.AreaValue, areaC.AreaValue);
             Assert.Equal(3, areaC.AreaValue);
-            Assert.Same(areaB.UnitOfMeasure, areaC.UnitOfMeasure);
+            Assert.Same(areaB.AreaUnitOfMeasure, areaC.AreaUnitOfMeasure);
 
             // make sure value of different unit converts propertly via constructor.
             Assert.Equal(25000000, (new Area<Metres, Int32>(new Area<Kilometres, Int32>(25))).AreaValue);
@@ -130,8 +131,8 @@ namespace NGenericDimensionsUnitTests
         public void TestUnitOfMeasureProperty()
         {
             // make sure the UnitOfMeasure is actually the correct type
-            Assert.Same(typeof(Kilometres), (new Area<Kilometres, Int32>(33)).UnitOfMeasure.GetType());
-            Assert.Same(typeof(Kilometres), ((IArea)(new Area<Kilometres, Int32>(33))).UnitOfMeasure.GetType());
+            Assert.Same(typeof(Kilometres), (new Area<Kilometres, Int32>(33)).AreaUnitOfMeasure.GetType());
+            Assert.Same(typeof(Kilometres), ((IArea)(new Area<Kilometres, Int32>(33))).AreaUnitOfMeasure.GetType());
         }
 
         [Fact]
@@ -140,7 +141,7 @@ namespace NGenericDimensionsUnitTests
             var areaA = new Area<Kilometres, Int32>(25);
             var areaB = areaA.ConvertTo<Millimetres, Decimal>();
             Assert.Equal(25000000000000, areaB.AreaValue);
-            Assert.Same(typeof(Millimetres), areaB.UnitOfMeasure.GetType());
+            Assert.Same(typeof(Millimetres), areaB.AreaUnitOfMeasure.GetType());
             var areaC = new Area<Kilometres, Int32>(25);
             var areaD = areaC.ConvertTo<decimal>();
             Assert.Equal(25, areaD.AreaValue);
@@ -182,7 +183,7 @@ namespace NGenericDimensionsUnitTests
                 var areaC = new Area<Feet, Int32>(2);
                 var areaD = new Area<Feet, Byte>(8);
                 var areaCD = areaC + areaD;
-                Assert.Same(areaC.UnitOfMeasure.GetType(), areaCD.UnitOfMeasure.GetType());
+                Assert.Same(areaC.AreaUnitOfMeasure.GetType(), areaCD.AreaUnitOfMeasure.GetType());
                 Assert.Same(typeof(double), areaCD.AreaValue.GetType());
                 Assert.Equal(10, areaCD.AreaValue);
             }
@@ -190,7 +191,7 @@ namespace NGenericDimensionsUnitTests
                 var areaC = new Area<Inches, Int32>(5);
                 var areaD = new Area<Feet, Byte>(2);
                 var areaCD = areaC + areaD;
-                Assert.Same(areaC.UnitOfMeasure.GetType(), areaCD.UnitOfMeasure.GetType());
+                Assert.Same(areaC.AreaUnitOfMeasure.GetType(), areaCD.AreaUnitOfMeasure.GetType());
                 Assert.Same(typeof(double), areaCD.AreaValue.GetType());
                 Assert.Equal(293, areaCD.AreaValue);
             }
@@ -224,7 +225,7 @@ namespace NGenericDimensionsUnitTests
                 var areaC = new Area<Feet, Int32>(2);
                 var areaD = new Area<Feet, Byte>(8);
                 var areaCD = areaC - areaD;
-                Assert.Same(areaC.UnitOfMeasure.GetType(), areaCD.UnitOfMeasure.GetType());
+                Assert.Same(areaC.AreaUnitOfMeasure.GetType(), areaCD.AreaUnitOfMeasure.GetType());
                 Assert.Same(typeof(double), areaCD.AreaValue.GetType());
                 Assert.Equal(-6, areaCD.AreaValue);
             }
@@ -232,7 +233,7 @@ namespace NGenericDimensionsUnitTests
                 var areaC = new Area<Inches, Int32>(5);
                 var areaD = new Area<Feet, Byte>(2);
                 var areaCD = areaC - areaD;
-                Assert.Same(areaC.UnitOfMeasure.GetType(), areaCD.UnitOfMeasure.GetType());
+                Assert.Same(areaC.AreaUnitOfMeasure.GetType(), areaCD.AreaUnitOfMeasure.GetType());
                 Assert.Same(typeof(double), areaCD.AreaValue.GetType());
                 Assert.Equal(-283, areaCD.AreaValue);
             }

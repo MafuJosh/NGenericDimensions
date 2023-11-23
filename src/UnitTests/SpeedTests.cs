@@ -19,14 +19,14 @@ namespace NGenericDimensionsUnitTests
             = GetUnitOfMeasuresTypes<NGenericDimensions.Lengths.Length1DUnitOfMeasure>(false, true)
             .Where(o => o.Name != "Length1DUnitOfMeasure"
                      && o.Name != "UscsLengthUnitOfMeasure"
-                     && o.Name != "SILengthUnitOfMeasure")
+                     && o.Name != "MetricSILengthUnitOfMeasure")
             .OrderBy(o => o.FullName).ToArray();
 
         private static readonly Type[] actualUomsTypesOfUscsLengthUnitOfMeasure
             = GetUnitOfMeasuresTypes<UscsLengthUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
 
         private static readonly Type[] actualUomsTypesOfSILengthUnitOfMeasure
-            = GetUnitOfMeasuresTypes<SILengthUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
+            = GetUnitOfMeasuresTypes<MetricSILengthUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
 
         private static readonly Type[] actualUomsTypesOfDurationUnitOfMeasure
             = GetUnitOfMeasuresTypes<DurationUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
@@ -242,7 +242,7 @@ namespace NGenericDimensionsUnitTests
                 var speedA = new Speed<Inches, Days, Int32>(7);
                 var durationB = new Duration<Days, Int32>(2);
                 var lengthC = speedA * durationB;
-                Assert.Same(speedA.LengthUnitOfMeasure.GetType(), lengthC.UnitOfMeasure.GetType());
+                Assert.Same(speedA.LengthUnitOfMeasure.GetType(), lengthC.LengthUnitOfMeasure.GetType());
                 Assert.Same(speedA.SpeedValue.GetType(), lengthC.LengthValue.GetType());
                 Assert.Equal(14, lengthC.LengthValue);
             }
@@ -250,7 +250,7 @@ namespace NGenericDimensionsUnitTests
                 var speedA = new Speed<Inches, Days, Int32>(7);
                 var durationB = new Duration<Days, Int32>(2);
                 var lengthC = durationB * speedA;
-                Assert.Same(speedA.LengthUnitOfMeasure.GetType(), lengthC.UnitOfMeasure.GetType());
+                Assert.Same(speedA.LengthUnitOfMeasure.GetType(), lengthC.LengthUnitOfMeasure.GetType());
                 Assert.Same(speedA.SpeedValue.GetType(), lengthC.LengthValue.GetType());
                 Assert.Equal(14, lengthC.LengthValue);
             }

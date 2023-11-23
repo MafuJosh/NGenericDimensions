@@ -1,0 +1,653 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#
+var derivedFromArguments = string.Join(", ",dimension.BaseDimensionsThisDerivedFrom.Select(o => $@"{o.MostSpecificCommonDimensionUnitOfMeasureBase.InterfaceName} {o.ModeDimension.NameLowercase}UnitOfMeasure"));
+var derivedFromGenerics = string.Join(", ",dimension.BaseDimensionsThisDerivedFrom.Select(o => $@"T{o.ModeDimension.NameUppercase}UnitOfMeasure"));
+var derivedFromNewGenerics = string.Join(", ",dimension.BaseDimensionsThisDerivedFrom.Select(o => $@"TNew{o.ModeDimension.NameUppercase}UnitOfMeasure"));
+var derivedFromGenericDoubleArguments = string.Join(", ", dimension.BaseDimensionsThisDerivedFrom.Select(o => $@"{o.BaseDimension.NameUppercase}Double<T{o.BaseDimension.NameUppercase}UnitOfMeasure> {o.BaseDimension.NameLowercase}"));
+var commaPrefixed2D3DInterface = (dimension.IsCubedDimension ? ", IExponent1Or3" : "") + (dimension.IsSquaredDimension ? ", IExponent1Or2" : "");
+#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  "using" statements                                                                                      */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+<#  foreach (var derivedFrom in dimension.BaseDimensionsThisDerivedFrom) {#>
+using NGenericDimensions.<#=derivedFrom.UnitOfMeasureBase.Dimension.NamePluralUppercase#>;
+<#  }#>
+using NGenericDimensions.Math;
+using NGenericDimensions.MetricPrefix;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+
+namespace NGenericDimensions
+{
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  interface                                                                                               */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+    public interface I<#=dimension.NameUppercase#> : IDimension<#=dimension.IsPerSource ? ", IDimensionSupportsPerExtension" : ""#>
+    {
+<#  foreach (var derivedFrom in dimension.BaseDimensionsThisDerivedFrom) {#>
+        <#=derivedFrom.MostSpecificCommonDimensionUnitOfMeasureBase.InterfaceName#> <#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure { get; }
+<#  }#>
+    }
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  _____Double struct                                                                                      */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+    public readonly struct <#=dimension.NameUppercase#>Double : IEquatable<<#=dimension.NameUppercase#>Double>
+    {
+        internal readonly double ValueAsDouble;
+<#  foreach (var derivedFrom in dimension.BaseDimensionsThisDerivedFrom) { #>
+        internal readonly <#=derivedFrom.MostSpecificCommonDimensionUnitOfMeasureBase.InterfaceName#> <#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure;
+<#  }#>
+
+        internal <#=dimension.NameUppercase#>Double(double valueAsDouble, <#=derivedFromArguments#>)
+        {
+            ValueAsDouble = valueAsDouble;
+<#  foreach (var derivedFrom in dimension.BaseDimensionsThisDerivedFrom) { #>
+            <#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure = <#=derivedFrom.ModeDimension.NameLowercase#>UnitOfMeasure;
+<#  }#>
+        }
+
+        public override bool Equals(object? obj) => obj != null && obj is <#=dimension.NameUppercase#>Double o && o.ValueAsDouble.Equals(ValueAsDouble)<#foreach (var derivedFrom in dimension.BaseDimensionsThisDerivedFrom) {#> && o.<#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure.Equals(<#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure)<#}#>;
+        public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
+        bool IEquatable<<#=dimension.NameUppercase#>Double>.Equals(<#=dimension.NameUppercase#>Double other) => EqualityComparer<double>.Default.Equals(ValueAsDouble, other.ValueAsDouble)<#foreach (var derivedFrom in dimension.BaseDimensionsThisDerivedFrom) {#> && EqualityComparer<<#=derivedFrom.MostSpecificCommonDimensionUnitOfMeasureBase.InterfaceName#>>.Default.Equals(<#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure, other.<#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure)<#}#>;
+        public static bool operator ==(<#=dimension.NameUppercase#>Double left, <#=dimension.NameUppercase#>Double right) => left.Equals(right);
+        public static bool operator !=(<#=dimension.NameUppercase#>Double left, <#=dimension.NameUppercase#>Double right) => !left.Equals(right);
+    }
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  _____Double<___> struct                                                                                 */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+    public readonly struct <#=dimension.NameUppercase#>Double<<#=derivedFromGenerics#>> : IEquatable<<#=dimension.NameUppercase#>Double<<#=derivedFromGenerics#>>>
+<#  foreach (var derivedFrom in dimension.BaseDimensionsThisDerivedFrom) { #>
+        where T<#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure : <#=derivedFrom.MostSpecificCommonDimensionUnitOfMeasureBase.InterfaceName#><#=commaPrefixed2D3DInterface#>, IDefinedUnitOfMeasure
+<#  }#>
+    {
+        internal readonly double ValueAsDouble;
+        internal <#=dimension.NameUppercase#>Double(double valueAsDouble) => ValueAsDouble = valueAsDouble;
+        public override bool Equals(object? obj) => obj != null && obj is <#=dimension.NameUppercase#>Double<<#=derivedFromGenerics#>> o && o.ValueAsDouble.Equals(ValueAsDouble);
+        public override int GetHashCode() => HashCode.Combine(ValueAsDouble);
+        bool IEquatable<<#=dimension.NameUppercase#>Double<<#=derivedFromGenerics#>>>.Equals(<#=dimension.NameUppercase#>Double<<#=derivedFromGenerics#>> other) => EqualityComparer<double>.Default.Equals(ValueAsDouble, other.ValueAsDouble);
+        public static bool operator ==(<#=dimension.NameUppercase#>Double<<#=derivedFromGenerics#>> left, <#=dimension.NameUppercase#>Double<<#=derivedFromGenerics#>> right) => left.Equals(right);
+        public static bool operator !=(<#=dimension.NameUppercase#>Double<<#=derivedFromGenerics#>> left, <#=dimension.NameUppercase#>Double<<#=derivedFromGenerics#>> right) => !left.Equals(right);
+<#  foreach (var derivedFrom in dimension.BaseDimensionsThisDerivedFrom) { #>
+
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public T<#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure <#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure => UnitOfMeasureGlobals<T<#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure>.GlobalInstance;
+<#  }#>
+    }
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  main dimension struct                                                                                   */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+    [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "This is not needed yet.")]
+    public readonly struct <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> : I<#=dimension.NameUppercase#>, IEquatable<<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType>>
+<#  foreach (var derivedFrom in dimension.BaseDimensionsThisDerivedFrom) { #>
+        where T<#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure : <#=derivedFrom.MostSpecificCommonDimensionUnitOfMeasureBase.InterfaceName#><#=commaPrefixed2D3DInterface#>, IDefinedUnitOfMeasure
+<#  }#>
+        where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType>
+    {
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*  Constructors                                                                                            */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+        #region Constructors
+        public <#=dimension.NameUppercase#>(TDataType <#=dimension.NameLowercase#>) => <#=dimension.NameUppercase#>Value = <#=dimension.NameLowercase#>;
+
+<# if (dimension.NameUppercase == "Duration") { #>
+        public Duration(TimeSpan duration)
+        {
+            if (ReferenceEquals(typeof(TDurationUnitOfMeasure), typeof(Ticks)))
+            {
+                DurationValue = (TDataType)(Convert.ChangeType(duration.Ticks, typeof(TDataType), null));
+            }
+            else
+            {
+                DurationValue = GenericOperatorMath<TDataType>.ConvertFromDouble(duration.Ticks * UnitOfMeasureGlobals<Ticks>.GlobalInstance.GetCompleteMultiplier<TDurationUnitOfMeasure>(1));
+            }
+        }
+
+<# } #>
+        public <#=dimension.NameUppercase#>(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>) => <#=dimension.NameUppercase#>Value = <#=dimension.NameLowercase#>.<#=dimension.NameUppercase#>Value;
+        
+        public <#=dimension.NameUppercase#>(<#=dimension.NameUppercase#>Double <#=dimension.NameLowercase#>ToConvertFrom)
+            => <#=dimension.NameUppercase#>Value = GenericOperatorMath<TDataType>.ConvertFromDouble(
+            <#=dimension.NameLowercase#>ToConvertFrom.ValueAsDouble
+<#  foreach (var derivedFrom in dimension.BaseDimensionsThisDerivedFrom) { #>
+            <#=derivedFrom.Mode<0?"/":"*"#> <#=dimension.NameLowercase#>ToConvertFrom.<#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure.GetCompleteMultiplier<T<#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure>(<#=Math.Abs(derivedFrom.Mode)#>)
+<#  }#>
+            );
+        
+<#  if (dimension.BaseDimensionsThisDerivedFrom.Length > 1) { #>
+        public <#=dimension.NameUppercase#>(<#=derivedFromGenericDoubleArguments#>)
+        	=> <#=dimension.NameUppercase#>Value = GenericOperatorMath<TDataType>.ConvertFromDouble(
+        	(<#=dimension.BaseDimensionsThisDerivedFrom[0].BaseDimension.NameLowercase#>.ValueAsDouble * <#=dimension.BaseDimensionsThisDerivedFrom[0].BaseDimension.NameLowercase#>.<#=dimension.BaseDimensionsThisDerivedFrom[0].BaseDimension.NameUppercase#>UnitOfMeasure.GetCompleteMultiplier<T<#=dimension.BaseDimensionsThisDerivedFrom[0].BaseDimension.NameUppercase#>UnitOfMeasure>(<#=Math.Abs(dimension.BaseDimensionsThisDerivedFrom[0].Mode)#>))
+        	<#=dimension.BaseDimensionsThisDerivedFrom[1].Mode<0?"/":"*"#> (<#=dimension.BaseDimensionsThisDerivedFrom[1].BaseDimension.NameLowercase#>.ValueAsDouble * <#=dimension.BaseDimensionsThisDerivedFrom[1].BaseDimension.NameLowercase#>.<#=dimension.BaseDimensionsThisDerivedFrom[1].BaseDimension.NameUppercase#>UnitOfMeasure.GetCompleteMultiplier<T<#=dimension.BaseDimensionsThisDerivedFrom[1].BaseDimension.NameUppercase#>UnitOfMeasure>(<#=Math.Abs(dimension.BaseDimensionsThisDerivedFrom[1].Mode)#>))
+        );
+        
+<#  } #>
+<#  if (dimension.BaseDimensionsThisDerivedFrom.Length == 2 && dimension.BaseDimensionsThisDerivedFrom[1].BaseDimension.NameUppercase == "Duration") { #>
+        public <#=dimension.NameUppercase#>(<#=dimension.BaseDimensionsThisDerivedFrom[0].BaseDimension.NameUppercase#>Double<T<#=dimension.BaseDimensionsThisDerivedFrom[0].BaseDimension.NameUppercase#>UnitOfMeasure> <#=dimension.BaseDimensionsThisDerivedFrom[0].BaseDimension.NameLowercase#>, TimeSpan duration)
+            => <#=dimension.NameUppercase#>Value = GenericOperatorMath<TDataType>.ConvertFromDouble(
+            (<#=dimension.BaseDimensionsThisDerivedFrom[0].BaseDimension.NameLowercase#>.ValueAsDouble * <#=dimension.BaseDimensionsThisDerivedFrom[0].BaseDimension.NameLowercase#>.<#=dimension.BaseDimensionsThisDerivedFrom[0].BaseDimension.NameUppercase#>UnitOfMeasure.GetCompleteMultiplier<T<#=dimension.BaseDimensionsThisDerivedFrom[0].BaseDimension.NameUppercase#>UnitOfMeasure>(<#=Math.Abs(dimension.BaseDimensionsThisDerivedFrom[0].Mode)#>))
+            <#=dimension.BaseDimensionsThisDerivedFrom[1].Mode<0?"/":"*"#> (new Duration<TDurationUnitOfMeasure, double>(duration)).DurationValue
+        );
+        
+<#  } #>
+        #endregion
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*  Value                                                                                                   */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+        #region Value
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public TDataType <#=dimension.NameUppercase#>Value { get; }
+        
+        private double ValueAsDouble => GenericOperatorMath<TDataType>.ConvertToDouble(<#=dimension.NameUppercase#>Value);
+        double IDimension.Value => ValueAsDouble;
+<# if (dimension.NameUppercase == "Duration") { #>
+        
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public TimeSpan TimeSpan => new TimeSpan(Convert.ToInt64(ValueAsDouble * DurationUnitOfMeasure.GetCompleteMultiplier<Ticks>(1)));
+<# } #>
+        #endregion
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*  UnitOfMeasure                                                                                           */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+        #region UnitOfMeasure
+<#  foreach (var derivedFrom in dimension.BaseDimensionsThisDerivedFrom) { #>
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public T<#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure <#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure => UnitOfMeasureGlobals<T<#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure>.GlobalInstance;
+        
+        <#=derivedFrom.MostSpecificCommonDimensionUnitOfMeasureBase.InterfaceName#> I<#=dimension.NameUppercase#>.<#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure => <#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure;
+        
+<#  }#>
+        #endregion
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*  ConvertTo                                                                                               */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+        #region ConvertTo
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public <#=dimension.NameUppercase#><<#=derivedFromNewGenerics#>, TNewDataType> ConvertTo<<#=derivedFromNewGenerics#>, TNewDataType>()
+<#  foreach (var derivedFrom in dimension.BaseDimensionsThisDerivedFrom) { #>
+            where TNew<#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure : <#=derivedFrom.MostSpecificCommonDimensionUnitOfMeasureBase.InterfaceName#><#=commaPrefixed2D3DInterface#>, IDefinedUnitOfMeasure
+<#  }#>
+            where TNewDataType : struct, IComparable, IFormattable, IComparable<TNewDataType>, IEquatable<TNewDataType> => new <#=dimension.NameUppercase#><<#=derivedFromNewGenerics#>, TNewDataType>(this);
+
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TNewDataType> ConvertTo<TNewDataType>() where TNewDataType : struct, IComparable, IFormattable, IComparable<TNewDataType>, IEquatable<TNewDataType> => new <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TNewDataType>(this);
+        #endregion
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*  Casting Operators                                                                                       */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+        #region Casting Operators
+        public static implicit operator <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType>(TDataType <#=dimension.NameLowercase#>) => new <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType>(<#=dimension.NameLowercase#>);
+
+        public static explicit operator TDataType(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>) => <#=dimension.NameLowercase#>.<#=dimension.NameUppercase#>Value;
+
+        public static implicit operator <#=dimension.NameUppercase#>Double(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>) => new <#=dimension.NameUppercase#>Double(<#=dimension.NameLowercase#>.ValueAsDouble<#foreach (var derivedFrom in dimension.BaseDimensionsThisDerivedFrom) {#>, <#=dimension.NameLowercase#>.<#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure<#}#>);
+
+        public static implicit operator <#=dimension.NameUppercase#>Double<<#=derivedFromGenerics#>>(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>) => new <#=dimension.NameUppercase#>Double<<#=derivedFromGenerics#>>(<#=dimension.NameLowercase#>.ValueAsDouble);
+<# if (dimension.NameUppercase == "Duration") { #>
+
+        public static explicit operator TimeSpan(Duration<TDurationUnitOfMeasure, TDataType> duration) => new TimeSpan(Convert.ToInt64(duration.ValueAsDouble * duration.DurationUnitOfMeasure.GetCompleteMultiplier<Ticks>(1)));
+
+        public static explicit operator Duration<TDurationUnitOfMeasure, TDataType>(TimeSpan durationSpan) => new Duration<TDurationUnitOfMeasure, TDataType>(durationSpan);
+<# } #>
+        #endregion
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*  + Operators                                                                                             */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+        #region + Operators
+        public static <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> operator +(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>2) => new <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType>(GenericOperatorMath<TDataType>.Add(<#=dimension.NameLowercase#>1.<#=dimension.NameUppercase#>Value, <#=dimension.NameLowercase#>2.<#=dimension.NameUppercase#>Value));
+
+<# if (dimension.BaseDimensionsThisDerivedFromInDenominator.Any()) { #>
+        public static <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, double> operator +(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#>Double <#=dimension.NameLowercase#>2) => <#=dimension.NameLowercase#>1.ValueAsDouble + new <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, double>(<#=dimension.NameLowercase#>2);
+<# } else { #>
+        public static <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, double> operator +(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#>Double <#=dimension.NameLowercase#>2) => <#=dimension.NameLowercase#>1.ValueAsDouble + (<#=dimension.NameLowercase#>2.ValueAsDouble * <#=dimension.NameLowercase#>2.<#=dimension.NameUppercase#>UnitOfMeasure.GetCompleteMultiplier<<#=derivedFromGenerics#>>(<#=Math.Abs(dimension.BaseDimensionsThisDerivedFrom[0].Mode)#>));
+<# } #>
+        #endregion
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*  - Operators                                                                                             */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+        #region - Operators
+        public static <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> operator -(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>2) => new <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType>(GenericOperatorMath<TDataType>.Subtract(<#=dimension.NameLowercase#>1.<#=dimension.NameUppercase#>Value, <#=dimension.NameLowercase#>2.<#=dimension.NameUppercase#>Value));
+
+<# if (dimension.BaseDimensionsThisDerivedFromInDenominator.Any()) { #>
+        public static <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, double> operator -(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#>Double <#=dimension.NameLowercase#>2) => <#=dimension.NameLowercase#>1.ValueAsDouble - new <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, double>(<#=dimension.NameLowercase#>2);
+<# } else { #>
+        public static <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, double> operator -(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#>Double <#=dimension.NameLowercase#>2) => <#=dimension.NameLowercase#>1.ValueAsDouble - (<#=dimension.NameLowercase#>2.ValueAsDouble * <#=dimension.NameLowercase#>2.<#=dimension.NameUppercase#>UnitOfMeasure.GetCompleteMultiplier<<#=derivedFromGenerics#>>(<#=Math.Abs(dimension.BaseDimensionsThisDerivedFrom[0].Mode)#>));
+<# } #>
+        #endregion
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*  * Operators                                                                                             */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+        #region * Operators
+        public static <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> operator *(TDataType <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>2) => new <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType>(GenericOperatorMath<TDataType>.Multiply(<#=dimension.NameLowercase#>1, <#=dimension.NameLowercase#>2.<#=dimension.NameUppercase#>Value));
+
+        public static <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> operator *(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, TDataType <#=dimension.NameLowercase#>2) => new <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType>(GenericOperatorMath<TDataType>.Multiply(<#=dimension.NameLowercase#>1.<#=dimension.NameUppercase#>Value, <#=dimension.NameLowercase#>2));
+<# if (dimension.IsBaseDimension && dimension.IsUsedExponentiallyInDimensions) { #>
+
+        public static Area<T<#=dimension.NameUppercase#>UnitOfMeasure, TDataType> operator *(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>2) => GenericOperatorMath<TDataType>.Multiply(<#=dimension.NameLowercase#>1.<#=dimension.NameUppercase#>Value, <#=dimension.NameLowercase#>2.<#=dimension.NameUppercase#>Value);
+
+        public static Area<T<#=dimension.NameUppercase#>UnitOfMeasure, double> operator *(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#>Double <#=dimension.NameLowercase#>2) => <#=dimension.NameLowercase#>1.ValueAsDouble * (<#=dimension.NameLowercase#>2.ValueAsDouble * <#=dimension.NameLowercase#>2.<#=dimension.NameUppercase#>UnitOfMeasure.GetCompleteMultiplier<<#=derivedFromGenerics#>>(1));
+
+        public static Volume<T<#=dimension.NameUppercase#>UnitOfMeasure, TDataType> operator *(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, Area<T<#=dimension.NameUppercase#>UnitOfMeasure, TDataType> area2) => GenericOperatorMath<TDataType>.Multiply(<#=dimension.NameLowercase#>1.<#=dimension.NameUppercase#>Value, area2.AreaValue);
+
+        public static Volume<T<#=dimension.NameUppercase#>UnitOfMeasure, TDataType> operator *(Area<T<#=dimension.NameUppercase#>UnitOfMeasure, TDataType> area1, <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>2) => GenericOperatorMath<TDataType>.Multiply(area1.AreaValue, <#=dimension.NameLowercase#>2.<#=dimension.NameUppercase#>Value);
+
+        public static Volume<T<#=dimension.NameUppercase#>UnitOfMeasure, double> operator *(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, AreaDouble area2) => <#=dimension.NameLowercase#>1.ValueAsDouble * (area2.ValueAsDouble * area2.AreaUnitOfMeasure.GetCompleteMultiplier<<#=derivedFromGenerics#>>(2));
+
+        public static Volume<T<#=dimension.NameUppercase#>UnitOfMeasure, double> operator *(AreaDouble area1, <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>2) => <#=dimension.NameLowercase#>2.ValueAsDouble * (area1.ValueAsDouble * area1.AreaUnitOfMeasure.GetCompleteMultiplier<<#=derivedFromGenerics#>>(2));
+<# } #>
+<# if (dimension.BaseDimensionsThisDerivedFromInNumerator.Length == 1 && dimension.BaseDimensionsThisDerivedFromInDenominator.Length == 1) { #>
+<#     var numeratorDimension = dimension.BaseDimensionsThisDerivedFromInNumerator[0].BaseDimension.NameUppercase;#>
+<#     var denominatorDimension = dimension.BaseDimensionsThisDerivedFromInDenominator[0].BaseDimension.NameUppercase;#>
+<#     var denominatorDimensionLowercase = dimension.BaseDimensionsThisDerivedFromInDenominator[0].BaseDimension.NameLowercase;#>
+
+        public static <#=numeratorDimension#><T<#=numeratorDimension#>UnitOfMeasure, TDataType> operator *(<#=dimension.NameUppercase#><T<#=numeratorDimension#>UnitOfMeasure, T<#=denominatorDimension#>UnitOfMeasure, TDataType> <#=dimension.NameLowercase#>, <#=denominatorDimension#><T<#=denominatorDimension#>UnitOfMeasure, TDataType> <#=denominatorDimensionLowercase#>) => new <#=numeratorDimension#><T<#=numeratorDimension#>UnitOfMeasure, TDataType>(<#=dimension.NameLowercase#>.<#=dimension.NameUppercase#>Value) * <#=denominatorDimensionLowercase#>.<#=denominatorDimension#>Value;
+
+        public static <#=numeratorDimension#><T<#=numeratorDimension#>UnitOfMeasure, TDataType> operator *(<#=denominatorDimension#><T<#=denominatorDimension#>UnitOfMeasure, TDataType> <#=denominatorDimensionLowercase#>, <#=dimension.NameUppercase#><T<#=numeratorDimension#>UnitOfMeasure, T<#=denominatorDimension#>UnitOfMeasure, TDataType> <#=dimension.NameLowercase#>) => new <#=numeratorDimension#><T<#=numeratorDimension#>UnitOfMeasure, TDataType>(<#=dimension.NameLowercase#>.<#=dimension.NameUppercase#>Value) * <#=denominatorDimensionLowercase#>.<#=denominatorDimension#>Value;
+
+        public static <#=numeratorDimension#><T<#=numeratorDimension#>UnitOfMeasure, double> operator *(<#=dimension.NameUppercase#><T<#=numeratorDimension#>UnitOfMeasure, T<#=denominatorDimension#>UnitOfMeasure, TDataType> <#=dimension.NameLowercase#>, <#=denominatorDimension#>Double<T<#=denominatorDimension#>UnitOfMeasure> <#=denominatorDimensionLowercase#>) => new <#=numeratorDimension#><T<#=numeratorDimension#>UnitOfMeasure, double>(<#=dimension.NameLowercase#>.ValueAsDouble * <#=denominatorDimensionLowercase#>.ValueAsDouble);
+
+        public static <#=numeratorDimension#><T<#=numeratorDimension#>UnitOfMeasure, double> operator *(<#=denominatorDimension#>Double<T<#=denominatorDimension#>UnitOfMeasure> <#=denominatorDimensionLowercase#>, <#=dimension.NameUppercase#><T<#=numeratorDimension#>UnitOfMeasure, T<#=denominatorDimension#>UnitOfMeasure, TDataType> <#=dimension.NameLowercase#>) => new <#=numeratorDimension#><T<#=numeratorDimension#>UnitOfMeasure, double>(<#=dimension.NameLowercase#>.ValueAsDouble * <#=denominatorDimensionLowercase#>.ValueAsDouble);
+
+        public static <#=numeratorDimension#><T<#=numeratorDimension#>UnitOfMeasure, double> operator *(<#=dimension.NameUppercase#><T<#=numeratorDimension#>UnitOfMeasure, T<#=denominatorDimension#>UnitOfMeasure, TDataType> <#=dimension.NameLowercase#>, <#=denominatorDimension#>Double <#=denominatorDimensionLowercase#>) => new <#=numeratorDimension#><T<#=numeratorDimension#>UnitOfMeasure, double>(<#=dimension.NameLowercase#>.ValueAsDouble * (new <#=denominatorDimension#><T<#=denominatorDimension#>UnitOfMeasure, double>(<#=denominatorDimensionLowercase#>)).<#=denominatorDimension#>Value);
+
+        public static <#=numeratorDimension#><T<#=numeratorDimension#>UnitOfMeasure, double> operator *(<#=denominatorDimension#>Double <#=denominatorDimensionLowercase#>, <#=dimension.NameUppercase#><T<#=numeratorDimension#>UnitOfMeasure, T<#=denominatorDimension#>UnitOfMeasure, TDataType> <#=dimension.NameLowercase#>) => new <#=numeratorDimension#><T<#=numeratorDimension#>UnitOfMeasure, double>(<#=dimension.NameLowercase#>.ValueAsDouble * (new <#=denominatorDimension#><T<#=denominatorDimension#>UnitOfMeasure, double>(<#=denominatorDimensionLowercase#>)).<#=denominatorDimension#>Value);
+<# if (denominatorDimension == "Duration") { #>
+
+        public static <#=numeratorDimension#><T<#=numeratorDimension#>UnitOfMeasure, double> operator *(<#=dimension.NameUppercase#><T<#=numeratorDimension#>UnitOfMeasure, TDurationUnitOfMeasure, TDataType> <#=dimension.NameLowercase#>, TimeSpan duration) => new <#=numeratorDimension#><T<#=numeratorDimension#>UnitOfMeasure, double>(<#=dimension.NameLowercase#>.ValueAsDouble * (new Duration<TDurationUnitOfMeasure, double>(duration)).DurationValue);
+
+        public static <#=numeratorDimension#><T<#=numeratorDimension#>UnitOfMeasure, double> operator *(TimeSpan duration, <#=dimension.NameUppercase#><T<#=numeratorDimension#>UnitOfMeasure, TDurationUnitOfMeasure, TDataType> <#=dimension.NameLowercase#>) => new <#=numeratorDimension#><T<#=numeratorDimension#>UnitOfMeasure, double>(<#=dimension.NameLowercase#>.ValueAsDouble * (new Duration<TDurationUnitOfMeasure, double>(duration)).DurationValue);
+<# } #>
+<# } #>
+        #endregion
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*  / Operators                                                                                             */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+        #region / Operators
+        public static <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, double> operator /(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, double <#=dimension.NameLowercase#>2) => new <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, double>(<#=dimension.NameLowercase#>1.ValueAsDouble / <#=dimension.NameLowercase#>2);
+
+        public static <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, double> operator /(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, decimal <#=dimension.NameLowercase#>2) => new <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, double>(<#=dimension.NameLowercase#>1.ValueAsDouble / Convert.ToDouble(<#=dimension.NameLowercase#>2));
+
+        public static <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, double> operator /(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, long <#=dimension.NameLowercase#>2) => new <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, double>(<#=dimension.NameLowercase#>1.ValueAsDouble / <#=dimension.NameLowercase#>2);
+
+        public static double operator /(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#>Double <#=dimension.NameLowercase#>2) => <#=dimension.NameLowercase#>1.ValueAsDouble / (new <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, double>(<#=dimension.NameLowercase#>2).<#=dimension.NameUppercase#>Value);
+<# if (dimension.IsUsedExponentiallyInDimensions) { #>
+<#     var derivedDimensionUppercase = dimension.DerivedDimensionsFromThisBase.First(o => o.DerivedDimension.IsSquaredDimension).DerivedDimension.NameUppercase; #>
+<#     var derivedDimensionLowercase = dimension.DerivedDimensionsFromThisBase.First(o => o.DerivedDimension.IsSquaredDimension).DerivedDimension.NameLowercase; #>
+
+        public static <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, double> operator /(<#=derivedDimensionUppercase#>Double <#=derivedDimensionLowercase#>1, <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>2) => new <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, double>((new <#=derivedDimensionUppercase#><T<#=dimension.NameUppercase#>UnitOfMeasure, double>(<#=derivedDimensionLowercase#>1)).<#=derivedDimensionUppercase#>Value / <#=dimension.NameLowercase#>2.ValueAsDouble);
+<# } #>
+<# if (dimension.IsBaseDimension) { #>
+<#     foreach (var derivedDimension in dimension.DerivedDimensionsFromThisBase.Where(o => o.IsBaseInNumeratorWithADenominator).Select(o => o.DerivedDimension)) { #>
+<#         foreach (var unit in dimensions.Single(o => o.NameUppercase == "Duration").Units.Where(o => o.NameUppercase != "Tick")) { #>
+<#             var durationUnitName = unit.NamePluralUppercase; #>
+
+        public static <#=derivedDimension.NameUppercase#><T<#=dimension.NameUppercase#>UnitOfMeasure, Durations.<#=durationUnitName#>, double> operator /(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, DurationDouble<Durations.<#=durationUnitName#>> duration2) => new <#=derivedDimension.NameUppercase#><T<#=dimension.NameUppercase#>UnitOfMeasure, Durations.<#=durationUnitName#>, double>(<#=dimension.NameLowercase#>1, duration2);
+<#             if (unit.IsMetricBaseUnit) { #>
+<#                 foreach (var prefix in siPrefixes.Where(p => p.Prefix != "NoPrefix")) { #>
+
+        public static <#=derivedDimension.NameUppercase#><T<#=dimension.NameUppercase#>UnitOfMeasure, Durations.<#=durationUnitName#><<#=prefix.Prefix#>>, double> operator /(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, DurationDouble<Durations.<#=durationUnitName#><<#=prefix.Prefix#>>> duration2) => new <#=derivedDimension.NameUppercase#><T<#=dimension.NameUppercase#>UnitOfMeasure, Durations.<#=durationUnitName#><<#=prefix.Prefix#>>, double>(<#=dimension.NameLowercase#>1, duration2);
+<#                 } #>
+<#             } #>
+<#         } #>
+
+        public static <#=derivedDimension.NameUppercase#><T<#=dimension.NameUppercase#>UnitOfMeasure, Durations.Seconds, double> operator /(<#=dimension.NameUppercase#><T<#=dimension.NameUppercase#>UnitOfMeasure, TDataType> <#=dimension.NameLowercase#>1, TimeSpan duration2) => new <#=derivedDimension.NameUppercase#><T<#=dimension.NameUppercase#>UnitOfMeasure, Durations.Seconds, double>(<#=dimension.NameLowercase#>1, duration2);
+<#     } #>
+<# } #>
+        #endregion
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*  ==Operators                                                                                             */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+        #region == Operators
+        public static bool operator ==(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>2) => EqualityComparer<TDataType>.Default.Equals(<#=dimension.NameLowercase#>1.<#=dimension.NameUppercase#>Value, <#=dimension.NameLowercase#>2.<#=dimension.NameUppercase#>Value);
+
+<# if (dimension.BaseDimensionsThisDerivedFromInDenominator.Any()) { #>
+        public static bool operator ==(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#>Double <#=dimension.NameLowercase#>2) => <#=dimension.NameLowercase#>1.ValueAsDouble.CompareTo((new <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, double>(<#=dimension.NameLowercase#>2)).ValueAsDouble) == 0;
+<# } else { #>
+        public static bool operator ==(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#>Double <#=dimension.NameLowercase#>2) => <#=dimension.NameLowercase#>1.ValueAsDouble.CompareTo(<#=dimension.NameLowercase#>2.ValueAsDouble * <#=dimension.NameLowercase#>2.<#=dimension.NameUppercase#>UnitOfMeasure.GetCompleteMultiplier<<#=derivedFromGenerics#>>(<#=Math.Abs(dimension.BaseDimensionsThisDerivedFrom[0].Mode)#>)) == 0;
+<# } #>
+        #endregion
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*  != Operators                                                                                            */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+        #region != Operators
+        public static bool operator !=(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>2) => !EqualityComparer<TDataType>.Default.Equals(<#=dimension.NameLowercase#>1.<#=dimension.NameUppercase#>Value, <#=dimension.NameLowercase#>2.<#=dimension.NameUppercase#>Value);
+
+<# if (dimension.BaseDimensionsThisDerivedFromInDenominator.Any()) { #>
+        public static bool operator !=(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#>Double <#=dimension.NameLowercase#>2) => <#=dimension.NameLowercase#>1.ValueAsDouble.CompareTo((new <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, double>(<#=dimension.NameLowercase#>2)).ValueAsDouble) != 0;
+<# } else { #>
+        public static bool operator !=(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#>Double <#=dimension.NameLowercase#>2) => <#=dimension.NameLowercase#>1.ValueAsDouble.CompareTo(<#=dimension.NameLowercase#>2.ValueAsDouble * <#=dimension.NameLowercase#>2.<#=dimension.NameUppercase#>UnitOfMeasure.GetCompleteMultiplier<<#=derivedFromGenerics#>>(<#=Math.Abs(dimension.BaseDimensionsThisDerivedFrom[0].Mode)#>)) != 0;
+<# } #>
+        #endregion
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*  > Operators                                                                                             */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+        #region > Operators
+        public static bool operator >(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>2) => GenericOperatorMath<TDataType>.GreaterThan(<#=dimension.NameLowercase#>1.<#=dimension.NameUppercase#>Value, <#=dimension.NameLowercase#>2.<#=dimension.NameUppercase#>Value);
+
+<# if (dimension.BaseDimensionsThisDerivedFromInDenominator.Any()) { #>
+        public static bool operator >(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#>Double <#=dimension.NameLowercase#>2) => <#=dimension.NameLowercase#>1.ValueAsDouble.CompareTo((new <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, double>(<#=dimension.NameLowercase#>2)).ValueAsDouble) > 0;
+<# } else { #>
+        public static bool operator >(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#>Double <#=dimension.NameLowercase#>2) => <#=dimension.NameLowercase#>1.ValueAsDouble.CompareTo(<#=dimension.NameLowercase#>2.ValueAsDouble * <#=dimension.NameLowercase#>2.<#=dimension.NameUppercase#>UnitOfMeasure.GetCompleteMultiplier<<#=derivedFromGenerics#>>(<#=Math.Abs(dimension.BaseDimensionsThisDerivedFrom[0].Mode)#>)) > 0;
+<# } #>
+        #endregion
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*  < Operators                                                                                             */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+        #region < Operators
+        public static bool operator <(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>2) => GenericOperatorMath<TDataType>.LessThan(<#=dimension.NameLowercase#>1.<#=dimension.NameUppercase#>Value, <#=dimension.NameLowercase#>2.<#=dimension.NameUppercase#>Value);
+
+<# if (dimension.BaseDimensionsThisDerivedFromInDenominator.Any()) { #>
+        public static bool operator <(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#>Double <#=dimension.NameLowercase#>2) => <#=dimension.NameLowercase#>1.ValueAsDouble.CompareTo((new <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, double>(<#=dimension.NameLowercase#>2)).ValueAsDouble) < 0;
+<# } else { #>
+        public static bool operator <(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#>Double <#=dimension.NameLowercase#>2) => <#=dimension.NameLowercase#>1.ValueAsDouble.CompareTo(<#=dimension.NameLowercase#>2.ValueAsDouble * <#=dimension.NameLowercase#>2.<#=dimension.NameUppercase#>UnitOfMeasure.GetCompleteMultiplier<<#=derivedFromGenerics#>>(<#=Math.Abs(dimension.BaseDimensionsThisDerivedFrom[0].Mode)#>)) < 0;
+<# } #>
+        #endregion
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*  >= Operators                                                                                            */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+        #region >= Operators
+        public static bool operator >=(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>2) => GenericOperatorMath<TDataType>.GreaterThanOrEqualTo(<#=dimension.NameLowercase#>1.<#=dimension.NameUppercase#>Value, <#=dimension.NameLowercase#>2.<#=dimension.NameUppercase#>Value);
+
+<# if (dimension.BaseDimensionsThisDerivedFromInDenominator.Any()) { #>
+        public static bool operator >=(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#>Double <#=dimension.NameLowercase#>2) => <#=dimension.NameLowercase#>1.ValueAsDouble.CompareTo((new <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, double>(<#=dimension.NameLowercase#>2)).ValueAsDouble) >= 0;
+<# } else { #>
+        public static bool operator >=(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#>Double <#=dimension.NameLowercase#>2) => <#=dimension.NameLowercase#>1.ValueAsDouble.CompareTo(<#=dimension.NameLowercase#>2.ValueAsDouble * <#=dimension.NameLowercase#>2.<#=dimension.NameUppercase#>UnitOfMeasure.GetCompleteMultiplier<<#=derivedFromGenerics#>>(<#=Math.Abs(dimension.BaseDimensionsThisDerivedFrom[0].Mode)#>)) >= 0;
+<# } #>
+        #endregion
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*  <= Operators                                                                                            */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+        #region <= Operators
+        public static bool operator <=(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>2) => GenericOperatorMath<TDataType>.LessThanOrEqualTo(<#=dimension.NameLowercase#>1.<#=dimension.NameUppercase#>Value, <#=dimension.NameLowercase#>2.<#=dimension.NameUppercase#>Value);
+
+<# if (dimension.BaseDimensionsThisDerivedFromInDenominator.Any()) { #>
+        public static bool operator <=(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#>Double <#=dimension.NameLowercase#>2) => <#=dimension.NameLowercase#>1.ValueAsDouble.CompareTo((new <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, double>(<#=dimension.NameLowercase#>2)).ValueAsDouble) <= 0;
+<# } else { #>
+        public static bool operator <=(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> <#=dimension.NameLowercase#>1, <#=dimension.NameUppercase#>Double <#=dimension.NameLowercase#>2) => <#=dimension.NameLowercase#>1.ValueAsDouble.CompareTo(<#=dimension.NameLowercase#>2.ValueAsDouble * <#=dimension.NameLowercase#>2.<#=dimension.NameUppercase#>UnitOfMeasure.GetCompleteMultiplier<<#=derivedFromGenerics#>>(<#=Math.Abs(dimension.BaseDimensionsThisDerivedFrom[0].Mode)#>)) <= 0;
+<# } #>
+        #endregion
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*  squared, cubed                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+<# if (dimension.IsUsedExponentiallyInDimensions) { #>
+        #region squared, cubed
+        public Area<T<#=dimension.NameUppercase#>UnitOfMeasure, TDataType> Squared => GenericOperatorMath<TDataType>.Multiply(<#=dimension.NameUppercase#>Value, <#=dimension.NameUppercase#>Value);
+
+        public Volume<T<#=dimension.NameUppercase#>UnitOfMeasure, TDataType> Cubed => GenericOperatorMath<TDataType>.Multiply(GenericOperatorMath<TDataType>.Multiply(<#=dimension.NameUppercase#>Value, <#=dimension.NameUppercase#>Value), <#=dimension.NameUppercase#>Value);
+        #endregion
+
+<# } #>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*  ToString                                                                                                */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+        #region ToString
+<# if (dimension.IsSquaredOrCubedDimension) { #>
+        public override string ToString() => ToString(null, null);
+
+        public string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            if (format == null)
+            { }
+            else if (format.Contains("NU", StringComparison.Ordinal))
+            {
+                return <#=dimension.NameUppercase#>UnitOfMeasure.ToString(<#=dimension.NameUppercase#>Value, format, formatProvider);
+            }
+            else if (format.Contains("SU", StringComparison.Ordinal))
+            {
+                if (<#=dimension.NameUppercase#>UnitOfMeasure is <#=dimension.BaseDimensionsThisDerivedFrom[0].BaseDimension.NameUppercase#>1DUnitOfMeasure <#=dimension.BaseDimensionsThisDerivedFrom[0].BaseDimension.NameLowercase#>1DUom)
+                {
+                    return <#=dimension.NameUppercase#>UnitOfMeasure.ToString(<#=dimension.NameUppercase#>Value, format.Replace("SU", "NU", StringComparison.Ordinal), formatProvider) + @" " + <#=dimension.BaseDimensionsThisDerivedFrom[0].BaseDimension.NameLowercase#>1DUom.<#=dimension.NameUppercase#>UnitSymbol;
+                }
+                else
+                {
+                    return <#=dimension.NameUppercase#>UnitOfMeasure.ToString(<#=dimension.NameUppercase#>Value, format, formatProvider);
+                }
+            }
+            return <#=dimension.NameUppercase#>Value.ToString((format ?? "").Replace("LU", "", StringComparison.Ordinal), formatProvider) + @" <#=dimension.IsSquaredDimension ? "Square" : "Cubic"#> " + <#=dimension.NameUppercase#>UnitOfMeasure.ToString(format, formatProvider);
+        }
+<# } else if (dimension.BaseDimensionsThisDerivedFromInNumerator.Length == 1 && dimension.BaseDimensionsThisDerivedFromInDenominator.Length == 1) { #>
+<#       var numeratorDimension = dimension.BaseDimensionsThisDerivedFromInNumerator[0].BaseDimension; #>
+<#       var denominatorDimension = dimension.BaseDimensionsThisDerivedFromInDenominator[0].BaseDimension; #>
+        public override string ToString() => ToString(null, null);
+
+        public string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            if (format == null)
+            { }
+            else if (format.Contains("NU", StringComparison.Ordinal))
+            {
+                return <#=numeratorDimension.NameUppercase#>UnitOfMeasure.ToString(<#=dimension.NameUppercase#>Value, format, formatProvider);
+            }
+            else if (format.Contains("SU", StringComparison.Ordinal))
+            {
+                return <#=numeratorDimension.NameUppercase#>UnitOfMeasure.ToString(<#=dimension.NameUppercase#>Value, "NU", formatProvider) + " " + (<#=numeratorDimension.NameUppercase#>UnitOfMeasure.GetDimensionalUnitSymbol(this) ?? <#=denominatorDimension.NameUppercase#>UnitOfMeasure.GetDimensionalUnitSymbol(this) ?? (<#=numeratorDimension.NameUppercase#>UnitOfMeasure.ToString(format, formatProvider).TrimEnd(".".ToCharArray()) + @"/" + <#=denominatorDimension.NameUppercase#>UnitOfMeasure.ToString(format, formatProvider)));
+            }
+            return <#=numeratorDimension.NameUppercase#>UnitOfMeasure.ToString(<#=dimension.NameUppercase#>Value, "NU", formatProvider) + " " + <#=numeratorDimension.NameUppercase#>UnitOfMeasure.ToString(format, formatProvider) + @" per " + <#=denominatorDimension.NameUppercase#>UnitOfMeasure.ToSingularString();
+        }
+<# } else { #>
+        public override string ToString() => <#=dimension.NameUppercase#>UnitOfMeasure.ToString(<#=dimension.NameUppercase#>Value, null, null);
+
+        public string ToString(string? format, IFormatProvider? formatProvider) => <#=dimension.NameUppercase#>UnitOfMeasure.ToString(<#=dimension.NameUppercase#>Value, format, formatProvider);
+<# } #>
+        #endregion
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*  Equals                                                                                                  */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+        #region Equals
+        public override bool Equals(object? obj) => obj != null && obj is <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> o && EqualityComparer<TDataType>.Default.Equals(<#=dimension.NameUppercase#>Value, o.<#=dimension.NameUppercase#>Value);
+
+        bool IEquatable<<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType>>.Equals(<#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType> other) => EqualityComparer<TDataType>.Default.Equals(<#=dimension.NameUppercase#>Value, other.<#=dimension.NameUppercase#>Value);
+        #endregion
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*  GetHashCode                                                                                             */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+        #region GetHashCode
+        public override int GetHashCode() => HashCode.Combine(<#=dimension.NameUppercase#>Value);
+        #endregion
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*  IConvertible                                                                                            */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+        #region IConvertible
+        TypeCode IConvertible.GetTypeCode() => GenericOperatorMath<TDataType>.GetTypeCode();
+        object IConvertible.ToType(Type conversionType, IFormatProvider? provider)
+        {
+<# if (dimension.NameUppercase == "Duration") { #>
+            if (conversionType == typeof(TimeSpan))
+            {
+                return (TimeSpan)this;
+            }
+<# } #>
+            if (typeof(I<#=dimension.NameUppercase#>).IsAssignableFrom(conversionType))
+            {
+                var convertedInstance = Activator.CreateInstance(conversionType, (<#=dimension.NameUppercase#>Double)this);
+                if (convertedInstance != null) return convertedInstance;
+            }
+            throw new NotImplementedException();
+        }
+        byte IConvertible.ToByte(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToByte(<#=dimension.NameUppercase#>Value);
+        decimal IConvertible.ToDecimal(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToDecimal(<#=dimension.NameUppercase#>Value);
+        double IConvertible.ToDouble(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToDouble(<#=dimension.NameUppercase#>Value);
+        short IConvertible.ToInt16(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToInt16(<#=dimension.NameUppercase#>Value);
+        int IConvertible.ToInt32(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToInt32(<#=dimension.NameUppercase#>Value);
+        long IConvertible.ToInt64(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToInt64(<#=dimension.NameUppercase#>Value);
+        sbyte IConvertible.ToSByte(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToSByte(<#=dimension.NameUppercase#>Value);
+        float IConvertible.ToSingle(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToSingle(<#=dimension.NameUppercase#>Value);
+        ushort IConvertible.ToUInt16(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToUInt16(<#=dimension.NameUppercase#>Value);
+        uint IConvertible.ToUInt32(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToUInt32(<#=dimension.NameUppercase#>Value);
+        ulong IConvertible.ToUInt64(IFormatProvider? provider) => GenericOperatorMath<TDataType>.ConvertToUInt64(<#=dimension.NameUppercase#>Value);
+        #endregion
+    }
+}
+
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*                                                                                                          */#>
+<#/*  ======================================================================================================= */#>
+<#/*  Extensions                                                                                            */#>
+<#/*  ======================================================================================================= */#>
+<#/*                                                                                                          */#>
+namespace NGenericDimensions.Extensions
+{
+    public static class <#=dimension.NameUppercase#>ExtensionMethods
+    {
+        #region Nullable <#=dimension.NameUppercase#>Value
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public static TDataType? <#=dimension.NameUppercase#>Value<<#=derivedFromGenerics#>, TDataType>(this <#=dimension.NameUppercase#><<#=derivedFromGenerics#>, TDataType>? <#=dimension.NameLowercase#>)
+<#  foreach (var derivedFrom in dimension.BaseDimensionsThisDerivedFrom) { #>
+            where T<#=derivedFrom.ModeDimension.NameUppercase#>UnitOfMeasure : <#=derivedFrom.MostSpecificCommonDimensionUnitOfMeasureBase.InterfaceName#><#=commaPrefixed2D3DInterface#>, IDefinedUnitOfMeasure
+<#  }#>
+            where TDataType : struct, IComparable, IFormattable, IComparable<TDataType>, IEquatable<TDataType> => <#=dimension.NameLowercase#>?.<#=dimension.NameUppercase#>Value;
+        #endregion
+    }
+}

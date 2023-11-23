@@ -17,11 +17,11 @@ namespace NGenericDimensionsUnitTests
         private static readonly Type[] actualUomsTypesOfMassUnitOfMeasureEvenWithoutIDefinedUnitOfMeasure
             = GetUnitOfMeasuresTypes<NGenericDimensions.Masses.MassUnitOfMeasure>(false, true)
             .Where(o => o.Name != "MassUnitOfMeasure" 
-                     && o.Name != "SIMassUnitOfMeasure")
+                     && o.Name != "MetricSIMassUnitOfMeasure")
             .OrderBy(o => o.FullName).ToArray();
 
         private static readonly Type[] actualUomsTypesOfSIMassUnitOfMeasure
-            = GetUnitOfMeasuresTypes<SIMassUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
+            = GetUnitOfMeasuresTypes<MetricSIMassUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
 
         [Fact]
         public void MassUOMsBaseClassesAndInterfaces()
@@ -31,6 +31,7 @@ namespace NGenericDimensionsUnitTests
 
             var expectedUomsOfSIMassUnitOfMeasure = new[] {
                 typeof(Kilograms),
+                typeof(Grams<NoPrefix>),
                 typeof(Grams<Deca>),
                 typeof(Grams<Hecto>),
                 typeof(Grams<Kilo>),
@@ -87,7 +88,7 @@ namespace NGenericDimensionsUnitTests
             var massC = new Mass<Kilograms, Int32>(massB);
             Assert.Equal(massB.MassValue, massC.MassValue);
             Assert.Equal(3, massC.MassValue);
-            Assert.Same(massB.UnitOfMeasure, massC.UnitOfMeasure);
+            Assert.Same(massB.MassUnitOfMeasure, massC.MassUnitOfMeasure);
 
             // make sure value of different unit converts propertly via constructor.
             Assert.Equal(5000, (new Mass<Grams, Int32>(new Mass<Kilograms, Int32>(5))).MassValue);
@@ -103,8 +104,8 @@ namespace NGenericDimensionsUnitTests
         public void TestUnitOfMeasureProperty()
         {
             // make sure the UnitOfMeasure is actually the correct type
-            Assert.Same(typeof(Kilograms), (new Mass<Kilograms, Int32>(33)).UnitOfMeasure.GetType());
-            Assert.Same(typeof(Kilograms), ((IMass)(new Mass<Kilograms, Int32>(33))).UnitOfMeasure.GetType());
+            Assert.Same(typeof(Kilograms), (new Mass<Kilograms, Int32>(33)).MassUnitOfMeasure.GetType());
+            Assert.Same(typeof(Kilograms), ((IMass)(new Mass<Kilograms, Int32>(33))).MassUnitOfMeasure.GetType());
         }
 
 
@@ -114,7 +115,7 @@ namespace NGenericDimensionsUnitTests
             var massA = new Mass<Kilograms, Int32>(333);
             var massB = massA.ConvertTo<Grams, Decimal>();
             Assert.Equal(333000, massB.MassValue);
-            Assert.Same(typeof(Grams), massB.UnitOfMeasure.GetType());
+            Assert.Same(typeof(Grams), massB.MassUnitOfMeasure.GetType());
             var massC = new Mass<Kilograms, Int32>(333);
             var massD = massC.ConvertTo<decimal>();
             Assert.Equal(333, massD.MassValue);
@@ -156,7 +157,7 @@ namespace NGenericDimensionsUnitTests
                 var massC = new Mass<Kilograms, Int32>(2);
                 var massD = new Mass<Kilograms, Byte>(8);
                 var massCD = massC + massD;
-                Assert.Same(massC.UnitOfMeasure.GetType(), massCD.UnitOfMeasure.GetType());
+                Assert.Same(massC.MassUnitOfMeasure.GetType(), massCD.MassUnitOfMeasure.GetType());
                 Assert.Same(typeof(double), massCD.MassValue.GetType());
                 Assert.Equal(10, massCD.MassValue);
             }
@@ -164,7 +165,7 @@ namespace NGenericDimensionsUnitTests
                 var massC = new Mass<Grams, Int32>(5);
                 var massD = new Mass<Kilograms, Byte>(2);
                 var massCD = massC + massD;
-                Assert.Same(massC.UnitOfMeasure.GetType(), massCD.UnitOfMeasure.GetType());
+                Assert.Same(massC.MassUnitOfMeasure.GetType(), massCD.MassUnitOfMeasure.GetType());
                 Assert.Same(typeof(double), massCD.MassValue.GetType());
                 Assert.Equal(2005, massCD.MassValue);
             }
@@ -198,7 +199,7 @@ namespace NGenericDimensionsUnitTests
                 var massC = new Mass<Kilograms, Int32>(2);
                 var massD = new Mass<Kilograms, Byte>(8);
                 var massCD = massC - massD;
-                Assert.Same(massC.UnitOfMeasure.GetType(), massCD.UnitOfMeasure.GetType());
+                Assert.Same(massC.MassUnitOfMeasure.GetType(), massCD.MassUnitOfMeasure.GetType());
                 Assert.Same(typeof(double), massCD.MassValue.GetType());
                 Assert.Equal(-6, massCD.MassValue);
             }
@@ -206,7 +207,7 @@ namespace NGenericDimensionsUnitTests
                 var massC = new Mass<Grams, Int32>(5);
                 var massD = new Mass<Kilograms, Byte>(2);
                 var massCD = massC - massD;
-                Assert.Same(massC.UnitOfMeasure.GetType(), massCD.UnitOfMeasure.GetType());
+                Assert.Same(massC.MassUnitOfMeasure.GetType(), massCD.MassUnitOfMeasure.GetType());
                 Assert.Same(typeof(double), massCD.MassValue.GetType());
                 Assert.Equal(-1995, massCD.MassValue);
             }
