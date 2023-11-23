@@ -20,14 +20,14 @@ namespace NGenericDimensionsUnitTests
             = GetUnitOfMeasuresTypes<NGenericDimensions.Lengths.Length1DUnitOfMeasure>(false, true)
             .Where(o => o.Name != "Length1DUnitOfMeasure" 
                      && o.Name != "UscsLengthUnitOfMeasure" 
-                     && o.Name != "SILengthUnitOfMeasure")
+                     && o.Name != "MetricSILengthUnitOfMeasure")
             .OrderBy(o => o.FullName).ToArray();
 
         private static readonly Type[] actualUomsTypesOfUscsLengthUnitOfMeasure
             = GetUnitOfMeasuresTypes<UscsLengthUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
         
         private static readonly Type[] actualUomsTypesOfSILengthUnitOfMeasure
-            = GetUnitOfMeasuresTypes<SILengthUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
+            = GetUnitOfMeasuresTypes<MetricSILengthUnitOfMeasure>(true, true).OrderBy(o => o.FullName).ToArray();
 
         [Fact]
         public void LengthUOMsBaseClassesAndInterfaces()
@@ -44,6 +44,7 @@ namespace NGenericDimensionsUnitTests
                 typeof(Micrometres),
                 typeof(Millimetres),
                 typeof(Nanometres),
+                typeof(Metres<NoPrefix>),
                 typeof(Metres<Deca>),
                 typeof(Metres<Hecto>),
                 typeof(Metres<Kilo>),
@@ -100,7 +101,7 @@ namespace NGenericDimensionsUnitTests
             var lengthC = new Length<NGenericDimensions.Lengths.MetricSI.Kilometres, Int32>(lengthB);
             Assert.Equal(lengthB.LengthValue, lengthC.LengthValue);
             Assert.Equal(3, lengthC.LengthValue);
-            Assert.Same(lengthB.UnitOfMeasure, lengthC.UnitOfMeasure);
+            Assert.Same(lengthB.LengthUnitOfMeasure, lengthC.LengthUnitOfMeasure);
 
             // make sure value of different unit converts propertly via constructor.
             Assert.Equal(5000, (new Length<NGenericDimensions.Lengths.MetricSI.Metres, Int32>(new Length<NGenericDimensions.Lengths.MetricSI.Kilometres, Int32>(5))).LengthValue);
@@ -116,8 +117,8 @@ namespace NGenericDimensionsUnitTests
         public void TestUnitOfMeasureProperty()
         {
             // make sure the UnitOfMeasure is actually the correct type
-            Assert.Same(typeof(NGenericDimensions.Lengths.MetricSI.Kilometres), (new Length<NGenericDimensions.Lengths.MetricSI.Kilometres, Int32>(33)).UnitOfMeasure.GetType());
-            Assert.Same(typeof(NGenericDimensions.Lengths.MetricSI.Kilometres), ((ILength)(new Length<NGenericDimensions.Lengths.MetricSI.Kilometres, Int32>(33))).UnitOfMeasure.GetType());
+            Assert.Same(typeof(NGenericDimensions.Lengths.MetricSI.Kilometres), (new Length<NGenericDimensions.Lengths.MetricSI.Kilometres, Int32>(33)).LengthUnitOfMeasure.GetType());
+            Assert.Same(typeof(NGenericDimensions.Lengths.MetricSI.Kilometres), ((ILength)(new Length<NGenericDimensions.Lengths.MetricSI.Kilometres, Int32>(33))).LengthUnitOfMeasure.GetType());
         }
 
         [Fact]
@@ -126,7 +127,7 @@ namespace NGenericDimensionsUnitTests
             var lengthA = new Length<NGenericDimensions.Lengths.MetricSI.Kilometres, Int32>(333);
             var lengthB = lengthA.ConvertTo<NGenericDimensions.Lengths.MetricSI.Millimetres, Decimal>();
             Assert.Equal(333000000, lengthB.LengthValue);
-            Assert.Same(typeof(NGenericDimensions.Lengths.MetricSI.Millimetres), lengthB.UnitOfMeasure.GetType());
+            Assert.Same(typeof(NGenericDimensions.Lengths.MetricSI.Millimetres), lengthB.LengthUnitOfMeasure.GetType());
             var lengthC = new Length<NGenericDimensions.Lengths.MetricSI.Kilometres, Int32>(333);
             var lengthD = lengthC.ConvertTo<decimal>();
             Assert.Equal(333, lengthD.LengthValue);
@@ -168,7 +169,7 @@ namespace NGenericDimensionsUnitTests
                 var lengthC = new Length<Feet, Int32>(2);
                 var lengthD = new Length<Feet, Byte>(8);
                 var lengthCD = lengthC + lengthD;
-                Assert.Same(lengthC.UnitOfMeasure.GetType(), lengthCD.UnitOfMeasure.GetType());
+                Assert.Same(lengthC.LengthUnitOfMeasure.GetType(), lengthCD.LengthUnitOfMeasure.GetType());
                 Assert.Same(typeof(double), lengthCD.LengthValue.GetType());
                 Assert.Equal(10, lengthCD.LengthValue);
             }
@@ -176,7 +177,7 @@ namespace NGenericDimensionsUnitTests
                 var lengthC = new Length<Inches, Int32>(5);
                 var lengthD = new Length<Feet, Byte>(2);
                 var lengthCD = lengthC + lengthD;
-                Assert.Same(lengthC.UnitOfMeasure.GetType(), lengthCD.UnitOfMeasure.GetType());
+                Assert.Same(lengthC.LengthUnitOfMeasure.GetType(), lengthCD.LengthUnitOfMeasure.GetType());
                 Assert.Same(typeof(double), lengthCD.LengthValue.GetType());
                 Assert.Equal(29, lengthCD.LengthValue);
             }
@@ -210,7 +211,7 @@ namespace NGenericDimensionsUnitTests
                 var lengthC = new Length<Feet, Int32>(2);
                 var lengthD = new Length<Feet, Byte>(8);
                 var lengthCD = lengthC - lengthD;
-                Assert.Same(lengthC.UnitOfMeasure.GetType(), lengthCD.UnitOfMeasure.GetType());
+                Assert.Same(lengthC.LengthUnitOfMeasure.GetType(), lengthCD.LengthUnitOfMeasure.GetType());
                 Assert.Same(typeof(double), lengthCD.LengthValue.GetType());
                 Assert.Equal(-6, lengthCD.LengthValue);
             }
@@ -218,7 +219,7 @@ namespace NGenericDimensionsUnitTests
                 var lengthC = new Length<Inches, Int32>(5);
                 var lengthD = new Length<Feet, Byte>(2);
                 var lengthCD = lengthC - lengthD;
-                Assert.Same(lengthC.UnitOfMeasure.GetType(), lengthCD.UnitOfMeasure.GetType());
+                Assert.Same(lengthC.LengthUnitOfMeasure.GetType(), lengthCD.LengthUnitOfMeasure.GetType());
                 Assert.Same(typeof(double), lengthCD.LengthValue.GetType());
                 Assert.Equal(-19, lengthCD.LengthValue);
             }
@@ -253,7 +254,7 @@ namespace NGenericDimensionsUnitTests
                 var areaAB = lengthA * lengthB;
                 Assert.Same(typeof(Area<Inches, Int32>), areaAB.GetType());
                 Assert.Equal(7 * 4, areaAB.AreaValue);
-                Assert.Same(typeof(Inches), areaAB.UnitOfMeasure.GetType());
+                Assert.Same(typeof(Inches), areaAB.AreaUnitOfMeasure.GetType());
             }
 
             // multiplying 2 lengths of differing types gives us an Area with a uom of the first type and a datatype of double
@@ -263,7 +264,7 @@ namespace NGenericDimensionsUnitTests
                 var areaAB = lengthA * lengthB;
                 Assert.Same(typeof(Area<Inches, double>), areaAB.GetType());
                 Assert.Equal(2 * 12 * 7, areaAB.AreaValue);
-                Assert.Same(typeof(Inches), areaAB.UnitOfMeasure.GetType());
+                Assert.Same(typeof(Inches), areaAB.AreaUnitOfMeasure.GetType());
             }
 
             // multiplying a length by an area that share the same length uom and same datatype gives us a Volume of the same uom and datatype
@@ -357,7 +358,7 @@ namespace NGenericDimensionsUnitTests
                 var lengthB = new Length<NGenericDimensions.Lengths.MetricSI.Millimetres, Decimal>(Convert.ToDecimal(100000));
                 var lengthC = areaA / lengthB;
                 Assert.Same(typeof(double), lengthC.LengthValue.GetType());
-                Assert.Same(typeof(NGenericDimensions.Lengths.MetricSI.Millimetres), lengthC.UnitOfMeasure.GetType());
+                Assert.Same(typeof(NGenericDimensions.Lengths.MetricSI.Millimetres), lengthC.LengthUnitOfMeasure.GetType());
                 Assert.Equal(40000000, lengthC.LengthValue);
             }
 

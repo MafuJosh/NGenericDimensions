@@ -11,6 +11,7 @@ namespace NGenericDimensionsUnitTests
     {
         protected readonly static string[] ValidDataTypeConversions =
             {
+            @"System.Char>(System.Convert.ToChar(4)", // this works in .net6 but not in an earlier one i think
             @"System.Double>(System.Convert.ToDouble(4.44444)",
             @"System.Double>(System.Convert.ToSingle(4.44444)",
             @"System.Single>(System.Convert.ToSingle(4.44444)",
@@ -31,7 +32,6 @@ namespace NGenericDimensionsUnitTests
 
         protected readonly static string[] InvalidDataTypeConversions =
             {
-            @"System.Char>(System.Convert.ToChar(4)",
             @"System.Boolean>(System.Convert.ToBoolean(4)"
             };
 

@@ -35,6 +35,7 @@ namespace NGenericDimensionsUnitTests
                 typeof(Milliseconds),
                 typeof(Minutes),
                 typeof(Ticks),
+                typeof(Seconds<NoPrefix>),
                 typeof(Seconds<Deca>),
                 typeof(Seconds<Hecto>),
                 typeof(Seconds<Kilo>),
@@ -90,7 +91,7 @@ namespace NGenericDimensionsUnitTests
             var durationC = new Duration<Hours, Int32>(durationB);
             Assert.Equal(durationB.DurationValue, durationC.DurationValue);
             Assert.Equal(3, durationC.DurationValue);
-            Assert.Same(durationB.UnitOfMeasure, durationC.UnitOfMeasure);
+            Assert.Same(durationB.DurationUnitOfMeasure, durationC.DurationUnitOfMeasure);
 
             // make sure value of different unit converts propertly via constructor.
             Assert.Equal(120, (new Duration<Seconds, Int32>(new Duration<Minutes, Int32>(2))).DurationValue);
@@ -106,8 +107,8 @@ namespace NGenericDimensionsUnitTests
         public void TestUnitOfMeasureProperty()
         {
             // make sure the UnitOfMeasure is actually the correct type
-            Assert.Same(typeof(Hours), (new Duration<Hours, Int32>(33)).UnitOfMeasure.GetType());
-            Assert.Same(typeof(Hours), ((IDuration)(new Duration<Hours, Int32>(33))).UnitOfMeasure.GetType());
+            Assert.Same(typeof(Hours), (new Duration<Hours, Int32>(33)).DurationUnitOfMeasure.GetType());
+            Assert.Same(typeof(Hours), ((IDuration)(new Duration<Hours, Int32>(33))).DurationUnitOfMeasure.GetType());
         }
 
         [Fact]
@@ -116,7 +117,7 @@ namespace NGenericDimensionsUnitTests
             var durationA = new Duration<Hours, Int32>(333);
             var durationB = durationA.ConvertTo<Milliseconds, Decimal>();
             Assert.Equal(1198800000, durationB.DurationValue);
-            Assert.Same(typeof(Milliseconds), durationB.UnitOfMeasure.GetType());
+            Assert.Same(typeof(Milliseconds), durationB.DurationUnitOfMeasure.GetType());
             var durationC = new Duration<Hours, Int32>(333);
             var durationD = durationC.ConvertTo<decimal>();
             Assert.Equal(333, durationD.DurationValue);
@@ -170,7 +171,7 @@ namespace NGenericDimensionsUnitTests
                 var durationC = new Duration<Hours, Int32>(2);
                 var durationD = new Duration<Hours, Byte>(8);
                 var durationCD = durationC + durationD;
-                Assert.Same(durationC.UnitOfMeasure.GetType(), durationCD.UnitOfMeasure.GetType());
+                Assert.Same(durationC.DurationUnitOfMeasure.GetType(), durationCD.DurationUnitOfMeasure.GetType());
                 Assert.Same(typeof(double), durationCD.DurationValue.GetType());
                 Assert.Equal(10, durationCD.DurationValue);
             }
@@ -178,7 +179,7 @@ namespace NGenericDimensionsUnitTests
                 var durationC = new Duration<Minutes, Int32>(5);
                 var durationD = new Duration<Hours, Byte>(2);
                 var durationCD = durationC + durationD;
-                Assert.Same(durationC.UnitOfMeasure.GetType(), durationCD.UnitOfMeasure.GetType());
+                Assert.Same(durationC.DurationUnitOfMeasure.GetType(), durationCD.DurationUnitOfMeasure.GetType());
                 Assert.Same(typeof(double), durationCD.DurationValue.GetType());
                 Assert.Equal(125, durationCD.DurationValue);
             }
@@ -212,7 +213,7 @@ namespace NGenericDimensionsUnitTests
                 var durationC = new Duration<Hours, Int32>(2);
                 var durationD = new Duration<Hours, Byte>(8);
                 var durationCD = durationC - durationD;
-                Assert.Same(durationC.UnitOfMeasure.GetType(), durationCD.UnitOfMeasure.GetType());
+                Assert.Same(durationC.DurationUnitOfMeasure.GetType(), durationCD.DurationUnitOfMeasure.GetType());
                 Assert.Same(typeof(double), durationCD.DurationValue.GetType());
                 Assert.Equal(-6, durationCD.DurationValue);
             }
@@ -220,7 +221,7 @@ namespace NGenericDimensionsUnitTests
                 var durationC = new Duration<Minutes, Int32>(5);
                 var durationD = new Duration<Hours, Byte>(2);
                 var durationCD = durationC - durationD;
-                Assert.Same(durationC.UnitOfMeasure.GetType(), durationCD.UnitOfMeasure.GetType());
+                Assert.Same(durationC.DurationUnitOfMeasure.GetType(), durationCD.DurationUnitOfMeasure.GetType());
                 Assert.Same(typeof(double), durationCD.DurationValue.GetType());
                 Assert.Equal(-115, durationCD.DurationValue);
             }
