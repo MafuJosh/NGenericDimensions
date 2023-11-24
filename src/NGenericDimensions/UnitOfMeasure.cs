@@ -13,13 +13,15 @@ namespace NGenericDimensions
     {
         double Value { get; }
 
+#if NET
         bool IConvertible.ToBoolean(IFormatProvider? provider) => throw new InvalidCastException("The conversion to a Boolean is not supported.");
         char IConvertible.ToChar(IFormatProvider? provider) => throw new InvalidCastException("The conversion to a Char is not supported.");
         DateTime IConvertible.ToDateTime(IFormatProvider? provider) => throw new InvalidCastException("The conversion to a DateTime is not supported.");
         string IConvertible.ToString(IFormatProvider? provider) => ToString(null, provider);
+#endif
     }
 
-    [EditorBrowsable(EditorBrowsableState.Never)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
     [SuppressMessage("Design", "CA1040:Avoid empty interfaces", Justification = "Empty interfaces are sometimes the only way to control a generic constraint.")]
     public interface IDimensionSupportsPerExtension { }
 
@@ -137,7 +139,7 @@ namespace NGenericDimensions
             // use some default logic to try to figure out the singular form of the unit
             if (name.EndsWith("s", StringComparison.Ordinal))
             {
-                return name[0..^1];
+                return name.Substring(0, name.Length - 1);
             }
 
             // otherwise just return the name - if this name is plural, then the inheriting class should override this function
