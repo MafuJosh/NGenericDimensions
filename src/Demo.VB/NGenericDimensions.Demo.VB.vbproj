@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>NGenericDimensions.Demo.VB</RootNamespace>
-    <TargetFramework>net6</TargetFramework>
+    <TargetFrameworks>net48;net6.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
