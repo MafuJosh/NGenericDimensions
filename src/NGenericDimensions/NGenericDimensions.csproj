@@ -1,15 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>net46;netstandard2.0;netstandard2.1;net6.0;net7.0;net8.0</TargetFrameworks>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+  <PropertyGroup Condition="('$(TargetFramework)' == 'netstandard2.0') Or ('$(TargetFramework)' == 'net46')">
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AgileObjects.NetStandardPolyfills" Version="1.6.0" Condition="'$(TargetFramework)' == 'net46'" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
       <PrivateAssets>all</PrivateAssets>
